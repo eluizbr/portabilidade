@@ -1,30 +1,60 @@
 # -*- coding: UTF-8 -*-
 from django.shortcuts import render,get_object_or_404
-from django.http import HttpResponse
-from django.db.models import Count, Sum
+from django.http import HttpResponse, HttpResponseRedirect
+from django.template import RequestContext
+from django.db.models import Count
+from django.contrib.auth.decorators import login_required
 from models import Portados, NaoPortados, AuthKey, Cdr, Prefixo
 from ratelimit.decorators import ratelimit
 from tasks import insert_cdr
 from django.conf import settings
 import MySQLdb
 import datetime
+import random
 from datetime import timedelta,date
+from forms import CadastroForm
+from models import Cadastro
+from django.contrib.auth.models import User
 #from celery import signature
 
+@login_required
 def index(request):
 
 	return render(request, 'index.html')
-
+@login_required
 def meus_dados(request):
 
-	return render(request, 'meus_dados.html')
+	user = User.objects.get(pk=request.user.id)
+	print user.email
 
+	if request.method == 'POST':
+		form = CadastroForm(request.POST)
+		
+		if form.is_valid():
+			obj = form.save(commit=False)
+			obj.email = user.email
+			obj.user = user
+			obj.first_name = request.user.first_name
+			obj.last_name = request.user.last_name
+			obj.cod_cliente = int(random.randint(10000000, 99000000))
+			obj.save()
+			#print form.errors
+
+			#return HttpResponseRedirect('/')
+	else:
+
+		form = CadastroForm(instance=user)
+		
+
+	return render(request, 'meus_dados.html', {'form':form})
+
+@login_required
 def operadoras(request):
 
 	## Conexão ao banco MySQL
 	connection = MySQLdb.connect(host=settings.DB_HOST, user=settings.DB_USER, passwd=settings.DB_PASS, db=settings.DB_NAME)
 	c = connection.cursor()
-	id_cliente = 3
+	id_cliente = request.user.id
 	operadoras = Cdr.objects.values('operadora','tipo').order_by('operadora').annotate(Count('cidade')).filter(cliente=id_cliente)
 
 	data = date.today()
@@ -45,17 +75,15 @@ def operadoras(request):
 	portados_semana= Cdr.objects.filter(data__range=(week_hoje, week),portado=1,cliente=id_cliente).count()
 	portados_mes= Cdr.objects.filter(data__month=mes_atual,portado=1,cliente=id_cliente).count()
 
-	portado_diff = [portados_dia,portados_ontem]
+	portado_diff = [portados_ontem,portados_dia]
 
 	for a, b in zip(portado_diff[::1], portado_diff[1::1]):
 	    portado_diff = 100 * (b - a) / a
-	    print portado_diff
 
-	nao_portado_diff = [nao_portado_dia,nao_portado_ontem]
+	nao_portado_diff = [nao_portado_ontem,nao_portado_dia]
 
 	for a, b in zip(nao_portado_diff[::1], nao_portado_diff[1::1]):
 	    nao_portado_diff = 100 * (b - a) / a
-	    print nao_portado_diff
 
 	total ="""SELECT DISTINCT operadora,
 					  COUNT( IF( tipo='FIXO', 1, NULL ) ) AS fixo,

@@ -19,5 +19,6 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^conta/', include('registration.backends.default.urls')),
     url(r'^portabilidade/', include('port.urls')),
 ]

@@ -3,6 +3,10 @@
 {% load l10n %}
 {% load staticfiles %}
 
+{% block nome %}
+    <strong>{{user}}</strong>&nbsp;
+{% endblock %}
+
 {% block content %}
 
 <h1 class="page-title">Portabilidade <small><small>Dashboard</small></small></h1>

@@ -140,7 +140,7 @@ $(function(){
         $('.widget').widgster();
         initMap();
         initCalendar();
-        initRickshaw();
+      //  initRickshaw();
         initAnimations();
     }
 

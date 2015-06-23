@@ -1,10 +1,13 @@
 from django import forms
 from models import Cadastro
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import User
+import random
 
-class CadastroFrom(forms.ModelForm):
+class CadastroForm(forms.ModelForm):
+
+
 	class Meta:
 		model = Cadastro
-		fields = ['user','tipo','cpf','cnpj','ie','telefoneF','telefoneM','email',
-				'email_contato','nome','endereco','numero','bairro','complemento',
-				'cidade','estado','cep','cod_cliente','plano']
-		
+		fields = '__all__'
+		exclude = ['user','cod_cliente', 'plano']

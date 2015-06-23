@@ -85,6 +85,8 @@ class Cadastro(models.Model):
 
     user = models.OneToOneField(User, unique=True)
     tipo = models.CharField(u'Tipo', max_length=20, choices=TIPO)
+    first_name = models.CharField(u'Nome', max_length=100)
+    last_name = models.CharField(u'SobreNome', max_length=200)
     empresa = models.CharField(
         u'Nome fantasia', max_length=100, blank=True, null=True)
     cpf = models.CharField(u'CPF', max_length=20, blank=True, null=True, unique=True)
@@ -110,4 +112,4 @@ class Cadastro(models.Model):
     plano = models.CharField(
         u'Plano do servidor', max_length=100, choices=PLANO, default='Free')
     def __unicode__(self):
-        return unicode(self.cod_cliente)
+        return unicode(self.user)
