@@ -5,7 +5,7 @@ from celery import task
 from portabilidade.celery import app
 from django.shortcuts import render,get_object_or_404
 from django.http import HttpResponse
-from port.models import Portados, NaoPortados, AuthKey, Cdr, Prefixo
+from port.models import Portados, NaoPortados, Cadastro, Cdr, Prefixo
 
 @task
 def insert_cdr(request,numero):
@@ -58,7 +58,8 @@ def insert_cdr(request,numero):
 			tipo = item['tipo']
 			rn1 = item['rn1']
 
-			key = get_object_or_404(AuthKey, chave=chave)		
+			key = get_object_or_404(Cadastro, chave=chave)
+			print key		
 			criar = Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, operadora=operadora,\
 										 cidade=cidade, estado=estado, tipo=tipo)
 			criar.save()

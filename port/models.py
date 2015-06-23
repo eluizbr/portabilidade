@@ -53,7 +53,7 @@ class AuthKey(models.Model):
 
 class Cdr(models.Model):
 
-    cliente = models.ForeignKey('AuthKey')
+    cliente = models.ForeignKey('Cadastro')
     numero = models.CharField(max_length=30)
     prefixo = models.IntegerField()
     ddd = models.IntegerField()
@@ -109,6 +109,7 @@ class Cadastro(models.Model):
     estado = models.CharField(u'Estado', max_length=100, blank=True, null=True)
     cep = models.CharField(u'CEP', max_length=10, default='00000-000')
     cod_cliente = models.IntegerField(u'Codigo do Cliente', unique=True)
+    chave = models.UUIDField(default=uuid.uuid4, editable=False)
     plano = models.CharField(
         u'Plano do servidor', max_length=100, choices=PLANO, default='Free')
     def __unicode__(self):

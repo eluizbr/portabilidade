@@ -30,8 +30,7 @@ def meus_dados(request):
 	
 	try:
 		cad = Cadastro.objects.get(user=user)
-		codigo = cad.cod_cliente
-		print codigo
+		cod_cliente = cad.chave
 
 		if request.method == 'POST':
 			form = CadastroForm(request.POST or None, instance=cad)
@@ -47,13 +46,11 @@ def meus_dados(request):
 		else:
 
 			form = CadastroForm(instance=cad)
-
-		return render(request, 'meus_dados.html', {'form':form})
+		return render(request, 'meus_dados.html', locals())
 	
 	except Cadastro.DoesNotExist:
 		
 		cad = user
-
 
 	if request.method == 'POST':
 		form = CadastroForm(request.POST)
@@ -70,7 +67,7 @@ def meus_dados(request):
 
 		form = CadastroForm(instance=cad)
 
-	return render(request, 'meus_dados.html', {'form':form})
+	return render(request, 'meus_dados.html', locals())
 
 
 @login_required
@@ -103,12 +100,24 @@ def operadoras(request):
 	portado_diff = [portados_ontem,portados_dia]
 
 	for a, b in zip(portado_diff[::1], portado_diff[1::1]):
-	    portado_diff = 100 * (b - a) / a
+	    try:
+	    
+	    	portado_diff = 100 * (b - a) / a
+	    
+	    except ZeroDivisionError:
+	    
+	    	portado_diff = 0
 
 	nao_portado_diff = [nao_portado_ontem,nao_portado_dia]
 
 	for a, b in zip(nao_portado_diff[::1], nao_portado_diff[1::1]):
-	    nao_portado_diff = 100 * (b - a) / a
+	    try:
+	    	
+	    	nao_portado_diff = 100 * (b - a) / a
+	    
+	    except ZeroDivisionError:
+	    	
+	    	nao_portado_diff = 0
 
 	total ="""SELECT DISTINCT operadora,
 					  COUNT( IF( tipo='FIXO', 1, NULL ) ) AS fixo,
@@ -155,7 +164,7 @@ def consulta(request,numero):
 	segredo = request.GET['key']
 	segredo = str(segredo)
 
-	insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=10)
+	insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=1)
 	rn1 = len(numero)
 
 	try:
@@ -163,7 +172,7 @@ def consulta(request,numero):
 		key = request.GET['key']
 		key = str(key)
 
-		chave = AuthKey.objects.values_list('chave').filter(chave=key)[0]
+		chave = Cadastro.objects.values_list('chave').filter(chave=key)[0]
 		chave = chave[0]
 		chave = str(chave)
 
