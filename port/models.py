@@ -42,13 +42,13 @@ class Prefixo(models.Model):
     def __unicode__(self):
         return unicode(self.prefixo)
 
-class AuthKey(models.Model):
+# class AuthKey(models.Model):
 
-    nome = models.CharField(null=True,blank=True,max_length=255)
-    chave = models.UUIDField(default=uuid.uuid4, editable=False)
+#     nome = models.CharField(null=True,blank=True,max_length=255)
+#     chave = models.UUIDField(default=uuid.uuid4, editable=False)
 
-    def __unicode__(self):
-        return unicode(self.chave)
+#     def __unicode__(self):
+#         return unicode(self.chave)
 
 
 class Cdr(models.Model):

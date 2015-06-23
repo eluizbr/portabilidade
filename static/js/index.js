@@ -139,7 +139,7 @@ $(function(){
     function pjaxPageLoad(){
         $('.widget').widgster();
         initMap();
-        initCalendar();
+        //initCalendar();
       //  initRickshaw();
         initAnimations();
     }

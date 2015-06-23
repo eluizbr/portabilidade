@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.db.models import Count
 from django.contrib.auth.decorators import login_required
-from models import Portados, NaoPortados, AuthKey, Cdr, Prefixo
+from models import Portados, NaoPortados, Cdr, Prefixo
 from ratelimit.decorators import ratelimit
 from tasks import insert_cdr
 from django.conf import settings
