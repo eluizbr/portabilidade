@@ -1,0 +1,8 @@
+
+*.txt
+
+*.db
+
+*.pyc
+
+portabilidade/settings.py

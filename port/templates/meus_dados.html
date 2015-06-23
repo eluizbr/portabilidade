@@ -1,0 +1,456 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load l10n %}
+{% load staticfiles %}
+{% block nome %}
+
+
+    <strong>{{user}}</strong>&nbsp;
+
+{% endblock %}
+
+{% block lista_server %}{% endblock lista_server %}
+
+{% block content %}
+
+	{% if codigo == None %}
+		<form method="POST" action="{% url 'meus-dados' %}" role="form"> {% csrf_token %}
+		    <div class="row mb-lg">
+	            <div class="col-md-10">
+	                <div class="clearfix">
+	                    <ul id="tabs1" class="nav nav-tabs pull-left"> <!-- remove pull-left to get a cool effect too -->
+	                        <li class="active"><a href="#tab1" data-toggle="tab">Minhas informações</a></li>
+	                    </ul>
+	                </div>
+	                <div id="tabs1c" class="tab-content mb-lg">
+	                    <div class="tab-pane active clearfix" id="tab1">
+						        <div class="row">
+						            <div class="col-md-12">
+						            	<legend><strong>Seus dados</strong></legend>
+						                <section class="widget">
+						                    <div class="widget-body  bg-gray-lighter">
+		                                    <div class="modal-body bg-gray-lighter">
+		                                            <div class="row">
+		                                                <div class="col-md-8">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="Nome" name="nome" value="{{i.nome}}">
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-4">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="CPF" name="cpf" value="{{i.cpf}}">
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-4">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="Seu Email" name="email" value="{{i.email}}">
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-4">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="Telefone fixo" name="telefoneF" value="{{i.telefoneF}}">
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-4">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="Telefone movel" name="telefoneM" value="{{i.telefoneM}}">
+		                                                    </div>
+		                                                </div>
+		                                            </div>
+		                                    </div>
+						                    </div>
+						                </section>
+						            	<legend><strong>Empresas apenas</strong></legend>
+						                <section class="widget">
+						                    <div class="widget-body  bg-gray-lighter">
+		                                    <div class="modal-body bg-gray-lighter">
+		                                            <div class="row">
+		                                                <div class="col-md-8">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="Empresa" name="empresa" value="{{i.empresa}}">
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-2">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="CNPJ" name="cnpj" value="{{i.cnpj}}">
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-2">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="Insc. Estadual" name="ie" value="{{i.ie}}">
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-5">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="Contato" value="{{i.nome_contato}}">
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-3">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="Email do contato" name="email_contato" value="{{i.email}}">
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-2">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="Telefone Fixo" name="telefoneF" value="{{i.telefoneF}}">
+		                                                    </div>
+		                                                </div>
+					                                    <div class="col-sm-2">
+					                                        <select class="selectpicker" data-style="btn-default"
+					                                                data-width="auto" name="tipo"
+					                                                tabindex="-1" id="simple-select">
+						                                            
+						                                            <option value="Pessoa Juridica">Pessoa Juridica</option>
+						                                            <option value="Pessoa Fisica">Pessoa Fisica</option>						                                        
+					                                        </select>
+					                                    </div>
+		                                            </div>
+		                                    </div>
+						                    </div>
+						                </section>
+						                <legend><strong>Endereço</strong></legend>
+						                <section class="widget">
+						                    <div class="widget-body  bg-gray-lighter">
+				                                    <div class="modal-body bg-gray-lighter">
+				                                            <div class="row">
+				                                                <div class="col-md-6">
+				                                                    <div class="form-group">
+				                                                        <input type="text" class="form-control input-no-border"
+				                                                               placeholder="Endereço" name="endereco" value="{{i.endereco}}">
+				                                                    </div>
+				                                                </div>
+				                                                <div class="col-md-3">
+				                                                    <div class="form-group">
+				                                                        <input type="text" class="form-control input-no-border"
+				                                                               placeholder="Numero" name="numero" value="{{i.numero}}">
+				                                                    </div>
+				                                                </div>
+				                                                <div class="col-md-3">
+				                                                    <div class="form-group">
+				                                                        <input type="text" class="form-control input-no-border"
+				                                                               placeholder="Complemento" name="complemento" value="{{i.complemento}}">
+				                                                    </div>
+				                                                </div>
+				                                                <div class="col-md-4">
+				                                                    <div class="form-group">
+				                                                        <input type="text" class="form-control input-no-border"
+				                                                               placeholder="Bairro" name="bairro" value="{{i.bairro}}">
+				                                                    </div>
+				                                                </div>
+				                                                <div class="col-md-4">
+				                                                    <div class="form-group">
+				                                                        <input type="text" class="form-control input-no-border"
+				                                                               placeholder="Cidade" name="cidade" value="{{i.cidade}}">
+				                                                    </div>
+				                                                </div>
+				                                                <div class="col-md-2">
+				                                                    <div class="form-group">
+				                                                        <input type="text" class="form-control input-no-border"
+				                                                               placeholder="Estado" name="estado" value="{{i.estado}}">
+				                                                    </div>
+				                                                </div>
+				                                                <div class="col-md-2">
+				                                                    <div class="form-group">
+				                                                        <input type="text" class="form-control input-no-border"
+				                                                               placeholder="CEP" name="cep" value="{{i.cep}}">
+				                                                    </div>
+				                                                </div>
+				                                            </div>
+				                                    </div>
+						                    </div>
+						                </section>
+				                            <div class="form-actions">
+				                                <div class="row">
+				                                    <div class="col-sm-offset-5 col-sm-7">
+				                                        <button type="submit" class="btn btn-inverse">Atualizar dados</button>
+				                                    </div>
+				                                </div>
+				                            </div>
+						            </div>
+						        </div>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+		</form>
+	{% else %}
+		<form method="POST" action="{% url 'meus-dados' %}" role="form"> {% csrf_token %}
+		    <div class="row mb-lg">
+	            <div class="col-md-10">
+	                <div class="clearfix">
+	                    <ul id="tabs1" class="nav nav-tabs pull-left"> <!-- remove pull-left to get a cool effect too -->
+	                        <li class="active"><a href="#tab1" data-toggle="tab">Minhas informações</a></li>
+	                        <li class=""><a href="#tab2" data-toggle="tab">Financeiro</a></li>
+	                    </ul>
+	                </div>
+	                <div id="tabs1c" class="tab-content mb-lg">
+	                    <div class="tab-pane active clearfix" id="tab1">
+						{% for i in usuarios  %}
+						        <div class="row">
+						            <div class="col-md-12">
+						            	<legend>Codigo do cliente: <strong> {{i.cod_cliente}}</strong> </legend>
+						                <section class="widget">
+						                    <div class="widget-body  bg-gray-lighter">
+		                                    <div class="modal-body bg-gray-lighter">
+		                                            <div class="row">
+		                                                <div class="col-md-8">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="Nome" name="nome" value="{{i.nome}}">
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-4">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="CPF" name="cpf" value="{{i.cpf}}">
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-4">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="Seu Email" name="email" value="{{i.email}}">
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-4">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="Telefone fixo" name="telefoneF" value="{{i.telefoneF}}">
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-4">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="Telefone movel" name="telefoneM" value="{{i.telefoneM}}">
+		                                                    </div>
+		                                                </div>
+		                                            </div>
+		                                    </div>
+						                    </div>
+						                </section>
+						            	<legend><strong>Empresas apenas</strong></legend>
+						                <section class="widget">
+						                    <div class="widget-body  bg-gray-lighter">
+		                                    <div class="modal-body bg-gray-lighter">
+		                                            <div class="row">
+		                                                <div class="col-md-8">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="Empresa" name="empresa" value="{{i.empresa}}">
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-2">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="CNPJ" name="cnpj" value="{{i.cnpj}}">
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-2">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="Insc. Estadual" name="ie" value="{{i.ie}}">
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-5">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="Contato" value="{{i.nome_contato}}">
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-3">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="Email do contato" name="email_contato" value="{{i.email}}">
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-2">
+		                                                    <div class="form-group">
+		                                                        <input type="text" class="form-control input-no-border"
+		                                                               placeholder="Telefone Fixo" name="telefoneF" value="{{i.telefoneF}}">
+		                                                    </div>
+		                                                </div>
+					                                    <div class="col-sm-2">
+					                                        <select class="selectpicker" data-style="btn-default"
+					                                                data-width="auto" name="tipo" id="tipo" 
+					                                                tabindex="-1" id="simple-select">
+					                                            
+					                                            {% if i.tipo == 'Pessoa Fisica' %}
+						                                            <option value="{{i.tipo}}">{{i.tipo}}</option>
+						                                            <option value="Pessoa Juridica">Pessoa Juridica</option>
+						                                        {% else %}
+						                                            <option value="{{i.tipo}}">{{i.tipo}}</option>
+						                                            <option value="Pessoa Fisica">Pessoa Fisica</option>						                                        
+					                                            {% endif %}
+					                                        </select>
+					                                    </div>
+		                                            </div>
+		                                    </div>
+						                    </div>
+						                </section>
+						                <legend><strong>Endereço</strong></legend>
+						                <section class="widget">
+						                    <div class="widget-body  bg-gray-lighter">
+				                                    <div class="modal-body bg-gray-lighter">
+				                                            <div class="row">
+				                                                <div class="col-md-6">
+				                                                    <div class="form-group">
+				                                                        <input type="text" class="form-control input-no-border"
+				                                                               placeholder="Endereço" name="endereco" value="{{i.endereco}}">
+				                                                    </div>
+				                                                </div>
+				                                                <div class="col-md-3">
+				                                                    <div class="form-group">
+				                                                        <input type="text" class="form-control input-no-border"
+				                                                               placeholder="Numero" name="numero" value="{{i.numero}}">
+				                                                    </div>
+				                                                </div>
+				                                                <div class="col-md-3">
+				                                                    <div class="form-group">
+				                                                        <input type="text" class="form-control input-no-border"
+				                                                               placeholder="Complemento" name="complemento" value="{{i.complemento}}">
+				                                                    </div>
+				                                                </div>
+				                                                <div class="col-md-4">
+				                                                    <div class="form-group">
+				                                                        <input type="text" class="form-control input-no-border"
+				                                                               placeholder="Bairro" name="bairro" value="{{i.bairro}}">
+				                                                    </div>
+				                                                </div>
+				                                                <div class="col-md-4">
+				                                                    <div class="form-group">
+				                                                        <input type="text" class="form-control input-no-border"
+				                                                               placeholder="Cidade" name="cidade" value="{{i.cidade}}">
+				                                                    </div>
+				                                                </div>
+				                                                <div class="col-md-2">
+				                                                    <div class="form-group">
+				                                                        <input type="text" class="form-control input-no-border"
+				                                                               placeholder="Estado" name="estado" value="{{i.estado}}">
+				                                                    </div>
+				                                                </div>
+				                                                <div class="col-md-2">
+				                                                    <div class="form-group">
+				                                                        <input type="text" class="form-control input-no-border"
+				                                                               placeholder="CEP" name="cep" value="{{i.cep}}">
+				                                                    </div>
+				                                                </div>
+				                                            </div>
+				                                    </div>
+						                    </div>
+						                </section>
+				                            <div class="form-actions">
+				                                <div class="row">
+				                                    <div class="col-sm-offset-5 col-sm-7">
+				                                        <button type="submit" class="btn btn-inverse">Atualizar dados</button>
+				                                    </div>
+				                                </div>
+				                            </div>
+						            </div>
+						        </div>
+						{% endfor %}
+	                    </div>
+	                    <div class="tab-pane" id="tab2">
+	                        <p>Why don't use Lore Ipsum? I think if some one says don't use lore ipsum it's very controversial
+	                            point. I think the opposite actually. Everyone knows what is lore ipsum - it is easy to understand if text is lore ipsum.</p>
+	                        <div class="clearfix">
+	                            <div class="btn-toolbar">
+	                                <a class="btn btn-default" href="#">&nbsp;&nbsp;Check&nbsp;&nbsp;</a>
+	                                <a class="btn btn-primary" href="#">&nbsp;&nbsp;Dance?&nbsp;&nbsp;</a>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+		</form>
+	{% endif %}
+
+
+
+{% endblock content %}
+
+{% block scripts %}
+
+<script id="test" src="{% static "vendor/underscore/underscore.js"%}"></script>
+<script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
+<script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
+<script src="{% static "vendor/d3/d3.min.js"%}"></script>
+<script src="{% static "vendor/rickshaw/rickshaw.min.js"%}"></script>
+<script src="{% static "vendor/raphael/raphael-min.js"%}"></script>
+<script src="{% static "vendor/jQuery-Mapael/js/jquery.mapael.js"%}"></script>
+<script src="{% static "js/brazil.js"%}"></script>
+<script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/popover.js"%}"></script>
+<script src="{% static "vendor/bootstrap_calendar/bootstrap_calendar/js/bootstrap_calendar.min.js"%}"></script>
+<script src="{% static "vendor/jquery-animateNumber/jquery.animateNumber.min.js"%}"></script>
+
+<script src="{% static "js/index.js"%}"></script>
+
+<!-- page specific libs -->
+<script src="{% static "vendor/underscore/underscore-min.js"%}"></script>
+<script src="{% static "vendor/backbone/backbone.js"%}"></script>
+<script src="{% static "vendor/backbone.paginator/lib/backbone.paginator.min.js"%}"></script>
+<script src="{% static "vendor/backgrid/lib/backgrid.js"%}"></script>
+<script src="{% static "vendor/backgrid-paginator/backgrid-paginator.js"%}"></script>
+<script src="{% static "vendor/datatables/media/js/jquery.dataTables.js"%}"></script>
+<script src="{% static "vendor/bootstrap-select/dist/js/bootstrap-select.min.js"%}"></script>
+
+<script src="{% static "js/tables-dynamic.js"%}"></script>
+
+
+<script type="text/javascript">
+    
+    function initCalendar(){
+
+        var monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+        var dayNames = ["D", "S", "T", "Q", "Q", "S", "S"];
+
+        var now = new Date(),
+            month = now.getMonth() + 1,
+            year = now.getFullYear();
+
+        var events = [
+            {% for dia, mes, total in byDay %}
+            [
+                "{{dia|date:"j"}}/"+{{mes}}+"/"+year,
+                '{{total|intcomma}} ligações nesta data',
+                Sing.colors['brand-primary'],
+            ],
+            {% endfor %}
+        ];
+        var $calendar = $('#events-calendar');
+        $calendar.calendar({
+            months: monthNames,
+            days: dayNames,
+            events: events,
+            popover_options:{
+                placement: 'top',
+                html: true
+            }
+        });
+        $calendar.find('.icon-arrow-left').addClass('fa fa-arrow-left');
+        $calendar.find('.icon-arrow-right').addClass('fa fa-arrow-right');
+        function restyleCalendar(){
+            $calendar.find('.event').each(function(){
+                var $this = $(this),
+                    $eventIndicator = $('<span></span>');
+                $eventIndicator.css('background-color', $this.css('background-color')).appendTo($this.find('a'));
+                $this.css('background-color', '');
+            })
+        }
+        $calendar.find('.icon-arrow-left, .icon-arrow-right').parent().on('click', restyleCalendar);
+        restyleCalendar();
+    }
+</script>
+
+{% endblock %}
