@@ -11,3 +11,4 @@ class CadastroForm(forms.ModelForm):
 		model = Cadastro
 		fields = '__all__'
 		exclude = ['user','cod_cliente', 'plano']
+

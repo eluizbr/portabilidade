@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 from django.shortcuts import render,get_object_or_404
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.db.models import Count
@@ -21,11 +22,38 @@ from django.contrib.auth.models import User
 def index(request):
 
 	return render(request, 'index.html')
+
 @login_required
 def meus_dados(request):
 
 	user = User.objects.get(pk=request.user.id)
-	print user.email
+	
+	try:
+		cad = Cadastro.objects.get(user=user)
+		codigo = cad.cod_cliente
+		print codigo
+
+		if request.method == 'POST':
+			form = CadastroForm(request.POST or None, instance=cad)
+			
+			if form.is_valid():
+				obj = form.save(commit=False)
+				obj.email = user.email
+				obj.user = user
+				obj.cod_cliente = int(random.randint(10000000, 99000000))
+				obj.save()
+
+				#return HttpResponseRedirect('/')
+		else:
+
+			form = CadastroForm(instance=cad)
+
+		return render(request, 'meus_dados.html', {'form':form})
+	
+	except Cadastro.DoesNotExist:
+		
+		cad = user
+
 
 	if request.method == 'POST':
 		form = CadastroForm(request.POST)
@@ -34,19 +62,16 @@ def meus_dados(request):
 			obj = form.save(commit=False)
 			obj.email = user.email
 			obj.user = user
-			obj.first_name = request.user.first_name
-			obj.last_name = request.user.last_name
 			obj.cod_cliente = int(random.randint(10000000, 99000000))
 			obj.save()
-			#print form.errors
 
 			#return HttpResponseRedirect('/')
 	else:
 
-		form = CadastroForm(instance=user)
-		
+		form = CadastroForm(instance=cad)
 
 	return render(request, 'meus_dados.html', {'form':form})
+
 
 @login_required
 def operadoras(request):
@@ -70,10 +95,10 @@ def operadoras(request):
 	nao_portado_semana = Cdr.objects.filter(data__range=(week_hoje, week),portado=0,cliente=id_cliente).count()
 	nao_portado_mes = Cdr.objects.filter(data__month=mes_atual,portado=0,cliente=id_cliente).count()
 
-	portados_dia= Cdr.objects.filter(data__day=hoje,portado=1,cliente=id_cliente).count()
-	portados_ontem= Cdr.objects.filter(data__day=ontem_d,portado=1,cliente=id_cliente).count()
-	portados_semana= Cdr.objects.filter(data__range=(week_hoje, week),portado=1,cliente=id_cliente).count()
-	portados_mes= Cdr.objects.filter(data__month=mes_atual,portado=1,cliente=id_cliente).count()
+	portados_dia = Cdr.objects.filter(data__day=hoje,portado=1,cliente=id_cliente).count()
+	portados_ontem = Cdr.objects.filter(data__day=ontem_d,portado=1,cliente=id_cliente).count()
+	portados_semana = Cdr.objects.filter(data__range=(week_hoje, week),portado=1,cliente=id_cliente).count()
+	portados_mes = Cdr.objects.filter(data__month=mes_atual,portado=1,cliente=id_cliente).count()
 
 	portado_diff = [portados_ontem,portados_dia]
 
