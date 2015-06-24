@@ -16,7 +16,7 @@ apt-get install -q -y mysql-server mysql-client libmysqlclient-dev -y
 mysqladmin -u root password
 apt-get clean
 
-abbitmqctl add_user teste teste
+rabbitmqctl add_user teste teste
 rabbitmqctl add_vhost beta
 rabbitmqctl set_permissions -p beta teste ".*" ".*" ".*"
 
