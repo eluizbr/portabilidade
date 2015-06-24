@@ -1,8 +1,17 @@
 
-*.txt
-
 *.db
 
 *.pyc
 
 portabilidade/settings.py
+
+key.txt
+
+numeros-2.txt
+
+numeros.txt
+
+
+static/admin/js/LICENSE-JQUERY.txt
+
+utils.txt
