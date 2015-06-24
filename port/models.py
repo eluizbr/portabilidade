@@ -3,7 +3,6 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import User
 
-
 class NaoPortados(models.Model):
     operadora = models.CharField(max_length=64)
     tipo = models.CharField(max_length=64)
@@ -42,13 +41,15 @@ class Prefixo(models.Model):
     def __unicode__(self):
         return unicode(self.prefixo)
 
-# class AuthKey(models.Model):
+class Plano(models.Model):
 
-#     nome = models.CharField(null=True,blank=True,max_length=255)
-#     chave = models.UUIDField(default=uuid.uuid4, editable=False)
+    plano = models.CharField(null=True,blank=True,max_length=255)
+    valor = models.FloatField(blank=True, null=True, default=00.00)
+    valor_consulta = models.FloatField(blank=True, null=True, default=00.00)
+    consultas_gratis = models.IntegerField(blank=True, null=True,default=0)
 
-#     def __unicode__(self):
-#         return unicode(self.chave)
+    def __unicode__(self):
+        return unicode(self.plano)
 
 
 class Cdr(models.Model):
@@ -110,7 +111,8 @@ class Cadastro(models.Model):
     cep = models.CharField(u'CEP', max_length=10, default='00000-000')
     cod_cliente = models.IntegerField(u'Codigo do Cliente', unique=True)
     chave = models.UUIDField(default=uuid.uuid4, editable=False)
-    plano = models.CharField(
-        u'Plano do servidor', max_length=100, choices=PLANO, default='Free')
+    plano = models.OneToOneField(Plano,default=1)
+
     def __unicode__(self):
         return unicode(self.user)
+

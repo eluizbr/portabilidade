@@ -39,7 +39,6 @@ def insert_cdr(request,numero):
 										 cidade=cidade, estado=estado, tipo=tipo,portado=1)
 			criar.save()
 
-			print 'a chave e %s' %key	
 	else:
 
 		if tamanho == 10:
@@ -62,7 +61,6 @@ def insert_cdr(request,numero):
 			print 'a chave e %s' %key		
 			criar = Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, operadora=operadora,\
 										 cidade=cidade, estado=estado, tipo=tipo)
-			criar.save()
 			
 
 			#print key,estado,cidade,operadora,tipo

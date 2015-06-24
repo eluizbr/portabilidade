@@ -61,7 +61,7 @@
                     {% if p.portados == 0 %}
                         <div class="row progress-stats">
                             <div class="col-sm-9">
-                                <h5 class="name">Não números portados</h5>
+                                <h5 class="name">Números não portados</h5>
                                 <div class="progress progress-sm js-progress-animate bg-white">
                                     <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0"
                                          data-width="{{p.value|stringformat:".2f"}}%"
@@ -94,10 +94,10 @@
                         </div>    
                     {% endif %}
                 {% endfor %}
-                <h5 class="fw-semi-bold mt">Consultas</h5>
+                <h5 class="fw-semi-bold mt">Consultas restantes</h5>
                 <p>
-                    <span class="circle bg-warning"><i class="fa fa-cog"></i></span>
-                    {{total_consultas|intcomma}} <strong>Total de consultas</strong>
+                    <span class="circle bg-warning"><i class="fa fa-random"></i></span>
+                    <strong>{{consulta}}</strong>
                 </p>
             </div>
         </section>
@@ -186,47 +186,36 @@
                 </div>
         </section>
     </div>
-    <!--
     <div class="col-md-4">
         <section class="widget">
             <header>
-                <h5>
-                    RANDOM VALUES
-                </h5>
-                <div class="widget-controls">
-                    <a href="#"><i class="glyphicon glyphicon-cog"></i></a>
-                    <a href="#" data-widgster="close"><i class="glyphicon glyphicon-remove"></i></a>
-                </div>
+                <h5>Últimos 5 numeros <span class="fw-semi-bold">consultados</span></h5>
             </header>
             <div class="widget-body">
-                <div class="stats-row">
-                    <div class="stat-item">
-                        <h6 class="name">Overcome T.</h6>
-                        <p class="value">104.85%</p>
-                    </div>
-                    <div class="stat-item">
-                        <h6 class="name">Takeoff Angle</h6>
-                        <p class="value">14.29&deg;</p>
-                    </div>
-                    <div class="stat-item">
-                        <h6 class="name">World Pop.</h6>
-                        <p class="value">7,211M</p>
-                    </div>
-                </div>
-                <div class="progress progress-xs">
-                    <div class="progress-bar" role="progressbar" aria-valuenow="60"
-                         aria-valuemin="0" aria-valuemax="100" style="width: 80%;">
-                    </div>
-                </div>
-                <p>
-                    <small><span class="circle bg-warning"><i class="fa fa-plus"></i></span></small>
-                    <span class="fw-semi-bold">8 734 higher</span>
-                    than last month
-                </p>
+                <table class="table table-striped mt-lg mb-0">
+                    <thead>
+                    <tr>
+                        <th class="text-align-center">Número</th>
+                        <th class="text-align-center">Operadora</th>
+                        <th class="text-align-center">Tipo</th>
+                        <th class="text-align-center">Hora</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for n in ultimos_numero %}
+                        <tr>
+                            <td class="text-align-center">{{n.numero}}</td>
+                            <td class="text-align-center">{{n.operadora}}</td>
+                            <td class="text-align-center">{{n.tipo}}</td>
+                            <td class="text-align-center">{{n.data_hora|naturaltime}}</td>
+
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </section>
     </div>
-    -->
 </div>
 <!--
 <div class="row">
@@ -395,9 +384,9 @@
 <script src="{% static "vendor/backgrid-paginator/backgrid-paginator.js"%}"></script>
 <script src="{% static "vendor/datatables/media/js/jquery.dataTables.js"%}"></script>
 <script src="{% static "vendor/bootstrap-select/dist/js/bootstrap-select.min.js"%}"></script>
+<script src="{% static "vendor/jasny-bootstrap/js/inputmask.js"%}"></script>
 
 <script src="{% static "js/tables-dynamic.js"%}"></script>
-
 
 <script type="text/javascript">
     

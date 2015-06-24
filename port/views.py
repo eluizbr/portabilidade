@@ -10,11 +10,12 @@ from ratelimit.decorators import ratelimit
 from tasks import insert_cdr
 from django.conf import settings
 import MySQLdb
+from django.db import connection
 import datetime
 import random
 from datetime import timedelta,date
 from forms import CadastroForm
-from models import Cadastro
+from models import Cadastro, Plano
 from django.contrib.auth.models import User
 #from celery import signature
 
@@ -27,6 +28,16 @@ def index(request):
 def meus_dados(request):
 
 	user = User.objects.get(pk=request.user.id)
+	id_cliente = Cadastro.objects.values('plano').filter(user_id=request.user.id)
+
+	plano = Plano.objects.values('plano','valor','valor_consulta').filter(id=id_cliente)
+
+	for v in plano:
+		plano = v['plano']
+		valor = v['valor']
+		valorc = v[ 'valor_consulta']
+		consulta = int(valor / valorc)
+		print plano,consulta
 	
 	try:
 		cad = Cadastro.objects.get(user=user)
@@ -74,12 +85,24 @@ def meus_dados(request):
 def operadoras(request):
 
 	## Conexão ao banco MySQL
-	connection = MySQLdb.connect(host=settings.DB_HOST, user=settings.DB_USER, passwd=settings.DB_PASS, db=settings.DB_NAME)
 	c = connection.cursor()
+	
 	id_cliente = Cadastro.objects.values_list('id').filter(user_id=request.user.id)[0]
+	consulta_cliente = Cadastro.objects.values('plano').filter(user_id=request.user.id)
 
 	operadoras = Cdr.objects.values('operadora','tipo').order_by('operadora').annotate(Count('cidade')).filter(cliente=id_cliente)
 
+	tipo_numero = Cdr.objects.values('tipo').annotate(Count('tipo')).filter(cliente=id_cliente)
+
+	ultimos_numero = operadoras = Cdr.objects.values('numero','operadora','tipo','data_hora').order_by('-id').filter(cliente=id_cliente)[:5][::1]
+	consulta = Plano.objects.values('valor','valor_consulta').filter(id=consulta_cliente)
+
+	for v in consulta:
+		valor = v['valor']
+		valorc = v[ 'valor_consulta']
+		consulta = int(valor / valorc)
+		print consulta
+	
 	data = date.today()
 	ontem_d = data - timedelta(days=1)
 	ontem_d = ontem_d.strftime('%d')

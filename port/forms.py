@@ -10,5 +10,5 @@ class CadastroForm(forms.ModelForm):
 	class Meta:
 		model = Cadastro
 		fields = '__all__'
-		exclude = ['user','cod_cliente', 'plano']
+		exclude = ['user','cod_cliente']
 

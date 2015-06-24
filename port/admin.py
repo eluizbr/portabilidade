@@ -1,15 +1,14 @@
 from django.contrib import admin
-from .models import Cadastro
+from .models import Cadastro, Plano
 
-# class AuthKeyAdmin(admin.ModelAdmin):
-# 	list_display = ['nome', 'chave']
+class PlanoAdmin(admin.ModelAdmin):
+	list_display = ['plano','valor','valor_consulta', 'consultas_gratis']
 
 
 class CadastroAdmin(admin.ModelAdmin):
 	list_display = ['user']
 
-# admin.site.register(AuthKey,AuthKeyAdmin)
+
+admin.site.register(Plano,PlanoAdmin)
 admin.site.register(Cadastro,CadastroAdmin)
-
-
 
