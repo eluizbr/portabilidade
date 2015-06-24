@@ -135,11 +135,11 @@
                     <p>
                         {% if nao_portado_diff > 0 %}
                             <small><span class="circle bg-warning"><i class="glyphicon glyphicon-chevron-up"></i></span></small>
-                            <span class="fw-semi-bold">{{nao_portado_diff}}% maoir</span> que ontem</p>
+                            <span class="fw-semi-bold">{{nao_portado_diff}}%
                         {% elif nao_portado_diff < 0 %}
                             <small><span class="circle bg-warning"><i class="glyphicon glyphicon-chevron-down"></i></span></small>
-                            <span class="fw-semi-bold">{{nao_portado_diff}}% menor</span> que ontem</p>
-                        {% elif nao_portado_diff == '0' %}
+                            <span class="fw-semi-bold">{{nao_portado_diff}}%
+                        {% elif nao_portado_diff == 0 %}
                             <span class="fw-semi-bold">Sem consultas realizadas no dia de ontem  
                         {% endif %}
                 </div>
@@ -175,10 +175,10 @@
                     <p>
                         {% if portado_diff > 0 %}
                             <small><span class="circle bg-warning"><i class="glyphicon glyphicon-chevron-up"></i></span></small>
-                            <span class="fw-semi-bold">{{portado_diff}}% maoir</span> que ontem</p>
+                            <span class="fw-semi-bold">{{portado_diff}}%
                         {% elif portado_diff < 0 %}
                             <small><span class="circle bg-warning"><i class="glyphicon glyphicon-chevron-down"></i></span></small>
-                            <span class="fw-semi-bold">{{portado_diff}}% menor</span> que ontem</p>
+                            <span class="fw-semi-bold">{{portado_diff}}%
                         {% elif portado_diff == 0 %}
                             
                             <span class="fw-semi-bold">Sem consultas realizadas no dia de ontem 

@@ -11,4 +11,5 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
     url(r'^(?P<numero>\d+)$', views.consulta, name='consulta'),
 
+
 )

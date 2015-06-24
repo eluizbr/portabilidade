@@ -76,7 +76,8 @@ def operadoras(request):
 	## Conexão ao banco MySQL
 	connection = MySQLdb.connect(host=settings.DB_HOST, user=settings.DB_USER, passwd=settings.DB_PASS, db=settings.DB_NAME)
 	c = connection.cursor()
-	id_cliente = request.user.id
+	id_cliente = Cadastro.objects.values_list('id').filter(user_id=request.user.id)[0]
+
 	operadoras = Cdr.objects.values('operadora','tipo').order_by('operadora').annotate(Count('cidade')).filter(cliente=id_cliente)
 
 	data = date.today()
@@ -89,12 +90,13 @@ def operadoras(request):
 
 	nao_portado_ontem = Cdr.objects.filter(data__day=ontem_d,portado=0,cliente=id_cliente).count()
 	nao_portado_dia = Cdr.objects.filter(data__day=hoje,portado=0,cliente=id_cliente).count()
-	nao_portado_semana = Cdr.objects.filter(data__range=(week_hoje, week),portado=0,cliente=id_cliente).count()
+	nao_portado_semana = Cdr.objects.filter(data__range=(week ,week_hoje),portado=0,cliente=id_cliente).count()
+	print week_hoje, week, nao_portado_semana
 	nao_portado_mes = Cdr.objects.filter(data__month=mes_atual,portado=0,cliente=id_cliente).count()
 
 	portados_dia = Cdr.objects.filter(data__day=hoje,portado=1,cliente=id_cliente).count()
 	portados_ontem = Cdr.objects.filter(data__day=ontem_d,portado=1,cliente=id_cliente).count()
-	portados_semana = Cdr.objects.filter(data__range=(week_hoje, week),portado=1,cliente=id_cliente).count()
+	portados_semana = Cdr.objects.filter(data__range=(week, week_hoje),portado=1,cliente=id_cliente).count()
 	portados_mes = Cdr.objects.filter(data__month=mes_atual,portado=1,cliente=id_cliente).count()
 
 	portado_diff = [portados_ontem,portados_dia]

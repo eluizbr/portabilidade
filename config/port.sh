@@ -3,11 +3,13 @@ set -e
 LOGFILE=/var/log/cdrport/gunicorn_port.log
 LOGDIR=$(dirname $LOGFILE)
 
+bash /usr/share/portabilidade/config/celery.sh
+
 # The number of workers is number of worker processes that will serve requests.
 # You can set it as low as 1 if you’re on a small VPS.
 # A popular formula is 1 + 2 * number_of_cpus on the machine (the logic being,
 # half of the processess will be waiting for I/O, such as database).
-NUM_WORKERS=2
+NUM_WORKERS=1
 ADDRESS=0.0.0.0:7000
 
 # user/group to run as

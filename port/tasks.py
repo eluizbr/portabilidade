@@ -39,7 +39,7 @@ def insert_cdr(request,numero):
 										 cidade=cidade, estado=estado, tipo=tipo,portado=1)
 			criar.save()
 
-			print key,estado,cidade,operadora,tipo
+			print 'a chave e %s' %key	
 	else:
 
 		if tamanho == 10:
@@ -59,10 +59,10 @@ def insert_cdr(request,numero):
 			rn1 = item['rn1']
 
 			key = get_object_or_404(Cadastro, chave=chave)
-			print key		
+			print 'a chave e %s' %key		
 			criar = Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, operadora=operadora,\
 										 cidade=cidade, estado=estado, tipo=tipo)
 			criar.save()
 			
 
-			print key,estado,cidade,operadora,tipo
+			#print key,estado,cidade,operadora,tipo
