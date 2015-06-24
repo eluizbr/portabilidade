@@ -34,7 +34,7 @@ def insert_cdr(request,numero):
 			tipo = item['tipo']
 			rn1 = item['rn1']
 
-			key = get_object_or_404(AuthKey, chave=chave)		
+			key = get_object_or_404(Cadastro, chave=chave)		
 			criar = Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, operadora=operadora,\
 										 cidade=cidade, estado=estado, tipo=tipo,portado=1)
 			criar.save()

@@ -119,6 +119,7 @@ def operadoras(request):
 	    	
 	    	nao_portado_diff = 0
 
+
 	total ="""SELECT DISTINCT operadora,
 					  COUNT( IF( tipo='FIXO', 1, NULL ) ) AS fixo,
 					  COUNT( IF( tipo='MOVEL', 1, NULL ) ) AS movel,
@@ -175,6 +176,7 @@ def consulta(request,numero):
 		chave = Cadastro.objects.values_list('chave').filter(chave=key)[0]
 		chave = chave[0]
 		chave = str(chave)
+
 
 		if key == chave:
 
