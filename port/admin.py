@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import Cadastro, Plano, PlanoCliente
 
 class PlanoAdmin(admin.ModelAdmin):
-	list_display = ['plano','valor','valor_consulta', 'consultas_gratis']
+	list_display = ['plano','descricao','valor','valor_consulta', 'consultas_gratis']
 
 class PlanoClienteAdmin(admin.ModelAdmin):
 	list_display = ['cliente','plano','consultas','consultas_gratis']

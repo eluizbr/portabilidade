@@ -13,10 +13,13 @@ import MySQLdb
 from django.db import connection
 import datetime
 import random
+import decimal
 from datetime import timedelta,date
 from forms import CadastroForm
 from models import Cadastro, Plano
 from django.contrib.auth.models import User
+from pagseguro.api import PagSeguroItem, PagSeguroApi
+import compra
 #from celery import signature
 
 @login_required
@@ -62,21 +65,30 @@ def meus_dados(request):
 				if pega_plano_cliente != pega_plano_cadastro:
 					print u'plano são diferentes'
 
+					#print compra['redirect_url']
 					### INIICIO Pega o valor do plano e o valor por consulta de obtem a quantidade de consultas
 					x = Plano.objects.get(id=pega_plano_cadastro)
-					valor = x.valor
+					id_plano = x.id
+					descricao = x.descricao
+					valorD = x.valor
+					print valorD
+					valor = int(x.valor)
 					v_consulta = x.valor_consulta
 					try:
 						result = valor / v_consulta
+						print result
+						result = decimal.Decimal(result)
 					except ZeroDivisionError:
-						result = 0
+						result = 00.00
 
-					print int(result)
 					### FIM Pega o valor do plano e o valor por consulta de obtem a quantidade de consultas
-
+					
 					z = PlanoCliente.objects.get(plano_id=pega_plano_cliente)
 					print 'saldo atual é %s' %z.consultas
-					print z
+
+					compra.pagseguro(id_plano,descricao,valorD)
+					
+
 					z.plano_id = pega_plano_cadastro
 					z.consultas = z.consultas + result
 					z.save()

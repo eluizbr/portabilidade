@@ -44,7 +44,8 @@ class Prefixo(models.Model):
 class Plano(models.Model):
 
     plano = models.CharField(null=True,blank=True,max_length=255)
-    valor = models.FloatField(blank=True, null=True, default=00.00)
+    descricao = models.CharField(null=True,blank=True,max_length=255)
+    valor = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2, default=00.00)
     valor_consulta = models.FloatField(blank=True, null=True, default=00.00)
     consultas_gratis = models.IntegerField(blank=True, null=True,default=0)
 

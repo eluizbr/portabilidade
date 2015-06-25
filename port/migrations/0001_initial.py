@@ -112,7 +112,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('plano', models.CharField(max_length=255, null=True, blank=True)),
-                ('valor', models.FloatField(default=0.0, null=True, blank=True)),
+                ('descricao', models.CharField(max_length=255, null=True, blank=True)),
+                ('valor', models.DecimalField(default=0.0, null=True, max_digits=2, decimal_places=2, blank=True)),
                 ('valor_consulta', models.FloatField(default=0.0, null=True, blank=True)),
                 ('consultas_gratis', models.IntegerField(default=0, null=True, blank=True)),
             ],
