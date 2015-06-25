@@ -96,8 +96,16 @@
                 {% endfor %}
                 <h5 class="fw-semi-bold mt">Consultas restantes</h5>
                 <p>
-                    <span class="circle bg-warning"><i class="fa fa-random"></i></span>
-                    <strong>{{consulta}}</strong>
+                    
+                    {% if consultas == 0 %}
+                        <strong class="text-danger"><h5>ATENÇÃO </h5>Você esta sem creditos</strong>
+                    {% elif consultas == -1 %}
+                        <strong>Plano ILIMITADO</strong>
+                    {% else %}
+                        <span class="circle bg-warning"><i class="fa fa-random"></i></span> 
+                        <strong>{{consultas|intcomma}}</strong>
+                    {% endif %}
+                    
                 </p>
             </div>
         </section>

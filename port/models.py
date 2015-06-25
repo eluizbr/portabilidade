@@ -112,7 +112,17 @@ class Cadastro(models.Model):
     cod_cliente = models.IntegerField(u'Codigo do Cliente', unique=True)
     chave = models.UUIDField(default=uuid.uuid4, editable=False)
     plano = models.OneToOneField(Plano,default=1)
+    consultas = models.IntegerField(u'Consultas', default=0)
 
     def __unicode__(self):
         return unicode(self.user)
 
+class PlanoCliente(models.Model):
+
+    cliente = models.OneToOneField(Cadastro)
+    plano = models.OneToOneField(Plano)
+    consultas = models.IntegerField(blank=True, null=True,default=0)
+    consultas_gratis = models.IntegerField(blank=True, null=True,default=0)
+
+    def __unicode__(self):
+        return unicode(self.plano)    
