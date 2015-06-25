@@ -87,7 +87,8 @@ def meus_dados(request):
 					print 'saldo atual é %s' %z.consultas
 
 					compra.pagseguro(id_plano,descricao,valorD)
-					
+					print compra.pagseguro(id_plano,descricao,valorD)
+					return redirect(compra.pagseguro(id_plano,descricao,valorD))
 
 					z.plano_id = pega_plano_cadastro
 					z.consultas = z.consultas + result

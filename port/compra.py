@@ -18,13 +18,13 @@ def pagseguro(id,descricao,valor):
 	pagseguro_api = PagSeguroApi(reference='563dd4b8f3d740fe80a50058dc5cf938')
 	pagseguro_api.add_item(compra)
 	data = pagseguro_api.checkout()
-	print data['redirect_url']
+	#print data['redirect_url']
 	url = data['redirect_url']
-	print url
+	#print url
 	
-	return redirect(url)
+	return url
 	#print data['transaction']['code']
-	checkout_realizado.connect(load_signal)
+	#checkout_realizado.connect(load_signal)
 
 #pagseguro('001','Teste','100.00')
 
