@@ -2,6 +2,7 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
+import choices
 
 class NaoPortados(models.Model):
     operadora = models.CharField(max_length=64)
@@ -119,7 +120,7 @@ class Cadastro(models.Model):
 
 class PlanoCliente(models.Model):
 
-    cliente = models.IntegerField(u'Cliente', default=1)
+    cliente = models.IntegerField(u'Cliente', default=1, unique=True)
     plano = models.IntegerField(u'Plano', default=1)
     consultas = models.IntegerField(blank=True, null=True,default=0)
     consultas_gratis = models.IntegerField(blank=True, null=True,default=0)
@@ -130,21 +131,25 @@ class PlanoCliente(models.Model):
 
 class Retorno(models.Model):
 
+    TIPO = choices.TIPO_MEIO_PAGAMENTO_CHOICES
+    CODIGO = choices.CODIGO_PAGAMENTO_CHOICES
+    STATUS = choices.STATUS_CHOICES
     # Referencia dos campos: https://pagseguro.uol.com.br/v3/guia-de-integracao/consulta-de-transacoes-por-codigo.html
     date = models.DateTimeField()
     lastEventDate = models.DateTimeField()
     code = models.CharField(max_length=200)
     reference = models.CharField(max_length=200)
-    status = models.IntegerField()
-    paymentMethod = models.IntegerField()
-    paymentMethodCode = models.IntegerField()
+    status = models.CharField(max_length=200,choices=STATUS,default=1)
+    paymentMethod = models.CharField(max_length=200,choices=TIPO,default=1)
+    paymentMethodCode = models.CharField(max_length=200,choices=CODIGO,default=101)
     grossAmount = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2)
     discountAmount = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2)
     netAmount = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2)
     extraAmount = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2)
     item = models.CharField(max_length=200)
 
-
-
+    def __unicode__(self):
+        return unicode(self.status)
+    
 
 

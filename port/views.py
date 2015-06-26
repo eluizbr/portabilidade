@@ -47,7 +47,6 @@ def meus_dados(request):
 		plano_nome = 1
 
 	retorno = Retorno.objects.all().filter(reference=codigo_cliente)
-	print retorno
 
 	### FIM Pega o ID do plano ###
 
@@ -322,9 +321,10 @@ def retorno(request):
 
 	retorno = request.GET['id_pagseguro']
 
+
 	#print retorno
 
-	compra.registra_compra(retorno)
+	compra.registra_compra(retorno,request.user.id)
 	return redirect('http://eluizbr.asuscomm.com:8000/portabilidade/meus-dados/#financeiro')
 
 	#print id_pagseguro

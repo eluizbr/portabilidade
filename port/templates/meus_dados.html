@@ -175,7 +175,7 @@
 	                        <h4>Seu Plano <span class="fw-semi-bold">{{plano_nome}}</span></h4>
 
 	                        <div class="clearfix">
-							    <div class="col-md-8">
+							    <div class="col-md-12">
 							        <section class="widget">
 							            <header>
 							                <h5>Últimas <span class="fw-semi-bold">transações</span></h5>
@@ -187,6 +187,8 @@
 							                        <th class="text-align-center">Plano</th>
 							                        <th class="text-align-center">Data Compra</th>
 							                        <th class="text-align-center">Ulta atualização</th>
+							                        <th class="text-align-center">Forma de pagamento</th>
+							                        <th class="text-align-center">Metodo de pgamento</th>
 							                        <th class="text-align-center">Status</th>
 							                    </tr>
 							                    </thead>
@@ -196,15 +198,9 @@
 							                            <td class="text-align-center">{{n.item}}</td>
 							                            <td class="text-align-center">{{n.date|naturaltime}}</td>
 							                            <td class="text-align-center">{{n.lastEventDate|naturaltime}}</td>
-							                            {% if n.status == 1 %}
-							                            	<td class="text-align-center text-danger">Aguardando pagamento</td>
-							                            {% elif n.status == 2 %}
-							                            	<td class="text-align-center">Em análise</td>
-							                            {% elif n.status == 3 %}
-							                            	<td class="text-align-center text-success">Pago</td>							                            	
-							                            {% endif %}
-							                            
-
+							                            <td class="text-align-center"><strong>{{ n.get_paymentMethod_display }}</strong></td>
+							                            <td class="text-align-center"><strong>{{ n.get_paymentMethodCode_display }}</strong></td>
+							                            <td class="text-align-center"><strong>{{ n.get_status_display }}</strong></td>
 							                        </tr>
 							                    {% endfor %}
 							                    </tbody>
