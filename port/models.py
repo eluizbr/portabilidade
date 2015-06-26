@@ -147,6 +147,7 @@ class Retorno(models.Model):
     netAmount = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2)
     extraAmount = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2)
     item = models.CharField(max_length=200)
+    id_plano = models.IntegerField()
 
     def __unicode__(self):
         return unicode(self.status)

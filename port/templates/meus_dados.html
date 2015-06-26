@@ -196,11 +196,11 @@
 							                    {% for n in retorno %}
 							                        <tr>
 							                            <td class="text-align-center">{{n.item}}</td>
-							                            <td class="text-align-center">{{n.date|naturaltime}}</td>
+							                            <td class="text-align-center">{{n.date}}</td>
 							                            <td class="text-align-center">{{n.lastEventDate|naturaltime}}</td>
-							                            <td class="text-align-center"><strong>{{ n.get_paymentMethod_display }}</strong></td>
-							                            <td class="text-align-center"><strong>{{ n.get_paymentMethodCode_display }}</strong></td>
-							                            <td class="text-align-center"><strong>{{ n.get_status_display }}</strong></td>
+							                            <td class="text-align-center">{{n.get_paymentMethod_display}}</td>
+							                            <td class="text-align-center">{{n.get_paymentMethodCode_display}}</td>
+							                            <td class="text-align-center fw-semi-bold">{{n.get_status_display}}</td>
 							                        </tr>
 							                    {% endfor %}
 							                    </tbody>

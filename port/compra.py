@@ -11,30 +11,6 @@ from datetime import datetime
 import decimal
 from django.db import IntegrityError
 
-# z = PlanoCliente.objects.get(cliente=request.user.id)
-	# print 'saldo atual é %s' %z.consultas
-	# z.plano = pega_plano_cadastro
-	# z.consultas = z.consultas + result
-	# z.save()
-	# print 'saldo atual é %s' %z.consultas
-
-# #print compra['redirect_url']
-# ### INIICIO Pega o valor do plano e o valor por consulta de obtem a quantidade de consultas
-# x = Plano.objects.get(id=pega_plano_cadastro)
-# id_plano = x.id
-# print id_plano
-# descricao = x.plano
-# valorD = x.valor
-# print valorD
-# valor = int(x.valor)
-# v_consulta = x.valor_consulta
-# try:
-# 	result = valor / v_consulta
-# 	print result
-# 	result = decimal.Decimal(result)
-# except ZeroDivisionError:
-# 	result = 00.00
-### FIM Pega o valor do plano e o valor por consulta de obtem a quantidade de consultas
 
 def pagseguro(id,descricao,valor,codigo):
 
@@ -116,7 +92,29 @@ def registra_compra(id_pagseguro,user):
 						### FIM cria o plano baseado no retorno do PagSeguro ###
 
 					except IntegrityError:
-						print 'ja tem'
+						
+						print 'ja tem <--------'
+						d = Retorno.objects.get(code=retorno)
+						d = d.id_plano
+						print d
+						x = PlanoCliente.objects.get(plano=d)
+						id_plano = x.id
+						print id_plano
+						consultas = int(x.consultas)
+						print 'saldo atual é %s' %(consultas)
+
+						z = Plano.objects.get(id=d)
+						valor = int(z.valor)
+						print valor
+						valor_consulta = z.valor_consulta
+						print valor_consulta
+						results = int(valor / valor_consulta)
+						print 'saldo a ser somado é %s' %(results)
+
+						novo_saldo = consultas + results
+						print 'o novo saldo é %s' %novo_saldo
+
+
 
 
 	except IndexError:
@@ -135,10 +133,11 @@ def registra_compra(id_pagseguro,user):
 		netAmount = data['transaction']['netAmount']
 		extraAmount = data['transaction']['extraAmount']
 		item = data['transaction']['items']['item']['description']
+		id_plano = data['transaction']['items']['item']['id']
 
 		Retorno.objects.create(date=date,lastEventDate=lastEventDate,code=code,reference=reference,status=status,
 								paymentMethod=paymentMethod,paymentMethodCode=paymentMethodCode,grossAmount=grossAmount,
-								discountAmount=discountAmount,netAmount=netAmount,extraAmount=extraAmount,item=item)
+								discountAmount=discountAmount,netAmount=netAmount,extraAmount=extraAmount,item=item,id_plano=id_plano)
 
 	
 

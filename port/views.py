@@ -325,7 +325,7 @@ def retorno(request):
 	#print retorno
 
 	compra.registra_compra(retorno,request.user.id)
-	return redirect('http://eluizbr.asuscomm.com:8000/portabilidade/meus-dados/#financeiro')
+	#return redirect('http://eluizbr.asuscomm.com:8000/portabilidade/meus-dados/#financeiro')
 
 	#print id_pagseguro
 
