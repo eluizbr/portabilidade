@@ -25,4 +25,5 @@ urlpatterns = [
     url(r'^$', RedirectView.as_view(pattern_name='operadoras')),
     url(r'^retorno/pagseguro/', include('pagseguro.urls')),
 
+
 ]

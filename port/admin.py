@@ -5,7 +5,7 @@ class PlanoAdmin(admin.ModelAdmin):
 	list_display = ['plano','descricao','valor','valor_consulta', 'consultas_gratis']
 
 class PlanoClienteAdmin(admin.ModelAdmin):
-	list_display = ['cliente','plano','consultas','consultas_gratis']
+	list_display = ['cliente','consultas','consultas_gratis']
 
 
 class CadastroAdmin(admin.ModelAdmin):

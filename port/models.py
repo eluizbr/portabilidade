@@ -112,18 +112,39 @@ class Cadastro(models.Model):
     cep = models.CharField(u'CEP', max_length=10, default='00000-000')
     cod_cliente = models.IntegerField(u'Codigo do Cliente', unique=True)
     chave = models.UUIDField(default=uuid.uuid4, editable=False)
-    plano = models.OneToOneField(Plano,default=1)
-    consultas = models.IntegerField(u'Consultas', default=0)
+    plano = models.IntegerField(u'Plano', default=1)
 
     def __unicode__(self):
         return unicode(self.user)
 
 class PlanoCliente(models.Model):
 
-    cliente = models.OneToOneField(Cadastro)
-    plano = models.OneToOneField(Plano)
+    cliente = models.IntegerField(u'Cliente', default=1)
+    plano = models.IntegerField(u'Plano', default=1)
     consultas = models.IntegerField(blank=True, null=True,default=0)
     consultas_gratis = models.IntegerField(blank=True, null=True,default=0)
 
     def __unicode__(self):
-        return unicode(self.plano)    
+        return unicode(self.plano)
+
+
+class Retorno(models.Model):
+
+    # Referencia dos campos: https://pagseguro.uol.com.br/v3/guia-de-integracao/consulta-de-transacoes-por-codigo.html
+    date = models.DateTimeField()
+    lastEventDate = models.DateTimeField()
+    code = models.CharField(max_length=200)
+    reference = models.CharField(max_length=200)
+    status = models.IntegerField()
+    paymentMethod = models.IntegerField()
+    paymentMethodCode = models.IntegerField()
+    grossAmount = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2)
+    discountAmount = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2)
+    netAmount = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2)
+    extraAmount = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2)
+    item = models.CharField(max_length=200)
+
+
+
+
+

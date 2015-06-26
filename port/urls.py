@@ -10,6 +10,8 @@ urlpatterns = patterns('',
     url(r'^meus-dados/$', views.meus_dados, name='meus-dados'),
     # url(r'^blog/', include('blog.urls')),
     url(r'^(?P<numero>\d+)$', views.consulta, name='consulta'),
+    url(r'^retorno/$', views.retorno, name='retorno'),
+    url(r'^retorno/pagseguro/', include('pagseguro.urls')),
 
 
 )

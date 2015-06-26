@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.db.models import Count
 from django.contrib.auth.decorators import login_required
-from models import Portados, NaoPortados, Cdr, Prefixo, PlanoCliente
+from models import Portados, NaoPortados, Cdr, Prefixo, PlanoCliente, Retorno
 from ratelimit.decorators import ratelimit
 from tasks import insert_cdr
 from django.conf import settings
@@ -30,12 +30,31 @@ def index(request):
 @login_required
 def meus_dados(request):
 
+	codigo_cliente = Cadastro.objects.values_list('cod_cliente').filter(id=request.user.id)[0]
+	codigo_cliente = codigo_cliente[0]
+
 	user = User.objects.get(pk=request.user.id)
 	id_cliente = Cadastro.objects.values('plano').filter(user_id=request.user.id)
+	
+	### INICIO Pega o ID do plano ###
+
+	cod_plano = id_cliente[0]['plano']
+	try:
+
+		plano_nome = Plano.objects.values_list('plano').filter(id=cod_plano)[0]
+		plano_nome = plano_nome[0]
+	except IndexError:
+		plano_nome = 1
+
+	retorno = Retorno.objects.all().filter(reference=codigo_cliente)
+	print retorno
+
+	### FIM Pega o ID do plano ###
 
 	try:
-		plano = PlanoCliente.objects.values_list('plano_id').filter(id=id_cliente)[0]
+		plano = PlanoCliente.objects.values_list('plano').filter(id=id_cliente)[0]
 		plano = plano[0]
+		print plano
 
 	except IndexError:
 		plano = 1
@@ -48,55 +67,55 @@ def meus_dados(request):
 			form = CadastroForm(request.POST or None, instance=cad)
 			
 			if form.is_valid():
+
 				obj = form.save(commit=False)
-				obj.email = user.email
-				obj.user = user
-				obj.cod_cliente = int(random.randint(10000000, 99000000))
+
 				obj.save()
-
-				pega_plano_cadastro = Cadastro.objects.values_list('plano_id').filter(plano_id=id_cliente)[0]
+				print 'o id cliente é %s' %id_cliente
+				pega_plano_cadastro = Cadastro.objects.values_list('plano').filter(plano=id_cliente)[0]
 				pega_plano_cadastro = pega_plano_cadastro[0]
-				print pega_plano_cadastro
+				print 'cadastro é %s' %pega_plano_cadastro
 
-				pega_plano_cliente = PlanoCliente.objects.values_list('plano_id').filter(id=request.user.id)[0]
-				pega_plano_cliente = pega_plano_cliente[0]
-				print pega_plano_cliente
+				try:
+					pega_plano_cliente = PlanoCliente.objects.values_list('plano').filter(cliente=request.user.id)[0]
+					pega_plano_cliente = pega_plano_cliente[0]
+					print 'plano é %s' %pega_plano_cliente
+				except IndexError:
+					pega_plano_cliente = 1
+					print 'plano é %s' %pega_plano_cliente
+
 
 				if pega_plano_cliente != pega_plano_cadastro:
 					print u'plano são diferentes'
 
-					#print compra['redirect_url']
-					### INIICIO Pega o valor do plano e o valor por consulta de obtem a quantidade de consultas
+					# #print compra['redirect_url']
+					# ### INIICIO Pega o valor do plano e o valor por consulta de obtem a quantidade de consultas
 					x = Plano.objects.get(id=pega_plano_cadastro)
 					id_plano = x.id
-					descricao = x.descricao
+					print id_plano
+					descricao = x.plano
 					valorD = x.valor
 					print valorD
-					valor = int(x.valor)
-					v_consulta = x.valor_consulta
-					try:
-						result = valor / v_consulta
-						print result
-						result = decimal.Decimal(result)
-					except ZeroDivisionError:
-						result = 00.00
-
 					### FIM Pega o valor do plano e o valor por consulta de obtem a quantidade de consultas
+
+					### INICIO PAGSEGURO ###
+					compra.pagseguro(id_plano,descricao,valorD,codigo_cliente)
+					print compra.pagseguro(id_plano,descricao,valorD,codigo_cliente)
+					return redirect(compra.pagseguro(id_plano,descricao,valorD,codigo_cliente))
+					### FIM PAGSEGURO ###
 					
-					z = PlanoCliente.objects.get(plano_id=pega_plano_cliente)
-					print 'saldo atual é %s' %z.consultas
+					# except IndexError:
 
-					compra.pagseguro(id_plano,descricao,valorD)
-					print compra.pagseguro(id_plano,descricao,valorD)
-					return redirect(compra.pagseguro(id_plano,descricao,valorD))
+					# 	z = PlanoCliente.objects.create(consultas=0,consultas_gratis=0,cliente=request.user.id,plano=1)
+					# 	z.save()
+					# 	print 'saldo atual é %s' %z.consultas
+					# 	print 'plano criado'
 
-					z.plano_id = pega_plano_cadastro
-					z.consultas = z.consultas + result
-					z.save()
-					print 'saldo atual é %s' %z.consultas
+					
+
 				else:
 					print u'planos são iguais'
-					#obj.save()
+
 		else:
 
 			form = CadastroForm(instance=cad)
@@ -130,7 +149,7 @@ def operadoras(request):
 		c = connection.cursor()
 		
 		id_cliente = Cadastro.objects.values_list('id').filter(user_id=request.user.id)[0]
-		plano = PlanoCliente.objects.values_list('consultas').filter(cliente_id=request.user.id)
+		plano = PlanoCliente.objects.values_list('consultas').filter(cliente=request.user.id)
 		operadoras = Cdr.objects.values('operadora','tipo').order_by('operadora').annotate(Count('cidade')).filter(cliente=id_cliente)
 		tipo_numero = Cdr.objects.values('tipo').annotate(Count('tipo')).filter(cliente=id_cliente)
 		ultimos_numero = operadoras = Cdr.objects.values('numero','operadora','tipo','data_hora').order_by('-id').filter(cliente=id_cliente)[:5][::1]
@@ -138,7 +157,7 @@ def operadoras(request):
 		try:
 
 			id_cliente = id_cliente[0]
-			consultas = PlanoCliente.objects.values_list('consultas').filter(cliente_id=id_cliente)[0]
+			consultas = PlanoCliente.objects.values_list('consultas').filter(cliente=id_cliente)[0]
 			consultas = consultas[0]
 
 		except ZeroDivisionError:
@@ -298,4 +317,15 @@ def consulta(request,numero):
 		response = HttpResponse(rn1, content_type='text/plain')
 		return response
 
+def retorno(request):
+
+
+	retorno = request.GET['id_pagseguro']
+
+	#print retorno
+
+	compra.registra_compra(retorno)
+	return redirect('http://eluizbr.asuscomm.com:8000/portabilidade/meus-dados/#financeiro')
+
+	#print id_pagseguro
 

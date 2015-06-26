@@ -172,13 +172,46 @@
 
 	                    </div>
 	                    <div class="tab-pane" id="financeiro">
-	                        <h4>Seu Plano <span class="fw-semi-bold">{{plano}}</span></h4>
+	                        <h4>Seu Plano <span class="fw-semi-bold">{{plano_nome}}</span></h4>
 
 	                        <div class="clearfix">
-	                            <div class="btn-toolbar">
-	                                <a class="btn btn-default" href="#">&nbsp;&nbsp;Check&nbsp;&nbsp;</a>
-	                                <a class="btn btn-primary" href="#">&nbsp;&nbsp;Dance?&nbsp;&nbsp;</a>
-	                            </div>
+							    <div class="col-md-8">
+							        <section class="widget">
+							            <header>
+							                <h5>Últimas <span class="fw-semi-bold">transações</span></h5>
+							            </header>
+							            <div class="widget-body">
+							                <table class="table table-striped mt-lg mb-0">
+							                    <thead>
+							                    <tr>
+							                        <th class="text-align-center">Plano</th>
+							                        <th class="text-align-center">Data Compra</th>
+							                        <th class="text-align-center">Ulta atualização</th>
+							                        <th class="text-align-center">Status</th>
+							                    </tr>
+							                    </thead>
+							                    <tbody>
+							                    {% for n in retorno %}
+							                        <tr>
+							                            <td class="text-align-center">{{n.item}}</td>
+							                            <td class="text-align-center">{{n.date|naturaltime}}</td>
+							                            <td class="text-align-center">{{n.lastEventDate|naturaltime}}</td>
+							                            {% if n.status == 1 %}
+							                            	<td class="text-align-center text-danger">Aguardando pagamento</td>
+							                            {% elif n.status == 2 %}
+							                            	<td class="text-align-center">Em análise</td>
+							                            {% elif n.status == 3 %}
+							                            	<td class="text-align-center text-success">Pago</td>							                            	
+							                            {% endif %}
+							                            
+
+							                        </tr>
+							                    {% endfor %}
+							                    </tbody>
+							                </table>
+							            </div>
+							        </section>
+							    </div>
 	                        </div>
 	                    </div>
 	                </div>

@@ -113,7 +113,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('plano', models.CharField(max_length=255, null=True, blank=True)),
                 ('descricao', models.CharField(max_length=255, null=True, blank=True)),
-                ('valor', models.DecimalField(default=0.0, null=True, max_digits=2, decimal_places=2, blank=True)),
+                ('valor', models.DecimalField(default=0.0, null=True, max_digits=10, decimal_places=2, blank=True)),
                 ('valor_consulta', models.FloatField(default=0.0, null=True, blank=True)),
                 ('consultas_gratis', models.IntegerField(default=0, null=True, blank=True)),
             ],
@@ -122,10 +122,10 @@ class Migration(migrations.Migration):
             name='PlanoCliente',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('cliente', models.IntegerField(default=1, verbose_name='Cliente')),
+                ('plano', models.IntegerField(default=1, verbose_name='Plano')),
                 ('consultas', models.IntegerField(default=0, null=True, blank=True)),
                 ('consultas_gratis', models.IntegerField(default=0, null=True, blank=True)),
-                ('cliente', models.OneToOneField(to='port.Cadastro')),
-                ('plano', models.OneToOneField(to='port.Plano')),
             ],
         ),
         migrations.AddField(
