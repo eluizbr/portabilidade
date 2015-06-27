@@ -148,6 +148,8 @@ class Retorno(models.Model):
     extraAmount = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2)
     item = models.CharField(max_length=200)
     id_plano = models.IntegerField()
+    controle = models.IntegerField(default=0)
+    consultas = models.IntegerField(default=0)
 
     def __unicode__(self):
         return unicode(self.status)

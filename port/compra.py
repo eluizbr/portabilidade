@@ -10,6 +10,7 @@ from models import Retorno, Cadastro, PlanoCliente, Plano
 from datetime import datetime
 import decimal
 from django.db import IntegrityError
+from django.core.exceptions import ObjectDoesNotExist
 
 
 def pagseguro(id,descricao,valor,codigo):
@@ -31,6 +32,7 @@ def registra_compra(id_pagseguro,user):
 
 	print id_pagseguro
 	id_pagseguro = id_pagseguro.replace("-", "")
+	print id_pagseguro
 	agora = datetime.now()
 	print agora
 
@@ -51,12 +53,8 @@ def registra_compra(id_pagseguro,user):
 
 				print 'é diferente'
 				Retorno.objects.filter(code=retorno).update(lastEventDate=agora,status=status)
-			else:
-				print 'é igual'
-				### Atualiza da data da ultima consulta
-				if status == 1:
-					Retorno.objects.filter(code=retorno).update(lastEventDate=agora)
-				elif status == 3:
+
+				if status == 3:
 
 					print user
 					pega_plano_cadastro = Cadastro.objects.values_list('plano').filter(id=user)[0]
@@ -85,7 +83,6 @@ def registra_compra(id_pagseguro,user):
 					pega_plano_cliente = pega_plano_cliente[0]
 					print 'plano é %s' %pega_plano_cliente
 
-
 					try:
 						### INICIO cria o plano baseado no retorno do PagSeguro ###
 						PlanoCliente.objects.create(cliente=user,plano=pega_plano_cliente,consultas=result,consultas_gratis=0)
@@ -94,14 +91,33 @@ def registra_compra(id_pagseguro,user):
 					except IntegrityError:
 						
 						print 'ja tem <--------'
+						# Pega o plano no cadastro do cliente
+						p = Cadastro.objects.get(id=user)
+						p = p.plano
+						print 'Cadastro %s' %p
+						
+						# Pega o plano comprado
 						d = Retorno.objects.get(code=retorno)
 						d = d.id_plano
-						print d
-						x = PlanoCliente.objects.get(plano=d)
+						print 'Retorno %s' %d
+
+						b = PlanoCliente.objects.get(cliente=user)
+						b = b.plano
+						print 'PlanoCliente %s' %b
+
+						if b != p:
+							print 'planos sao diferentes'
+							PlanoCliente.objects.filter(plano=b).update(plano=p)
+							b = PlanoCliente.objects.get(cliente=user)
+							b = b.plano
+							print b
+
+						x = PlanoCliente.objects.get(cliente=user)
 						id_plano = x.id
 						print id_plano
 						consultas = int(x.consultas)
 						print 'saldo atual é %s' %(consultas)
+
 
 						z = Plano.objects.get(id=d)
 						valor = int(z.valor)
@@ -111,10 +127,24 @@ def registra_compra(id_pagseguro,user):
 						results = int(valor / valor_consulta)
 						print 'saldo a ser somado é %s' %(results)
 
-						novo_saldo = consultas + results
-						print 'o novo saldo é %s' %novo_saldo
+						controle = Retorno.objects.values_list('controle').filter(code=id_pagseguro)[0]
+						controle = controle[0]
+						print controle
+
+						if controle == 0:
+
+							novo_saldo = consultas + results
+							print 'o novo saldo é %s' %novo_saldo
+							PlanoCliente.objects.filter(cliente=user).update(consultas=novo_saldo)
+							Retorno.objects.filter(code=retorno).update(controle=1,consultas=results)
+							Retorno.objects.filter(code=retorno).update(lastEventDate=agora,status=status)
 
 
+			else:
+				print 'é igual'
+				### Atualiza da data da ultima consulta
+				if status == 1:
+					Retorno.objects.filter(code=retorno).update(lastEventDate=agora)
 
 
 	except IndexError:
@@ -139,10 +169,4 @@ def registra_compra(id_pagseguro,user):
 								paymentMethod=paymentMethod,paymentMethodCode=paymentMethodCode,grossAmount=grossAmount,
 								discountAmount=discountAmount,netAmount=netAmount,extraAmount=extraAmount,item=item,id_plano=id_plano)
 
-	
-
-
-
-
-		#return HttpResponseRedirect('/portabilidade/meus-dados/') 
 	

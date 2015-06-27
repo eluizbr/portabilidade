@@ -20,7 +20,7 @@ from models import Cadastro, Plano
 from django.contrib.auth.models import User
 from pagseguro.api import PagSeguroItem, PagSeguroApi
 import compra
-#from celery import signature
+
 
 @login_required
 def index(request):
@@ -105,10 +105,10 @@ def meus_dados(request):
 					
 					# except IndexError:
 
-					# 	z = PlanoCliente.objects.create(consultas=0,consultas_gratis=0,cliente=request.user.id,plano=1)
-					# 	z.save()
-					# 	print 'saldo atual é %s' %z.consultas
-					# 	print 'plano criado'
+					# z = PlanoCliente.objects.create(consultas=0,consultas_gratis=0,cliente=request.user.id,plano=1)
+					# z.save()
+					# print 'saldo atual é %s' %z.consultas
+					# print 'plano criado'
 
 					
 
@@ -320,12 +320,7 @@ def retorno(request):
 
 
 	retorno = request.GET['id_pagseguro']
-
-
-	#print retorno
-
 	compra.registra_compra(retorno,request.user.id)
-	#return redirect('http://eluizbr.asuscomm.com:8000/portabilidade/meus-dados/#financeiro')
+	return redirect('http://eluizbr.asuscomm.com:8000/portabilidade/meus-dados/#financeiro')
 
-	#print id_pagseguro
 

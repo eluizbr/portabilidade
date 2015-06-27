@@ -190,6 +190,7 @@
 							                        <th class="text-align-center">Forma de pagamento</th>
 							                        <th class="text-align-center">Metodo de pgamento</th>
 							                        <th class="text-align-center">Status</th>
+							                        <th class="text-align-center">Creditos inseridos</th>
 							                    </tr>
 							                    </thead>
 							                    <tbody>
@@ -201,6 +202,7 @@
 							                            <td class="text-align-center">{{n.get_paymentMethod_display}}</td>
 							                            <td class="text-align-center">{{n.get_paymentMethodCode_display}}</td>
 							                            <td class="text-align-center fw-semi-bold">{{n.get_status_display}}</td>
+							                            <td class="text-align-center">{{n.consultas|intcomma}}</td>
 							                        </tr>
 							                    {% endfor %}
 							                    </tbody>
