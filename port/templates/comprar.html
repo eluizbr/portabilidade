@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load l10n %}
+{% load staticfiles %}
+{% load bootstrap %}
+{% block nome %}
+    <strong>{{user}}</strong>&nbsp;
+{% endblock %}
+
+{% block lista_server %}{% endblock lista_server %}
+
+{% block content %}
+
+    <form method="GET" action="/portabilidade/comprar/">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                   <select class="selectpicker" data-style="btn-default"
+                            data-width="auto" name="plano"
+                            tabindex="-1" id="simple-select">
+                        <option>Escolha um plano</option>
+                        {% for plano in todos %}
+                        	<option  value="{{plano}}">{{plano}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+    </form>
+
+    <div class="col-md-12">
+        <section class="widget">
+            <header>
+                <h5>Últimas <span class="fw-semi-bold">transações</span></h5>
+            </header>
+            <div class="widget-body">
+                <table class="table table-striped mt-lg mb-0">
+                    <thead>
+                    <tr>
+                        <th class="text-align-center">Plano</th>
+                        <th class="text-align-center">Descrição</th>
+                        <th class="text-align-center">Valor</th>
+                        <th class="text-align-center">Valor por Consulta</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-align-center">{{plano}}</td>
+                            <td class="text-align-center">{{descricao}}</td>
+                            <td class="text-align-center">{{valor}}</td>
+                            <td class="text-align-center">{{valor_consulta}}</td>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <div class="form-actions">
+        <div class="row">
+            <div class="col-sm-offset-5 col-sm-7">
+                <button type="submit" class="btn btn-inverse">Escolher plano</button>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+{% block scripts %}
+
+<script src="{% static "js/invoice.js"%}"></script>
+<script id="test" src="{% static "vendor/underscore/underscore.js"%}"></script>
+<script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
+<script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
+<script src="{% static "vendor/d3/d3.min.js"%}"></script>
+<script src="{% static "vendor/rickshaw/rickshaw.min.js"%}"></script>
+<script src="{% static "vendor/raphael/raphael-min.js"%}"></script>
+<script src="{% static "vendor/jQuery-Mapael/js/jquery.mapael.js"%}"></script>
+<script src="{% static "js/brazil.js"%}"></script>
+<script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/popover.js"%}"></script>
+<script src="{% static "vendor/bootstrap_calendar/bootstrap_calendar/js/bootstrap_calendar.min.js"%}"></script>
+<script src="{% static "vendor/jquery-animateNumber/jquery.animateNumber.min.js"%}"></script>
+
+
+<!-- page specific libs -->
+<script src="{% static "vendor/underscore/underscore-min.js"%}"></script>
+<script src="{% static "vendor/backbone/backbone.js"%}"></script>
+<script src="{% static "vendor/backbone.paginator/lib/backbone.paginator.min.js"%}"></script>
+<script src="{% static "vendor/backgrid/lib/backgrid.js"%}"></script>
+<script src="{% static "vendor/backgrid-paginator/backgrid-paginator.js"%}"></script>
+<script src="{% static "vendor/datatables/media/js/jquery.dataTables.js"%}"></script>
+<script src="{% static "vendor/bootstrap-select/dist/js/bootstrap-select.min.js"%}"></script>
+
+<script src="{% static "js/tables-dynamic.js"%}"></script>
+<script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/tab.js"%}"></script>
+<script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/modal.js"%}"></script>
+
+<script type="text/javascript">
+    $('#myModalLabel18').on('hidden.bs.modal', function() {
+    $(this).removeData('bs.modal');
+});
+</script>
+
+{% endblock %}

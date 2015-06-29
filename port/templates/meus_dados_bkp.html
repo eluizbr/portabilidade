@@ -4,11 +4,46 @@
 {% load staticfiles %}
 {% load bootstrap %}
 {% block nome %}
-
-
     <strong>{{user}}</strong>&nbsp;
 {% endblock %}
-
+{% block menu %}
+            <ul class="sidebar-nav">
+            <li class="active">
+                <!-- an example of nested submenu. basic bootstrap collapse component -->
+                <a href="#sidebar-dashboard" data-toggle="collapse" data-parent="#sidebar">
+                    <span class="icon">
+                        <i class="fa fa-desktop"></i>
+                    </span>
+                    Painel
+                    <i class="toggle fa fa-angle-down"></i>
+                </a>
+                <ul id="sidebar-dashboard" class="collapse in">
+                    <li><a href="{% url 'meus-dados' %}">Meus dados</a></li>
+                    <li><a href="{% url 'operadoras' %}">Operadoras</a></li>
+                </ul>
+            </li>
+            <li>
+            </li>
+        </ul>
+{% endblock menu %}
+        <ul class="sidebar-nav">
+            <li class="active">
+                <!-- an example of nested submenu. basic bootstrap collapse component -->
+                <a href="#sidebar-dashboard" data-toggle="collapse" data-parent="#sidebar">
+                    <span class="icon">
+                        <i class="fa fa-desktop"></i>
+                    </span>
+                    Painel
+                    <i class="toggle fa fa-angle-down"></i>
+                </a>
+                <ul id="sidebar-dashboard" class="collapse in">
+                    <li><a href="{% url 'meus-dados' %}">Meus dados</a></li>
+                    <li><a href="{% url 'operadoras' %}">Operadoras</a></li>
+                </ul>
+            </li>
+            <li>
+            </li>
+        </ul>
 {% block lista_server %}{% endblock lista_server %}
 
 {% block content %}
@@ -16,8 +51,15 @@
 		<form method="POST" action="{% url 'meus-dados' %}" role="form"> {% csrf_token %}
 		    <div class="row mb-lg">
 	            <div class="col-md-10">
+	                <div class="clearfix">
+	                    <ul id="tabs1" class="nav nav-tabs pull-left"> <!-- remove pull-left to get a cool effect too -->
+	                        <li class="active"><a href="#meusdados" data-toggle="tab">Minhas informações</a></li>
+	                        <li class=""><a href="#financeiro" data-toggle="tab">Financeiro</a></li>
+	                    </ul>
+	                </div>
 	                <div id="tabs1c" class="tab-content mb-lg">
 	                    <div class="tab-pane active clearfix" id="meusdados">
+
 						        <div class="row">
 						            <div class="col-md-12">
 						            	<legend>CHAVE:  <strong> {{cod_cliente}}</strong> </legend>
@@ -57,6 +99,11 @@
 		                                                <div class="col-md-4">
 		                                                    <div class="form-group">
 		                                                        {{form.telefoneM|bootstrap}}
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-4">
+		                                                    <div class="form-group">
+		                                                        {{form.plano|bootstrap}}
 		                                                    </div>
 		                                                </div>
 		                                            </div>
@@ -156,11 +203,124 @@
 				                            </div>
 						            </div>
 						        </div>
+
+	                    </div>
+	                    <div class="tab-pane" id="financeiro">
+	                        <h4>Seu Plano <span class="fw-semi-bold">{{plano_nome}}</span></h4>
+
+	                        <div class="clearfix">
+							    <div class="col-md-12">
+							        <section class="widget">
+							            <header>
+							                <h5>Últimas <span class="fw-semi-bold">transações</span></h5>
+							            </header>
+							            <div class="widget-body">
+							                <table class="table table-striped mt-lg mb-0">
+							                    <thead>
+							                    <tr>
+							                        <th class="text-align-center">Plano</th>
+							                        <th class="text-align-center">Data Compra</th>
+							                        <th class="text-align-center">Última atualização</th>
+							                        <th class="text-align-center">Forma de pagamento</th>
+							                        <th class="text-align-center">Metodo de pgamento</th>
+							                        <th class="text-align-center">Status</th>
+							                        <th class="text-align-center">Creditos inseridos</th>
+							                        <th class="text-align-center">Recibo</th>
+							                    </tr>
+							                    </thead>
+							                    <tbody>
+							                    {% for n in retorno %}
+							                        <tr>
+							                            <td class="text-align-center">{{n.item}}</td>
+							                            <td class="text-align-center">{{n.date|naturaltime}}</td>
+							                            <td class="text-align-center">{{n.lastEventDate|naturaltime}}</td>
+							                            <td class="text-align-center">{{n.get_paymentMethod_display}}</td>
+							                            <td class="text-align-center">{{n.get_paymentMethodCode_display}}</td>
+							                            <td class="text-align-center fw-semi-bold">{{n.get_status_display}}</td>
+							                            <td class="text-align-center">{{n.consultas|intcomma}}</td>
+														{% if n.status == '3' %}
+							                            <td> <button data-toggle="modal" data-target="#myModal18"  class="btn btn-primary">
+										                    <i class="fa fa-print"></i></button></td>
+														{% else %}
+							                            <td> <button disabled="disabled" id="print" class="btn btn-danger">
+										                    <i class="fa fa-remove"></i></button></td>
+															
+														{% endif %}
+							                        </tr>
+							                    {% endfor %}
+							                    </tbody>
+							                </table>
+							            </div>
+							        </section>
+							    </div>
+	                        </div>
 	                    </div>
 	                </div>
 	            </div>
 	        </div>
 		</form>
+
+<div class="modal fade" id="myModal18" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title text-align-center fw-bold mt" id="myModalLabel18">One more step</h4>
+                <p class="text-align-center fs-mini text-muted mt-sm">
+                    We need a bit of your detailed information to proceed. US ticketing system requires
+                    us to process and check your personal infromation before we can go.
+                </p>
+            </div>
+            <div class="modal-body bg-gray-lighter">
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <input type="text" class="form-control input-no-border"
+                                       placeholder="Name">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input type="text" class="form-control input-no-border"
+                                       placeholder="Middle Name">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <input type="text" class="form-control input-no-border"
+                                       placeholder="Address">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input type="text" class="form-control input-no-border"
+                                       placeholder="City">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input type="text" class="form-control input-no-border"
+                                       placeholder="Country">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input type="text" class="form-control input-no-border"
+                                       placeholder="Zip">
+                            </div>
+                        </div>
+                    </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-gray" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 {% endblock content %}

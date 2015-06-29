@@ -16,7 +16,7 @@ import random
 import decimal
 from datetime import timedelta,date
 from forms import CadastroForm
-from models import Cadastro, Plano
+from models import Cadastro, Plano, Retorno
 from django.contrib.auth.models import User
 from pagseguro.api import PagSeguroItem, PagSeguroApi
 import compra
@@ -28,8 +28,52 @@ def index(request):
 	return render(request, 'index.html')
 
 @login_required
+def financeiro_info(request,id):
+
+    financeiro_info = Retorno.objects.all().filter(id=id)
+    return render(request,'financeiro_info.html', locals())
+
+@login_required
+def financeiro(request):
+
+	codigo_cliente = Cadastro.objects.values_list('cod_cliente').filter(id=request.user.id)[0]
+	codigo_cliente = codigo_cliente[0]
+
+	user = User.objects.get(pk=request.user.id)
+	id_cliente = Cadastro.objects.values('plano').filter(user_id=request.user.id)
+	
+	### INICIO Pega o ID do plano ###
+
+	cod_plano = id_cliente[0]['plano']
+	try:
+
+		plano_nome = Plano.objects.values_list('plano').filter(id=cod_plano)[0]
+		plano_nome = plano_nome[0]
+	except IndexError:
+		plano_nome = 1
+
+	retorno = Retorno.objects.all().filter(reference=codigo_cliente)
+
+	### FIM Pega o ID do plano ###
+
+	try:
+		plano = PlanoCliente.objects.values_list('plano').filter(id=id_cliente)[0]
+		plano = plano[0]
+		print plano
+
+	except IndexError:
+		plano = 1
+
+
+	return render(request, 'financeiro.html', locals())
+	
+
+
+
+@login_required
 def meus_dados(request):
 
+	
 	codigo_cliente = Cadastro.objects.values_list('cod_cliente').filter(id=request.user.id)[0]
 	codigo_cliente = codigo_cliente[0]
 
@@ -133,6 +177,10 @@ def meus_dados(request):
 			obj.user = user
 			obj.cod_cliente = int(random.randint(10000000, 99000000))
 			obj.save()
+			z = PlanoCliente.objects.create(consultas=0,consultas_gratis=0,cliente=request.user.id,plano=1)
+			z.save()
+			print 'saldo atual é %s' %z.consultas
+			print 'plano criado'
 	else:
 
 		form = CadastroForm(instance=cad)
@@ -321,6 +369,6 @@ def retorno(request):
 
 	retorno = request.GET['id_pagseguro']
 	compra.registra_compra(retorno,request.user.id)
-	return redirect('http://eluizbr.asuscomm.com:8000/portabilidade/meus-dados/#financeiro')
+	#return redirect('http://eluizbr.asuscomm.com:8000/portabilidade/financeiro/')
 
 

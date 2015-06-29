@@ -1,0 +1,116 @@
+
+{% for d in financeiro_info %}
+	<section class="widget widget-invoice">
+		
+		    <header>
+		    
+		        <div class="row">
+		        
+		            <div class="col-sm-6 col-print-6">
+		                {# <img src="{% static "demo/img/logo/invoice-logo.png"%}" alt="Logo" /> #}
+		                <h3 class="invoice-logo"><strong>CDR-Port</strong></h3>
+		            </div>
+		            <div class="col-sm-6 col-print-6">
+		                <h3 class="text-align-right">
+		                    <span class="fw-semi-bold">{{d.reference}}</span> / <small>{{d.date}}</small>
+		                </h3>
+		                <!--<div class="text-muted fs-larger text-align-right">
+		                    Some Invoice number description or whatever
+		                </div>-->
+		            </div>
+		            
+		        </div>
+		        
+		    </header>
+		    <div class="widget-body">
+		        <div class="row mb-lg">
+		            <section class="col-sm-6 col-print-6">
+		                <h4 class="text-muted no-margin">Informações da empresa</h4>
+		                <h3 class="company-name">
+		                    CDR-Port
+		                </h3>
+		                <address>
+		                    <strong>2 Infinite Loop</strong><br>
+		                    Minsk, Belarus 220004<br>
+		                    088.253.5345<br>
+		                    <abbr title="Work email">e-mail:</abbr> <a href="mailto:#">email@example.com</a><br>
+		                    <abbr title="Work Phone">Telefone:</abbr> (012) 345-678-901<br>
+		                </address>
+		            </section>
+		            <section class="col-sm-6 col-print-6 text-align-right">
+		                <h4 class="text-muted no-margin">Informações do cliente</h4>
+		                <h3 class="client-name">
+		                    {{d.name}}
+		                </h3>
+		                <address>
+		                    <strong>Consultant</strong> at
+		                    <a href="#">Allspana</a><br>
+		                    <abbr title="Work email">e-mail:</abbr> <a href="mailto:#">{{d.email}}</a><br>
+		                    <abbr title="Work Phone">Telefone:</abbr> {{d.phone}}<br>
+		                    <!--<abbr title="Work Fax">fax:</abbr> (012) 678-132-901
+		                    <p class="no-margin"><strong>Note:</strong></p>
+		                    <p class="text-muted fs-mini">Some nights I stay up cashing in my bad luck.
+		                        Some nights I call it a draw</p>-->
+		                </address>
+		            </section>
+		        </div>
+		        <table class="table table-striped">
+		            <thead>
+		            <tr>
+		                <th>Plano</th>
+		                <th class="hidden-xs">Quant. Consultas</th>
+		                <th>Valor</th>
+		                <th class="hidden-xs">Taxas</th>
+		                <th>Total</th>
+		            </tr>
+		            </thead>
+		            <tbody>
+		            <tr>
+		                <td>{{d.item}}</td>
+		                <td class="hidden-xs">{{d.consultas}}</td>
+		                <td>{{d.grossAmount}}</td>
+		                <td class="hidden-xs">{{d.extraAmount}}</td>
+		                <td>{{d.grossAmount}}</td>
+		            </tr>
+		            </tbody>
+		        </table>
+		        <div class="row">
+		            <div class="col-sm-8 col-print-6">
+		                
+		                    <strong>ID PagSeguro:</strong>
+		                    {{d.code}}
+		                </p>
+		            </div>
+		            <div class="col-sm-4 col-print-6">
+		                <div class="row text-align-right">
+		                    <div class="col-xs-6"></div> <!-- instead of offset -->
+		                    <div class="col-xs-3">
+		                        <p>Subtotal</p>
+		                        <p>Taxas</p>
+		                        <p class="no-margin"><strong>Total</strong></p>
+		                    </div>
+		                    <div class="col-xs-3">
+		                        <p>{{d.grossAmount}}</p>
+		                        <p>{{d.extraAmount}}</p>
+		                        <p class="no-margin"><strong>{{d.grossAmount}}</strong></p>
+		                    </div>
+		                </div>
+		            </div>
+		        </div>
+		        <div class="btn-toolbar mt-lg text-align-right hidden-print">
+		            <button id="prints" class="btn btn-inverse">
+		                <i class="fa fa-print"></i>
+		                &nbsp;&nbsp;
+		                Imprimir
+		            </button>
+		            <button class="btn btn-danger" data-dismiss="modal">
+		                Fechar
+		                &nbsp;
+		                <span class="circle bg-white">
+		                    <i class="fa fa-arrow-right text-danger"></i>
+		                </span>
+		            </button>
+		        </div>
+		    </div>   
+	</section>
+{% endfor %}

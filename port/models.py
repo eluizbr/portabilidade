@@ -122,6 +122,7 @@ class PlanoCliente(models.Model):
 
     cliente = models.IntegerField(u'Cliente', default=1, unique=True)
     plano = models.IntegerField(u'Plano', default=1)
+    nome_plano = models.CharField(u'Nome do Plano',max_length=255)
     consultas = models.IntegerField(blank=True, null=True,default=0)
     consultas_gratis = models.IntegerField(blank=True, null=True,default=0)
 
@@ -150,6 +151,10 @@ class Retorno(models.Model):
     id_plano = models.IntegerField()
     controle = models.IntegerField(default=0)
     consultas = models.IntegerField(default=0)
+    email = models.EmailField(default='email@email.com')
+    name = models.CharField(max_length=255,default=1)
+    phone = models.CharField(max_length=20,default=1)
+    
 
     def __unicode__(self):
         return unicode(self.status)

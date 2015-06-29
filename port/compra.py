@@ -14,8 +14,9 @@ from django.core.exceptions import ObjectDoesNotExist
 
 
 def pagseguro(id,descricao,valor,codigo):
+	print id,descricao,valor,codigo
 
-	compra = PagSeguroItem(id=id, description=descricao, amount=valor,quantity=1)
+	compra = PagSeguroItem(id=id,description=descricao,amount=valor,quantity=1)
 
 	pagseguro_api = PagSeguroApi(reference=codigo)
 	pagseguro_api.add_item(compra)
@@ -164,9 +165,14 @@ def registra_compra(id_pagseguro,user):
 		extraAmount = data['transaction']['extraAmount']
 		item = data['transaction']['items']['item']['description']
 		id_plano = data['transaction']['items']['item']['id']
+		name = data['transaction']['sender']['name']
+		email = data['transaction']['sender']['email']
+		areaCode = data['transaction']['sender']['phone']['areaCode']
+		phone = data['transaction']['sender']['phone']['number']
 
 		Retorno.objects.create(date=date,lastEventDate=lastEventDate,code=code,reference=reference,status=status,
 								paymentMethod=paymentMethod,paymentMethodCode=paymentMethodCode,grossAmount=grossAmount,
-								discountAmount=discountAmount,netAmount=netAmount,extraAmount=extraAmount,item=item,id_plano=id_plano)
+								discountAmount=discountAmount,netAmount=netAmount,extraAmount=extraAmount,item=item,id_plano=id_plano,
+								name=name,email=email,phone=areaCode+phone)
 
 	

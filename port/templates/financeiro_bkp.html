@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load l10n %}
+{% load staticfiles %}
+{% load bootstrap %}
+{% block nome %}
+    <strong>{{user}}</strong>&nbsp;
+{% endblock %}
+
+{% block lista_server %}{% endblock lista_server %}
+
+{% block content %}
+
+
+<div class="row mb-lg">
+    <div class="col-md-12">
+
+            <div class="tab-pane" id="financeiro">
+	            <div class="col-xs-4">
+	            	<h4>Plano atual:  <span class="fw-semi-bold">{{plano_nome}}</span></h4>
+	            </div>
+	            <div class="col-xs-4">
+	            	<h4>Consultas disponíveis:  <span class="fw-semi-bold">{{consultas}}</span></h4>
+	            </div>
+            </div>
+
+    </div>
+</div>
+
+			<div class="row">
+			<div class="col-md-12">
+			    <div class="panel-group mb-lg" id="accordion" data-toggle="collapse">
+			        <div class="panel panel-default">
+			            <div class="panel-heading">
+			                <h5 class="panel-title">
+			                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+			                        Últimas compras
+			                        <i class="fa fa-angle-down pull-right"></i>
+			                    </a>
+			                </h5>
+			            </div>
+			                <div id="collapseTwo" class="panel-collapse collapse in">
+					            <div class="tab-pane" id="financeiro">
+									<br>
+					                <div class="clearfix">
+									    <div class="col-md-12">
+									        <section class="widget">
+									            <header>
+									                <h5>Últimas <span class="fw-semi-bold">transações</span></h5>
+									            </header>
+									            <div class="widget-body">
+									                <table class="table table-striped mt-lg mb-0">
+									                    <thead>
+									                    <tr>
+									                        <th class="text-align-center">Plano</th>
+									                        <th class="text-align-center">Data Compra</th>
+									                        <th class="text-align-center">Última atualização</th>
+									                        <th class="text-align-center">Forma de pagamento</th>
+									                        <th class="text-align-center">Metodo de pgamento</th>
+									                        <th class="text-align-center">Status</th>
+									                        <th class="text-align-center">Creditos inseridos</th>
+									                        <th class="text-align-center">Recibo</th>
+									                    </tr>
+									                    </thead>
+									                    <tbody>
+									                    {% for n in retorno %}
+									                        <tr>
+									                            <td class="text-align-center">{{n.item}}</td>
+									                            <td class="text-align-center">{{n.date|naturaltime}}</td>
+									                            <td class="text-align-center">{{n.lastEventDate|naturaltime}}</td>
+									                            <td class="text-align-center">{{n.get_paymentMethod_display}}</td>
+									                            <td class="text-align-center">{{n.get_paymentMethodCode_display}}</td>
+									                            <td class="text-align-center fw-semi-bold">{{n.get_status_display}}</td>
+									                            <td class="text-align-center">{{n.consultas|intcomma}}</td>
+																{% if n.status == '3' %}
+									                            <td> <button href="/portabilidade/info/{{n.id}}" data-toggle="modal" data-target="#myModal18"  class="btn btn-inverse">
+												                    <i class="fa fa-print"></i></button></td>
+																{% else %}
+									                            <td> <button disabled="disabled" id="print" class="btn btn-inverse">
+												                    <i class="fa fa-print"></i></button></td>
+																	
+																{% endif %}
+									                        </tr>
+									                    {% endfor %}
+									                    </tbody>
+									                </table>
+									            </div>
+									        </section>
+									    </div>
+					                </div>
+					            </div>
+			    			</div>
+			        </div>
+			        <div class="panel panel-default">
+			            <div class="panel-heading collapsed">
+			                <h5 class="panel-title">
+			                    <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+			                        Comprar mais consultas
+			                        <i class="fa fa-angle-down pull-right"></i>
+			                    </a>
+			                </h5>
+			            </div>
+			            <div id="collapseOne" class="panel-collapse collapse">
+			                <div class="panel-body">
+							    <form method="GET" action="/portabilidade/comprar/">
+							        <div class="row">
+							            <div class="col-md-4">
+							                <div class="form-group">
+							                   <select class="selectpicker" data-style="btn-default"
+							                            data-width="auto" name="plano"
+							                            tabindex="-1" id="simple-select">
+							                        <option>Escolha um plano</option>
+							                        {% for plano in todos %}
+							                        	<option  value="{{plano}}">{{plano}}</option>
+							                        {% endfor %}
+							                    </select>
+							                </div>
+							            </div>
+							    </form>
+							    <div class="col-md-12">
+							        <section class="widget">
+							            <header>
+							                <h5>Últimas <span class="fw-semi-bold">transações</span></h5>
+							            </header>
+							            <div class="widget-body">
+							                <table class="table table-striped mt-lg mb-0">
+							                    <thead>
+							                    <tr>
+							                        <th class="text-align-center">Plano</th>
+							                        <th class="text-align-center">Descrição</th>
+							                        <th class="text-align-center">Valor</th>
+							                        <th class="text-align-center">Valor por Consulta</th>
+							                    </tr>
+							                    </thead>
+							                    <tbody>
+							                        <tr>
+							                            <td class="text-align-center">{{plano}}</td>
+							                            <td class="text-align-center">{{descricao}}</td>
+							                            <td class="text-align-center">{{valor}}</td>
+							                            <td class="text-align-center">{{valor_consulta}}</td>
+
+							                        </tr>
+							                    </tbody>
+							                </table>
+							            </div>
+							        </section>
+							    </div>
+							    <div class="form-actions">
+							        <div class="row">
+							            <div class="col-sm-offset-5 col-sm-7">
+							                <button type="submit" class="btn btn-inverse">Escolher plano</button>
+							            </div>
+							        </div>
+							    </div>
+			                </div>
+			            </div>
+			        </div>
+			    </div>
+			</div>
+
+			</div>
+
+<div class="modal fade" id="myModal18" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+	        <div class="row">
+	            <div class="col-md-12">
+	                <section class="widget widget-invoice">
+	                    <header>
+	                        <div class="row">
+
+	                        </div>
+	                    </header>
+	                    <div class="widget-body">
+				
+	                    </div>
+	                </section>
+	            </div>
+	        </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="comprar" tabindex="-1" role="dialog" aria-labelledby="comprar" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title text-align-center fw-bold mt" id="comprar">Selecione um plano</h4>
+                <p class="text-align-center fs-mini text-muted mt-sm">
+                    <h5 class="text-align-center">Seu plano atual é <strong>{{plano_nome}}</strong></h5>
+                </p>
+            </div>
+            <div class="modal-body bg-gray-lighter">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-gray" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success">Comprar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}
+
+{% block scripts %}
+
+<script src="{% static "js/invoice.js"%}"></script>
+<script id="test" src="{% static "vendor/underscore/underscore.js"%}"></script>
+<script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
+<script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
+<script src="{% static "vendor/d3/d3.min.js"%}"></script>
+<script src="{% static "vendor/rickshaw/rickshaw.min.js"%}"></script>
+<script src="{% static "vendor/raphael/raphael-min.js"%}"></script>
+<script src="{% static "vendor/jQuery-Mapael/js/jquery.mapael.js"%}"></script>
+<script src="{% static "js/brazil.js"%}"></script>
+<script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/popover.js"%}"></script>
+<script src="{% static "vendor/bootstrap_calendar/bootstrap_calendar/js/bootstrap_calendar.min.js"%}"></script>
+<script src="{% static "vendor/jquery-animateNumber/jquery.animateNumber.min.js"%}"></script>
+
+
+<!-- page specific libs -->
+<script src="{% static "vendor/underscore/underscore-min.js"%}"></script>
+<script src="{% static "vendor/backbone/backbone.js"%}"></script>
+<script src="{% static "vendor/backbone.paginator/lib/backbone.paginator.min.js"%}"></script>
+<script src="{% static "vendor/backgrid/lib/backgrid.js"%}"></script>
+<script src="{% static "vendor/backgrid-paginator/backgrid-paginator.js"%}"></script>
+<script src="{% static "vendor/datatables/media/js/jquery.dataTables.js"%}"></script>
+<script src="{% static "vendor/bootstrap-select/dist/js/bootstrap-select.min.js"%}"></script>
+
+<script src="{% static "js/tables-dynamic.js"%}"></script>
+<script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/tab.js"%}"></script>
+<script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/modal.js"%}"></script>
+
+<script type="text/javascript">
+    $('#myModalLabel18').on('hidden.bs.modal', function() {
+    $(this).removeData('bs.modal');
+});
+</script>
+
+{% endblock %}
