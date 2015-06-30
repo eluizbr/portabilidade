@@ -25,7 +25,8 @@ import compra
 @login_required
 def index(request):
 
-	return render(request, 'index.html')
+	# return render(request, 'index.html')
+	return redirect('/operadoras/')
 
 @login_required
 def financeiro_info(request,id):
@@ -361,6 +362,6 @@ def retorno(request):
 
 	retorno = request.GET['id_pagseguro']
 	compra.registra_compra(retorno,request.user.id)
-	return redirect('http://eluizbr.asuscomm.com:8000/portabilidade/financeiro/')
+	#return redirect('http://eluizbr.asuscomm.com:8000/portabilidade/financeiro/')
 
 
