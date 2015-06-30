@@ -60,6 +60,7 @@ def financeiro(request):
 	cod_plano = cad.plano
 	id_cliente = cad.id
 
+	retorno = Retorno.objects.all().filter(reference=codigo_cliente)
 
 	plano = PlanoCliente.objects.get(cliente=user_id)
 	plano_nome = plano.nome_plano
@@ -67,8 +68,8 @@ def financeiro(request):
 
 	retorno = Retorno.objects.all().filter(reference=codigo_cliente)
 
-	if request.method == 'GET' and 'plano' in request.GET:
-		form = CompraFrom(request.GET)
+	if request.method == 'POST' and 'plano' in request.POST:
+		form = CompraFrom(request.POST)
 		
 		if form.is_valid():
 			select = form.cleaned_data.get('plano')
@@ -77,12 +78,16 @@ def financeiro(request):
 			planos = qs.plano
 			descricao = qs.descricao
 			valor = qs.valor
+			valorD = int(valor)
 			valor_consulta = qs.valor_consulta
-			print id_plano,descricao, valor, valor_consulta
+			total = int(valorD / valor_consulta)
 
-			if request.method == 'GET' and 'selecionar' in request.GET:
-				print 'selecionar...'
-			if request.method == 'GET' and 'comprar' in request.GET:
+			consultas_gratis = qs.consultas_gratis
+
+
+			if request.method == 'POST' and 'selecionar' in request.POST:
+				pass
+			if request.method == 'POST' and 'comprar' in request.POST:
 				### INICIO PAGSEGURO ###
 				compra.pagseguro(id_plano,descricao,valor,codigo_cliente)
 				print compra.pagseguro(id_plano,descricao,valor,codigo_cliente)
@@ -92,27 +97,16 @@ def financeiro(request):
 
 		form = CompraFrom()
 
-
 	return render(request, 'financeiro.html', locals())
 	
-
-
-
 @login_required
-def meus_dados(request):
-
+def criar_user(request):
 
 	user = User.objects.get(pk=request.user.id)
-	print user
 
-	cad = Cadastro.objects.get(user=user)
-	user_id = cad.id
-	codigo_cliente = cad.cod_cliente
-	cod_cliente = cad.chave
-	
 	if request.method == 'POST':
-		form = CadastroForm(request.POST or None, instance=cad)
-		
+		form = CadastroForm(request.POST)
+			
 		if form.is_valid():
 			obj = form.save(commit=False)
 			#obj.email = user.email
@@ -122,15 +116,67 @@ def meus_dados(request):
 
 			try:
 				### Se o plano não exite, então cria...
+				cad = Cadastro.objects.get(user=user)
+				user_id = cad.id
 				z = PlanoCliente.objects.get(cliente=request.user.id)
 			except PlanoCliente.DoesNotExist:
 				z = PlanoCliente(consultas=0,consultas_gratis=0,cliente=user_id,plano=1,nome_plano='Sem Plano')
 				z.save()
 				### Se o plano não exite, então cria...
+			return redirect('/portabilidade/meus-dados/')
+	else:
+
+		form = CadastroForm()
+
+	return render(request, 'criar_user.html', locals())	
+
+
+@login_required
+def meus_dados(request):
+
+	user = User.objects.get(pk=request.user.id)
+	print user
+
+	try:
+		cad = Cadastro.objects.get(user=user)
+		user_id = cad.id
+		codigo_cliente = cad.cod_cliente
+		cod_cliente = cad.chave
+	except Cadastro.DoesNotExist:
+		return redirect('/portabilidade/criar-user/')
+	
+	if request.method == 'POST':
+		form = CadastroForm(request.POST or None, instance=cad)
+		
+		try:
+			p = Cadastro.objects.get(user_id=request.user.id)
+			print p
+			if form.is_valid():
+				obj = form.save(commit=False)
+				obj.save()
+			else:
+
+				form = CadastroForm(instance=cad)
+
+		except Cadastro.DoesNotExist:
+			
+			if form.is_valid():
+				obj = form.save(commit=False)
+				#obj.email = user.email
+				obj.user = user
+				obj.cod_cliente = int(random.randint(10000000, 99000000))
+				obj.save()
+
+				try:
+					### Se o plano não exite, então cria...
+					z = PlanoCliente.objects.get(cliente=request.user.id)
+				except PlanoCliente.DoesNotExist:
+					z = PlanoCliente(consultas=0,consultas_gratis=0,cliente=user_id,plano=1,nome_plano='Sem Plano')
+					z.save()
+					### Se o plano não exite, então cria...
 	else:
 
 		form = CadastroForm(instance=cad)
-
 
 	return render(request, 'meus_dados.html', locals())
 
@@ -312,7 +358,6 @@ def consulta(request,numero):
 		return response
 
 def retorno(request):
-
 
 	retorno = request.GET['id_pagseguro']
 	compra.registra_compra(retorno,request.user.id)

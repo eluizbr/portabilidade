@@ -94,7 +94,7 @@
 
 
 	<div class="panel-body">
-	    <form role="form" name="enviar" method="GET">
+	    <form role="form" name="enviar" method="POST">{% csrf_token %}
 	        <div class="row">
 	            <div class="col-md-4">
 	                <div class="form-group">
@@ -121,6 +121,7 @@
 
 					                        <th class="text-align-center">Plano</th>
 					                        <th class="text-align-center">Descrição</th>
+					                        <th class="text-align-center">Total de contultas</th>
 					                        <th class="text-align-center">Valor</th>
 					                        <th class="text-align-center">Valor por Consulta</th>
 					                    </tr>
@@ -133,12 +134,19 @@
 			                        <tr>
 			                            <td class="text-align-center">{{planos}}</td>
 			                            <td class="text-align-center">{{descricao}}</td>
+			                            <td class="text-align-center">{{total|intcomma}}</td>
 			                            <td class="text-align-center">R$ {{valor}}</td>
 			                            <td class="text-align-center">R$ {{valor_consulta}}</td>
 			                        </tr>
 									{% endif %}
 			                    </tbody>
 			                </table>
+			                	{% if consultas_gratis > 0 %}	
+			                		<header>
+						                <h4>Ao comprar este plano, você receberá <strong>+ {{consultas_gratis|intcomma}}</strong> consultas <span class="fw-semi-bold">grátis</span></h4>
+						            </header>
+							    {% else %}
+							    {% endif %}
 			            </div>
 			        </section>
 			    </div>

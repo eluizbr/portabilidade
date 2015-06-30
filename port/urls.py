@@ -7,6 +7,7 @@ urlpatterns = patterns('',
     # Examples:
     url(r'^$', views.index, name='index'),
     url(r'^operadoras/$', views.operadoras, name='operadoras'),
+    url(r'^criar-user/$', views.criar_user, name='criar-user'),
     url(r'^meus-dados/$', views.meus_dados, name='meus-dados'),
 	url(r'^info/(?P<id>\d+)$', views.financeiro_info, name='info'),
 	url(r'^comprar/$', views.comprar, name='comprar'),

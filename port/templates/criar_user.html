@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load l10n %}
+{% load staticfiles %}
+{% load bootstrap %}
+{% block nome %}
+
+
+    <strong>{{user}}</strong>&nbsp;
+{% endblock %}
+
+{% block lista_server %}{% endblock lista_server %}
+
+{% block content %}
+
+		<form method="POST" action="{% url 'criar-user' %}" role="form"> {% csrf_token %}
+		    <div class="row mb-lg">
+	            <div class="col-md-10">
+	                <div id="tabs1c" class="tab-content mb-lg">
+	                    <div class="tab-pane active clearfix" id="meusdados">
+						        <div class="row">
+						            <div class="col-md-12">
+						            	<legend>CHAVE:  <strong> {{cod_cliente}}</strong> </legend>
+						                <section class="widget">
+						                    <div class="widget-body  bg-gray-lighter">
+		                                    <div class="modal-body bg-gray-lighter">
+		                                            <div class="row">
+		                                                <div class="col-md-6">
+		                                               {{ form.cod_cliente_errors }}
+		                                               {{ form.user_errors }}
+		                                                    <div class="form-group">
+
+		                                                        {{form.first_name|bootstrap}}
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-6">
+		                                                {{ form.nome.errors }}
+		                                                    <div class="form-group">
+		                                                        {{form.last_name|bootstrap}}
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-4">
+		                                                    <div class="form-group">
+		                                                        {{form.cpf|bootstrap}}
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-4">
+		                                                    <div class="form-group">
+		                                                        {{form.email|bootstrap}}
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-4">
+		                                                    <div class="form-group">
+		                                                        {{form.telefoneF|bootstrap}}
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-4">
+		                                                    <div class="form-group">
+		                                                        {{form.telefoneM|bootstrap}}
+		                                                    </div>
+		                                                </div>
+		                                            </div>
+		                                    </div>
+						                    </div>
+						                </section>
+						            	<legend><strong>Empresa</strong></legend>
+						                <section class="widget">
+						                    <div class="widget-body  bg-gray-lighter">
+		                                    <div class="modal-body bg-gray-lighter">
+		                                            <div class="row">
+		                                                <div class="col-md-8">
+		                                                    <div class="form-group">
+		                                                        {{form.empresa|bootstrap}}
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-2">
+		                                                    <div class="form-group">
+		                                                        {{form.cnpj|bootstrap}}
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-2">
+		                                                    <div class="form-group">
+		                                                        {{form.ie|bootstrap}}
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-5">
+		                                                    <div class="form-group">
+		                                                        {{form.nome|bootstrap}}
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-3">
+		                                                    <div class="form-group">
+		                                                        {{form.email_contato|bootstrap}}
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-2">
+		                                                    <div class="form-group">
+		                                                        {{form.telefoneF|bootstrap}}
+		                                                    </div>
+		                                                </div>
+					                                    <div class="col-sm-2">
+					                                       {{form.tipo|bootstrap}}
+					                                    </div>
+		                                            </div>
+		                                    </div>
+						                    </div>
+						                </section>
+						                <legend><strong>Endereço</strong></legend>
+						                <section class="widget">
+						                    <div class="widget-body  bg-gray-lighter">
+				                                    <div class="modal-body bg-gray-lighter">
+				                                            <div class="row">
+				                                                <div class="col-md-6">
+				                                                    {{form.endereco|bootstrap}}
+				                                                </div>
+				                                                <div class="col-md-3">
+				                                                    <div class="form-group">
+				                                                        {{form.numero|bootstrap}}
+				                                                    </div>
+				                                                </div>
+				                                                <div class="col-md-3">
+				                                                    <div class="form-group">
+				                                                        {{form.complemento|bootstrap}}
+				                                                    </div>
+				                                                </div>
+				                                                <div class="col-md-4">
+				                                                    <div class="form-group">
+				                                                        {{form.bairro|bootstrap}}
+				                                                    </div>
+				                                                </div>
+				                                                <div class="col-md-4">
+				                                                    <div class="form-group">
+				                                                        {{form.cidade|bootstrap}}
+				                                                    </div>
+				                                                </div>
+				                                                <div class="col-md-2">
+				                                                    <div class="form-group">
+				                                                        {{form.estado|bootstrap}}
+				                                                    </div>
+				                                                </div>
+				                                                <div class="col-md-2">
+				                                                    <div class="form-group">
+				                                                        {{form.cep|bootstrap}}
+				                                                    </div>
+				                                                </div>
+				                                            </div>
+				                                    </div>
+						                    </div>
+						                </section>
+				                            <div class="form-actions">
+				                                <div class="row">
+				                                    <div class="col-sm-offset-5 col-sm-7">
+				                                        <button type="submit" class="btn btn-inverse">Atualizar dados</button>
+				                                    </div>
+				                                </div>
+				                            </div>
+						            </div>
+						        </div>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+		</form>
+
+
+{% endblock content %}
+
+{% block scripts %}
+
+<script id="test" src="{% static "vendor/underscore/underscore.js"%}"></script>
+<script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
+<script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
+<script src="{% static "vendor/d3/d3.min.js"%}"></script>
+<script src="{% static "vendor/rickshaw/rickshaw.min.js"%}"></script>
+<script src="{% static "vendor/raphael/raphael-min.js"%}"></script>
+<script src="{% static "vendor/jQuery-Mapael/js/jquery.mapael.js"%}"></script>
+<script src="{% static "js/brazil.js"%}"></script>
+<script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/popover.js"%}"></script>
+<script src="{% static "vendor/bootstrap_calendar/bootstrap_calendar/js/bootstrap_calendar.min.js"%}"></script>
+<script src="{% static "vendor/jquery-animateNumber/jquery.animateNumber.min.js"%}"></script>
+
+<script src="{% static "js/index.js"%}"></script>
+
+<!-- page specific libs -->
+<script src="{% static "vendor/underscore/underscore-min.js"%}"></script>
+<script src="{% static "vendor/backbone/backbone.js"%}"></script>
+<script src="{% static "vendor/backbone.paginator/lib/backbone.paginator.min.js"%}"></script>
+<script src="{% static "vendor/backgrid/lib/backgrid.js"%}"></script>
+<script src="{% static "vendor/backgrid-paginator/backgrid-paginator.js"%}"></script>
+<script src="{% static "vendor/datatables/media/js/jquery.dataTables.js"%}"></script>
+<script src="{% static "vendor/bootstrap-select/dist/js/bootstrap-select.min.js"%}"></script>
+
+<script src="{% static "js/tables-dynamic.js"%}"></script>
+<script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/tab.js"%}"></script>
+<script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/modal.js"%}"></script>
+
+<script type="text/javascript">
+    
+    function initCalendar(){
+
+        var monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+        var dayNames = ["D", "S", "T", "Q", "Q", "S", "S"];
+
+        var now = new Date(),
+            month = now.getMonth() + 1,
+            year = now.getFullYear();
+
+        var events = [
+            {% for dia, mes, total in byDay %}
+            [
+                "{{dia|date:"j"}}/"+{{mes}}+"/"+year,
+                '{{total|intcomma}} ligações nesta data',
+                Sing.colors['brand-primary'],
+            ],
+            {% endfor %}
+        ];
+        var $calendar = $('#events-calendar');
+        $calendar.calendar({
+            months: monthNames,
+            days: dayNames,
+            events: events,
+            popover_options:{
+                placement: 'top',
+                html: true
+            }
+        });
+        $calendar.find('.icon-arrow-left').addClass('fa fa-arrow-left');
+        $calendar.find('.icon-arrow-right').addClass('fa fa-arrow-right');
+        function restyleCalendar(){
+            $calendar.find('.event').each(function(){
+                var $this = $(this),
+                    $eventIndicator = $('<span></span>');
+                $eventIndicator.css('background-color', $this.css('background-color')).appendTo($this.find('a'));
+                $this.css('background-color', '');
+            })
+        }
+        $calendar.find('.icon-arrow-left, .icon-arrow-right').parent().on('click', restyleCalendar);
+        restyleCalendar();
+    }
+</script>
+
+{% endblock %}
