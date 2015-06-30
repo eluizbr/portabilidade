@@ -67,7 +67,6 @@
                     <i class="toggle fa fa-angle-down"></i>
                 </a>
                 <ul id="sidebar-dashboard" class="collapse in">
-                    <li><a href="{% url 'meus-dados' %}">Meus dados</a></li>
                     <li><a href="{% url 'operadoras' %}">Operadoras</a></li>
                 </ul>
             </li>
@@ -81,7 +80,7 @@
                 </a>
                 <ul id="sidebar-ui" class="collapse">
                     <li><a href="{% url 'meus-dados' %}">Meus dados</a></li>
-                    <li><a href="#">Financeiro</a></li>
+                    <li><a href="{% url 'financeiro' %}">Financeiro</a></li>
                 </ul>
             </li>
 
@@ -548,29 +547,18 @@
 <script src="{% static "vendor/widgster/widgster.js"%}"></script>
 <script src="{% static "vendor/pace.js/pace.min.js"%}"></script>
 <script src="{% static "vendor/jquery-touchswipe/jquery.touchSwipe.js"%}"></script>
-<script src="{% static "vendor/jquery-touchswipe/jquery.touchSwipe.js"%}"></script>
+
 
 <!-- common app js -->
 <script src="{% static "js/settings.js"%}"></script>
 <script src="{% static "js/app.js"%}"></script>
 
-<!-- page specific libs -->
-<script id="test" src="{% static "vendor/underscore/underscore.js"%}"></script>
-<script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
-<script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
-<script src="{% static "vendor/d3/d3.min.js"%}"></script>
-<script src="{% static "vendor/rickshaw/rickshaw.min.js"%}"></script>
-<script src="{% static "vendor/raphael/raphael-min.js"%}"></script>
-<script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/popover.js"%}"></script>
-<script src="{% static "vendor/bootstrap_calendar/bootstrap_calendar/js/bootstrap_calendar.min.js"%}"></script>
-<script src="{% static "vendor/jquery-animateNumber/jquery.animateNumber.min.js"%}"></script>
-
 <!-- page specific js -->
 <script src="{% static "js/index.js"%}"></script>
 
 
-{% block scripts %}{% endblock %}
 
+{% block scripts %}{% endblock %}
 
 
 

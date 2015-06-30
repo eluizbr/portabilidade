@@ -59,7 +59,7 @@
         <ul class="sidebar-nav">
             <li class="active">
                 <!-- an example of nested submenu. basic bootstrap collapse component -->
-                <a class="collapsed" href="#sidebar-dashboard" data-toggle="collapse" data-parent="#sidebar">
+                <a href="#sidebar-dashboard" data-toggle="collapse" data-parent="#sidebar">
                     <span class="icon">
                         <i class="fa fa-desktop"></i>
                     </span>
@@ -67,23 +67,41 @@
                     <i class="toggle fa fa-angle-down"></i>
                 </a>
                 <ul id="sidebar-dashboard" class="collapse in">
-                    <li><a href="{% url 'operadoras' %}">Operadoras</a></li>
+                    <li class="active"><a href="{% url 'operadoras' %}">Operadoras</a></li>
+                </ul>
+            </li>
+        </ul>
+        <!-- every .sidebar-nav may have a title -->
+        <h5 class="sidebar-nav-title">Perfil <a class="action-link" href="#"><i class="glyphicon glyphicon-refresh"></i></a></h5>
+        <ul class="sidebar-nav">
+            <li>
+                <a class="collapsed" href="#sidebar-dashboard2" data-toggle="collapse" data-parent="#sidebar">
+                    <span class="icon">
+                        <i class="glyphicon glyphicon-user"></i>
+                    </span>
+                    Minha conta
+                    <i class="toggle fa fa-angle-down"></i>
+                </a>
+                <ul id="sidebar-dashboard2" class="collapse">
+                    <!-- data-no-pjax turns off pjax loading for this link. Use in case of complicated js loading on the
+                         target page -->
+                    <li><a href="{% url 'meus-dados' %}" data-no-pjax>Meus dados</a></li>
+                    <li><a href="{% url 'financeiro' %}" data-no-pjax>Financeiro</a></li>
                 </ul>
             </li>
             <li>
                 <a class="collapsed" href="#sidebar-ui" data-toggle="collapse" data-parent="#sidebar">
                     <span class="icon">
-                        <i class="fa fa-user"></i>
+                        <i class="fa fa-gear"></i>
                     </span>
-                    Minha conta
+                    Configurações
                     <i class="toggle fa fa-angle-down"></i>
                 </a>
                 <ul id="sidebar-ui" class="collapse">
-                    <li><a href="{% url 'meus-dados' %}">Meus dados</a></li>
-                    <li><a href="{% url 'financeiro' %}">Financeiro</a></li>
+                    <li><a href="{% url 'asterisk' %}" data-no-pjax>Asterisk</a></li>
+                    <li><a href="{% url 'csp' %}" data-no-pjax>Retornos CSP</a></li>
                 </ul>
             </li>
-
         </ul>
     </div>
 </nav>
@@ -555,9 +573,6 @@
 
 <!-- page specific js -->
 <script src="{% static "js/index.js"%}"></script>
-
-
-
 {% block scripts %}{% endblock %}
 
 

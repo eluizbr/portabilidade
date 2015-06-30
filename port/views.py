@@ -25,8 +25,26 @@ import compra
 @login_required
 def index(request):
 
-	# return render(request, 'index.html')
-	return redirect('/operadoras/')
+	#return render(request, 'index.html')
+
+	return redirect('operadoras')
+
+@login_required
+def asterisk(request):
+
+	user = User.objects.get(pk=request.user.id)
+	cad = Cadastro.objects.get(user=user)
+	chave = cad.chave
+
+	return render(request, 'asterisk.html', locals())
+
+@login_required
+def csp(request):
+
+	operadora = Prefixo.objects.values('rn1','operadora','tipo').distinct()
+
+	return render(request, 'csp.html', locals())
+
 
 @login_required
 def financeiro_info(request,id):
@@ -34,19 +52,6 @@ def financeiro_info(request,id):
     financeiro_info = Retorno.objects.all().filter(id=id)
     return render(request,'financeiro_info.html', locals())
 
-
-def comprar(request):
-	print request.GET
-	print request
-	if request.method == 'GET' and 'selecionar' in request.GET:
-		print 'selecionou...'
-	### INICIO PAGSEGURO ###
-	# compra.pagseguro(id_plano,descricao,valorD,codigo_cliente)
-	# print compra.pagseguro(id_plano,descricao,valorD,codigo_cliente)
-	# return redirect(compra.pagseguro(id_plano,descricao,valorD,codigo_cliente))
-	### FIM PAGSEGURO ###
-
-	return render(request, 'comprar.html', locals())
 
 @login_required
 def financeiro(request):
@@ -79,9 +84,11 @@ def financeiro(request):
 			planos = qs.plano
 			descricao = qs.descricao
 			valor = qs.valor
+			taxa = qs.taxas
 			valorD = int(valor)
 			valor_consulta = qs.valor_consulta
 			total = int(valorD / valor_consulta)
+			valor_total = valor + taxa
 
 			consultas_gratis = qs.consultas_gratis
 
@@ -90,9 +97,9 @@ def financeiro(request):
 				pass
 			if request.method == 'POST' and 'comprar' in request.POST:
 				### INICIO PAGSEGURO ###
-				compra.pagseguro(id_plano,descricao,valor,codigo_cliente)
-				print compra.pagseguro(id_plano,descricao,valor,codigo_cliente)
-				return redirect(compra.pagseguro(id_plano,descricao,valor,codigo_cliente))
+				compra.pagseguro(id_plano,descricao,valor,codigo_cliente,taxa)
+				print compra.pagseguro(id_plano,descricao,valor,codigo_cliente,taxa)
+				return redirect(compra.pagseguro(id_plano,descricao,valor,codigo_cliente,taxa))
 				### FIM PAGSEGURO ###
 	else:
 
@@ -136,7 +143,6 @@ def criar_user(request):
 def meus_dados(request):
 
 	user = User.objects.get(pk=request.user.id)
-	print user
 
 	try:
 		cad = Cadastro.objects.get(user=user)
@@ -250,7 +256,8 @@ def operadoras(request):
 		total ="""SELECT DISTINCT operadora,
 						  COUNT( IF( tipo='FIXO', 1, NULL ) ) AS fixo,
 						  COUNT( IF( tipo='MOVEL', 1, NULL ) ) AS movel,
-						  COUNT( IF( tipo='RADIO', 1, NULL ) ) AS radio
+						  COUNT( IF( tipo='RADIO', 1, NULL ) ) AS radio,
+						  SUM(valor) AS valor
 						FROM port_cdr WHERE cliente_id = %d
 						GROUP BY operadora""" % id_cliente
 		total = c.execute(total)
@@ -296,72 +303,91 @@ def consulta(request,numero):
 	segredo = request.GET['key']
 	segredo = str(segredo)
 
-	insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=1)
-	rn1 = len(numero)
+	s = Cadastro.objects.get(chave=segredo)
+	id_user = s.id
 
-	try:
+	c = PlanoCliente.objects.get(cliente=id_user)
+	saldo = c.consultas
+	print saldo
 
-		key = request.GET['key']
-		key = str(key)
-		print key
+	if saldo <= 0:
+		rn1 = 'Sem credito'
+		response = HttpResponse(rn1, content_type='text/plain')
+		return response
+	else:
 
-		chave = Cadastro.objects.values_list('chave').filter(chave=key)[0]
-		chave = chave[0]
-		chave = str(chave)
 
-		if key != chave:
 
-			if rn1 == 9:
+		rn1 = len(numero)
 
-				rn1 = Portados.objects.values_list('rn1').filter(numero=numero)
-				rn1 = str(rn1)[5:7]
 
-				if not rn1:
-					rn1 = str(numero)[0:6]
-					rn1 = NaoPortados.objects.values_list('rn1').filter(prefixo=rn1)
+		try:
+
+			key = request.GET['key']
+			key = str(key)
+
+			chave = Cadastro.objects.values_list('chave').filter(chave=key)[0]
+			chave = chave[0]
+			chave = str(chave)
+
+			if key != chave:
+
+
+				if rn1 == 9:
+
+					rn1 = Portados.objects.values_list('rn1').filter(numero=numero)
 					rn1 = str(rn1)[5:7]
 
-			elif rn1 == 10:
-				rn1 = Portados.objects.values_list('rn1').filter(numero=numero)
-				rn1 = str(rn1)[5:7]
+					if not rn1:
+						rn1 = str(numero)[0:6]
+						rn1 = NaoPortados.objects.values_list('rn1').filter(prefixo=rn1)
+						rn1 = str(rn1)[5:7]
+						insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=1)
 
-				if not rn1:
-					rn1 = str(numero)[0:6]
-					rn1 = NaoPortados.objects.values_list('rn1').filter(prefixo=rn1)
+				elif rn1 == 10:
+					rn1 = Portados.objects.values_list('rn1').filter(numero=numero)
 					rn1 = str(rn1)[5:7]
 
-			elif rn1 == 11:
-				rn1 = Portados.objects.values_list('rn1').filter(numero=numero)
-				rn1 = str(rn1)[5:7]
 
-				if not rn1:
-					rn1 = str(numero)[0:7]
-					rn1 = NaoPortados.objects.values_list('rn1').filter(prefixo=rn1)
+					if not rn1:
+						rn1 = str(numero)[0:6]
+						rn1 = NaoPortados.objects.values_list('rn1').filter(prefixo=rn1)
+						rn1 = str(rn1)[5:7]
+						insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=1)
+
+				elif rn1 == 11:
+					rn1 = Portados.objects.values_list('rn1').filter(numero=numero)
 					rn1 = str(rn1)[5:7]
-			
-			elif rn1 <= 10:
-			
+
+					if not rn1:
+						rn1 = str(numero)[0:7]
+						rn1 = NaoPortados.objects.values_list('rn1').filter(prefixo=rn1)
+						rn1 = str(rn1)[5:7]
+						insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=1)
+				
+				elif rn1 <= 10:
+				
+					rn1 = 0
+					response = HttpResponse(rn1, content_type='text/plain')
+					return response			
+
+				response = HttpResponse(rn1, content_type='text/plain')
+				return response
+			else:
+
 				rn1 = 0
 				response = HttpResponse(rn1, content_type='text/plain')
-				return response			
-
-			response = HttpResponse(rn1, content_type='text/plain')
-			return response
-		else:
+				return response
+		except:
 
 			rn1 = 0
 			response = HttpResponse(rn1, content_type='text/plain')
 			return response
-	except:
-
-		rn1 = 0
-		response = HttpResponse(rn1, content_type='text/plain')
-		return response
 
 def retorno(request):
 
 	retorno = request.GET['id_pagseguro']
 	compra.registra_compra(retorno,request.user.id)
-	#return redirect('http://eluizbr.asuscomm.com:8000/portabilidade/financeiro/')
+	return redirect('http://eluizbr.asuscomm.com:8000/portabilidade/financeiro/')
 
 

@@ -12,7 +12,7 @@
 {% block content %}
 
 
-<div class="row mb-lg">
+<div class="row mb-lg non-printable">
     <div class="col-md-12">
         <div class="tab-pane" id="financeiro">
             <div class="col-xs-4">
@@ -122,8 +122,10 @@
 					                        <th class="text-align-center">Plano</th>
 					                        <th class="text-align-center">Descrição</th>
 					                        <th class="text-align-center">Total de contultas</th>
-					                        <th class="text-align-center">Valor</th>
 					                        <th class="text-align-center">Valor por Consulta</th>
+					                        <th class="text-align-center">Valor do plano</th>
+					                        <th class="text-align-center">Taxas PagSeguro</th>
+					                        <th class="text-align-center">Valor total a pagar</th>
 					                    </tr>
 									{% else %}
 										<h3 class="text-align-center">Selecione um <span class="fw-semi-bold">plano</span></h3>
@@ -135,8 +137,10 @@
 			                            <td class="text-align-center">{{planos}}</td>
 			                            <td class="text-align-center">{{descricao}}</td>
 			                            <td class="text-align-center">{{total|intcomma}}</td>
-			                            <td class="text-align-center">R$ {{valor}}</td>
 			                            <td class="text-align-center">R$ {{valor_consulta}}</td>
+			                            <td class="text-align-center">R$ {{valor}}</td>
+			                            <td class="text-align-center">R$ {{taxa}}</td>
+			                            <td class="text-align-center">R$ {{valor_total}}</td>
 			                        </tr>
 									{% endif %}
 			                    </tbody>
@@ -168,7 +172,7 @@
 </div>
 
 
-<div class="modal fade" id="myModal18" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18" aria-hidden="true">
+<div class="modal fade" id="myModal18" tabindex="-1" role="dialog" aria-labelledby="myModalLabel19" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
 	        <div class="row">
@@ -194,7 +198,7 @@
 
 {% block scripts %}
 
-<script src="{% static "js/invoice.js"%}"></script>
+
 <script id="test" src="{% static "vendor/underscore/underscore.js"%}"></script>
 <script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
 <script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
@@ -222,9 +226,10 @@
 <script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/modal.js"%}"></script>
 
 <script type="text/javascript">
-    $('#myModalLabel18').on('hidden.bs.modal', function() {
-    $(this).removeData('bs.modal');
+$(document).on('hidden.bs.modal', function (e) {
+    $(e.target).removeData('bs.modal');
 });
 </script>
+
 
 {% endblock %}

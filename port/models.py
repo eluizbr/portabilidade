@@ -49,6 +49,7 @@ class Plano(models.Model):
     valor = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2, default=00.00)
     valor_consulta = models.FloatField(blank=True, null=True, default=00.00)
     consultas_gratis = models.IntegerField(blank=True, null=True,default=0)
+    taxas = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2, default=00.00)
 
     def __unicode__(self):
         return unicode(self.plano)
