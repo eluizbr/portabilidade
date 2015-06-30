@@ -207,6 +207,7 @@
                         <th class="text-align-center">Operadora</th>
                         <th class="text-align-center">Tipo</th>
                         <th class="text-align-center">Hora</th>
+                        <th class="text-align-center">Custo</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -216,6 +217,7 @@
                             <td class="text-align-center">{{n.operadora}}</td>
                             <td class="text-align-center">{{n.tipo}}</td>
                             <td class="text-align-center">{{n.data_hora|naturaltime}}</td>
+                            <td class="text-align-center">R$ {{n.valor}}</td>
 
                         </tr>
                     {% endfor %}

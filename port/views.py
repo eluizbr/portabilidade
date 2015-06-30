@@ -193,7 +193,7 @@ def operadoras(request):
 		plano = PlanoCliente.objects.values_list('consultas').filter(cliente=request.user.id)
 		operadoras = Cdr.objects.values('operadora','tipo').order_by('operadora').annotate(Count('cidade')).filter(cliente=id_cliente)
 		tipo_numero = Cdr.objects.values('tipo').annotate(Count('tipo')).filter(cliente=id_cliente)
-		ultimos_numero = operadoras = Cdr.objects.values('numero','operadora','tipo','data_hora').order_by('-id').filter(cliente=id_cliente)[:5][::1]
+		ultimos_numero = operadoras = Cdr.objects.values('numero','operadora','tipo','data_hora','valor').order_by('-id').filter(cliente=id_cliente)[:5][::1]
 
 		try:
 
@@ -303,13 +303,13 @@ def consulta(request,numero):
 
 		key = request.GET['key']
 		key = str(key)
+		print key
 
 		chave = Cadastro.objects.values_list('chave').filter(chave=key)[0]
 		chave = chave[0]
 		chave = str(chave)
 
-
-		if key == chave:
+		if key != chave:
 
 			if rn1 == 9:
 

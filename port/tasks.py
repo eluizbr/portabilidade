@@ -5,7 +5,7 @@ from celery import task
 from portabilidade.celery import app
 from django.shortcuts import render,get_object_or_404
 from django.http import HttpResponse
-from port.models import Portados, NaoPortados, Cadastro, Cdr, Prefixo
+from port.models import Portados, NaoPortados, Cadastro, Cdr, Prefixo, PlanoCliente, Plano
 
 @task
 def insert_cdr(request,numero):
@@ -14,6 +14,27 @@ def insert_cdr(request,numero):
 	numero = numero
 	tamanho = len(numero)
 	portado = Portados.objects.values_list('numero').filter(numero=numero)
+
+	z = Cadastro.objects.get(chave=chave)
+	id_user = z.id
+	print id_user
+
+	x = PlanoCliente.objects.get(cliente=id_user)
+	plano_id_cliente = x.plano
+	print 'o ID do plano e %s' %plano_id_cliente 
+	consultas = x.consultas
+	print 'consultas restantes %s' %consultas
+	gratis = x.consultas_gratis
+	print 'consultas gratis restantes %s' %gratis
+
+	y = Plano.objects.get(id=plano_id_cliente)
+	valor_plano = y.valor_consulta
+	print 'o valor por consulta e %s' %valor_plano
+
+	### INICIO Remover credito ###
+	total_consultas = consultas -1
+	print 'restou apenas %s creditos' %total_consultas
+	### FIM Remover credito ###
 
 	if portado:
 		portado = Portados.objects.values_list('rn1').filter(numero=numero)
@@ -35,9 +56,10 @@ def insert_cdr(request,numero):
 			rn1 = item['rn1']
 
 			key = get_object_or_404(Cadastro, chave=chave)		
-			criar = Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, operadora=operadora,\
-										 cidade=cidade, estado=estado, tipo=tipo,portado=1)
-			criar.save()
+			Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, operadora=operadora,\
+										 cidade=cidade, estado=estado, tipo=tipo,portado=1,valor=valor_plano)
+
+			PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
 
 	else:
 
@@ -59,8 +81,8 @@ def insert_cdr(request,numero):
 
 			key = get_object_or_404(Cadastro, chave=chave)
 			#print 'a chave e %s' %key		
-			criar = Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, operadora=operadora,\
-										 cidade=cidade, estado=estado, tipo=tipo)
+			Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, operadora=operadora,\
+										 cidade=cidade, estado=estado, tipo=tipo,valor=valor_plano)
 			
-
+			PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
 			#print key,estado,cidade,operadora,tipo

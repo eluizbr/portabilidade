@@ -69,6 +69,7 @@ class Cdr(models.Model):
     data = models.DateField(auto_now=True)
     hora = models.TimeField(auto_now=True)
     data_hora = models.DateTimeField(auto_now=True)
+    valor = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2)
     
     def __unicode__(self):
         return unicode(self.numero)
