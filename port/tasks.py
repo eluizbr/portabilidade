@@ -26,14 +26,22 @@ def insert_cdr(request,numero):
 	print 'consultas restantes %s' %consultas
 	gratis = x.consultas_gratis
 	print 'consultas gratis restantes %s' %gratis
+	tipo = x.tipo
+	tipo = int(tipo)
+	print 'tipo de plano é %s' %tipo
 
 	y = Plano.objects.get(id=plano_id_cliente)
 	valor_plano = y.valor_consulta
 	print 'o valor por consulta e %s' %valor_plano
 
 	### INICIO Remover credito ###
-	total_consultas = consultas -1
-	print 'restou apenas %s creditos' %total_consultas
+	if tipo == 1:
+		total_consultas = consultas - 1
+		print 'restou apenas %s creditos' %total_consultas
+
+	else:
+		total_consultas = 0
+		print 'restou apenas %s creditos' %total_consultas		
 	### FIM Remover credito ###
 
 	if portado:

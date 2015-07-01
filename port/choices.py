@@ -1,4 +1,10 @@
 # -*- coding: UTF-8 -*-
+TIPO_PLANO_CHOICES = (
+    ('0', 'Ilimitado'),
+    ('1', 'normal')
+)
+
+
 
 STATUS_CHOICES = (
     ('1', 'Aguardando pagamento'),

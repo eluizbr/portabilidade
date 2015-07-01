@@ -2,7 +2,14 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
+import datetime
+from datetime import timedelta,date
 import choices
+
+data = datetime.datetime.now()
+mes = data + timedelta(days=30)
+
+
 
 class NaoPortados(models.Model):
     operadora = models.CharField(max_length=64)
@@ -44,13 +51,15 @@ class Prefixo(models.Model):
 
 class Plano(models.Model):
 
+    TIPO = choices.TIPO_PLANO_CHOICES
+
     plano = models.CharField(null=True,blank=True,max_length=255)
     descricao = models.CharField(null=True,blank=True,max_length=255)
     valor = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2, default=00.00)
     valor_consulta = models.FloatField(blank=True, null=True, default=00.00)
     consultas_gratis = models.IntegerField(blank=True, null=True,default=0)
     taxas = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2, default=00.00)
-
+    tipo = models.CharField(max_length=200,choices=TIPO,default=1)
     def __unicode__(self):
         return unicode(self.plano)
 
@@ -122,11 +131,16 @@ class Cadastro(models.Model):
 
 class PlanoCliente(models.Model):
 
+    TIPO = choices.TIPO_PLANO_CHOICES
+
     cliente = models.IntegerField(u'Cliente', default=1, unique=True)
     plano = models.IntegerField(u'Plano', default=1)
     nome_plano = models.CharField(u'Nome do Plano',max_length=255)
     consultas = models.IntegerField(blank=True, null=True,default=0)
     consultas_gratis = models.IntegerField(blank=True, null=True,default=0)
+    criado_em = models.DateTimeField(default=data)
+    expira_em = models.DateTimeField(default=mes)
+    tipo = models.CharField(max_length=200,choices=TIPO,default=1)
 
     def __unicode__(self):
         return unicode(self.plano)
@@ -160,6 +174,3 @@ class Retorno(models.Model):
 
     def __unicode__(self):
         return unicode(self.status)
-    
-
-

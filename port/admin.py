@@ -2,10 +2,10 @@ from django.contrib import admin
 from .models import Cadastro, Plano, PlanoCliente, Retorno
 
 class PlanoAdmin(admin.ModelAdmin):
-	list_display = ['plano','descricao','valor','valor_consulta', 'consultas_gratis','taxas']
+	list_display = ['plano','tipo','descricao','valor','valor_consulta', 'consultas_gratis','taxas']
 
 class PlanoClienteAdmin(admin.ModelAdmin):
-	list_display = ['cliente','consultas','consultas_gratis']
+	list_display = ['cliente','plano','consultas','consultas_gratis','criado_em', 'expira_em', 'tipo']
 
 
 class CadastroAdmin(admin.ModelAdmin):

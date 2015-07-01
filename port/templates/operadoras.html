@@ -99,13 +99,17 @@
                 <h5 class="fw-semi-bold mt">Consultas restantes</h5>
                 <p>
                     
-                    {% if consultas == 0 %}
-                        <strong class="text-danger"><h5>ATENÇÃO </h5>Você esta sem creditos</strong>
-                    {% elif consultas == -1 %}
-                        <strong>Plano ILIMITADO</strong>
-                    {% else %}
-                        <span class="circle bg-warning"><i class="fa fa-random"></i></span> 
-                        <strong>{{consultas|intcomma}}</strong>
+                    {% if tipo == '0' %}
+                        <strong class="text-reverse"><h5>ILIMITADO</h5> vence em {{expira|date:"d F Y" }}</strong>
+                        {% else %}
+                            {% if consultas == 0 %}
+                                <strong class="text-danger"><h5>ATENÇÃO </h5>Você esta sem creditos</strong>
+                            {% elif consultas == -1 %}
+                                <strong>Plano ILIMITADO</strong>
+                            {% else %}
+                                <span class="circle bg-warning"><i class="fa fa-random"></i></span> 
+                                <strong>{{consultas|intcomma}}</strong>
+                        {% endif %}    
                     {% endif %}
                     
                 </p>

@@ -70,7 +70,10 @@ def financeiro(request):
 
 	plano = PlanoCliente.objects.get(cliente=user_id)
 	plano_nome = plano.nome_plano
+	tipo = plano.tipo
+	print tipo
 	consultas = plano.consultas
+	expira = plano.expira_em
 
 	retorno = Retorno.objects.all().filter(reference=codigo_cliente)
 
@@ -110,6 +113,8 @@ def financeiro(request):
 @login_required
 def criar_user(request):
 
+	data = datetime.datetime.now()
+	mes = data + timedelta(days=30)
 	user = User.objects.get(pk=request.user.id)
 
 	if request.method == 'POST':
@@ -126,9 +131,13 @@ def criar_user(request):
 				### Se o plano não exite, então cria...
 				cad = Cadastro.objects.get(user=user)
 				user_id = cad.id
-				z = PlanoCliente.objects.get(cliente=request.user.id)
+				print 'o usuario novo é %s' %user_id
+				z = PlanoCliente.objects.get(cliente=user_id)
+				cliente = z.cliente
+				plano = z.plano
+				print cliente, plano
 			except PlanoCliente.DoesNotExist:
-				z = PlanoCliente(consultas=0,consultas_gratis=0,cliente=user_id,plano=1,nome_plano='Sem Plano')
+				z = PlanoCliente(consultas=0,consultas_gratis=0,cliente=user_id,plano=1,nome_plano='Ilimitado',criado_em=data,expira_em=mes,tipo=0)
 				z.save()
 				### Se o plano não exite, então cria...
 			return redirect('/portabilidade/meus-dados/')
@@ -195,17 +204,29 @@ def operadoras(request):
 	try:
 		c = connection.cursor()
 		
-		id_cliente = Cadastro.objects.values_list('id').filter(user_id=request.user.id)[0]
-		plano = PlanoCliente.objects.values_list('consultas').filter(cliente=request.user.id)
+		#id_cliente = Cadastro.objects.values_list('id').filter(user_id=request.user.id)[0]
+		try:
+			x = Cadastro.objects.get(user_id=request.user.id)
+			id_cliente = x.id
+		
+		except ObjectDoesNotExist:
+
+			return redirect('/portabilidade/criar-user/')
+
+
+		#plano = PlanoCliente.objects.values_list('consultas').filter(cliente=request.user.id)
+		p = PlanoCliente.objects.get(cliente=id_cliente)
+		plano = p.consultas
+		tipo = p.tipo
+		expira = p.expira_em
 		operadoras = Cdr.objects.values('operadora','tipo').order_by('operadora').annotate(Count('cidade')).filter(cliente=id_cliente)
 		tipo_numero = Cdr.objects.values('tipo').annotate(Count('tipo')).filter(cliente=id_cliente)
 		ultimos_numero = operadoras = Cdr.objects.values('numero','operadora','tipo','data_hora','valor').order_by('-id').filter(cliente=id_cliente)[:5][::1]
 
 		try:
-
-			id_cliente = id_cliente[0]
-			consultas = PlanoCliente.objects.values_list('consultas').filter(cliente=id_cliente)[0]
-			consultas = consultas[0]
+			#id_cliente = id_cliente	
+			#consultas = PlanoCliente.objects.values_list('consultas').filter(cliente=id_cliente)[0]
+			consultas = p.consultas
 
 		except ZeroDivisionError:
 			
@@ -284,7 +305,7 @@ def operadoras(request):
 
 		# teste2 = teste.filter(cidade='Belo Horizonte')
 		
-		portados = Cdr.objects.values('portado').annotate(cnt=Count('portado')).order_by('portado')
+		portados = Cdr.objects.values('portado').annotate(cnt=Count('portado')).order_by('portado').filter(cliente_id=id_cliente)
 		total_items = Cdr.objects.count()
 		total_items = float(total_items)
 
@@ -296,10 +317,17 @@ def operadoras(request):
 	except IndexError:
 		return redirect('/portabilidade/meus-dados/')
 
+def diffDate(data1, data2):
+   d1 = data1
+   d2 = data2
+   delta = d2-d1
+   r = delta.days if (delta.days > 0) else "0"
+   return r
 
 #@ratelimit(key='ip', rate='60/m', block=True)
 def consulta(request,numero):
 
+	hoje = datetime.datetime.now()
 	segredo = request.GET['key']
 	segredo = str(segredo)
 
@@ -308,18 +336,31 @@ def consulta(request,numero):
 
 	c = PlanoCliente.objects.get(cliente=id_user)
 	saldo = c.consultas
-	print saldo
+	saldo = int(saldo)
+	tipo = c.tipo
+	tipo = int(tipo)
 
-	if saldo <= 0:
+	expira = c.expira_em
+	expira_y = int(expira.strftime("%Y"))
+	expira_m = int(expira.strftime("%m"))
+	expira_d = int(expira.strftime("%d"))
+
+
+	diferenca = diffDate(date(expira_y,expira_m,expira_d),date(hoje.year,hoje.month,hoje.day))
+	diferenca = int(diferenca)
+	print diferenca
+	
+	if diferenca >= 30:
+		PlanoCliente.objects.filter(cliente=id_user).update(consultas=0,plano=1,nome_plano='Escolha um plano',tipo=1)
+
+	if (saldo <= 0) and (tipo == 1):
+
 		rn1 = 'Sem credito'
 		response = HttpResponse(rn1, content_type='text/plain')
 		return response
 	else:
 
-
-
 		rn1 = len(numero)
-
 
 		try:
 
@@ -331,7 +372,6 @@ def consulta(request,numero):
 			chave = str(chave)
 
 			if key != chave:
-
 
 				if rn1 == 9:
 
@@ -347,6 +387,7 @@ def consulta(request,numero):
 				elif rn1 == 10:
 					rn1 = Portados.objects.values_list('rn1').filter(numero=numero)
 					rn1 = str(rn1)[5:7]
+					insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=1)
 
 
 					if not rn1:
@@ -358,6 +399,7 @@ def consulta(request,numero):
 				elif rn1 == 11:
 					rn1 = Portados.objects.values_list('rn1').filter(numero=numero)
 					rn1 = str(rn1)[5:7]
+					insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=1)
 
 					if not rn1:
 						rn1 = str(numero)[0:7]

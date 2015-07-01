@@ -18,8 +18,13 @@
             <div class="col-xs-4">
             	<h4>Plano atual:  <span class="fw-semi-bold">{{plano_nome}}</span></h4>
             </div>
-            <div class="col-xs-4">
-            	<h4>Consultas disponíveis:  <span class="fw-semi-bold">{{consultas}}</span></h4>
+            <div class="col-xs-6">
+            	{% if tipo == '0' %}
+            		<h4>Consultas ilimitadas<span class="fw-semi-bold"> até <strong>{{expira|date:"d F Y"}}</strong></span></h4>
+            	{% else %}
+            		<h4>Consultas disponíveis:  <span class="fw-semi-bold">{{consultas}}</span></h4>
+            	{% endif %}
+            	
             </div>
         </div>
     </div>
