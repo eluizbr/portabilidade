@@ -4,6 +4,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseRedirect, HttpRequest
 from django.template import RequestContext
 from django.db.models import Count
+from django.views.decorators.csrf import csrf_exempt
+from django.core.mail import send_mail, BadHeaderError
 from django.contrib.auth.decorators import login_required
 from models import Portados, NaoPortados, Cdr, Prefixo, PlanoCliente, Retorno
 from ratelimit.decorators import ratelimit
@@ -21,6 +23,29 @@ from django.contrib.auth.models import User
 from pagseguro.api import PagSeguroItem, PagSeguroApi
 import compra
 
+@csrf_exempt
+def contato(request):
+    name = request.POST.get('name', '')
+    email = request.POST.get('email', '')
+    subject = request.POST.get('subject', '')
+    message = request.POST.get('message', '')
+ 
+    if name and message and email:
+        txtmessage = name + "\n"
+        txtmessage += message
+        try:
+            send_mail(
+                subject,
+                txtmessage,
+                email,
+                ['comercial@cdr-port.net'],
+                fail_silently=False
+            )
+            return redirect('http://cdr-port.net')
+        except BadHeaderError:
+            return HttpResponse(u"Cabeçalho inválido.")
+    else:
+        return HttpResponse("Preencha todos os campos.")
 
 @login_required
 def index(request):
@@ -74,11 +99,9 @@ def financeiro(request):
 
 	retorno = Retorno.objects.all().filter(reference=codigo_cliente)
 	
-	print request.POST
 	if request.method == 'POST' and 'plano' in request.POST:
 
 		form = CompraFrom(request.POST)
-		print 'aqui'
 		if form.is_valid():
 			print 'aqui'
 			selecao = form.cleaned_data.get('plano')
@@ -92,13 +115,14 @@ def financeiro(request):
 			taxa = qs.taxas
 			valorD = int(valor)
 			valor_consulta = qs.valor_consulta
-			total = int(valorD / valor_consulta)
+			try:
+				total = int(valorD / valor_consulta)
+			except ZeroDivisionError:
+				total = 0
 			valor_total = valor + taxa
 
 			consultas_gratis = qs.consultas_gratis
 			tipo = qs.tipo
-
-			print request.POST
 
 			if request.method == 'POST' and 'selecionar' in request.POST:
 				print 'selecionar'
@@ -112,7 +136,6 @@ def financeiro(request):
 
 		form = CompraFrom()
 
-	print locals()
 	return render(request, 'financeiro.html', locals())
 	
 @login_required
