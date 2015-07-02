@@ -60,6 +60,7 @@ class Plano(models.Model):
     consultas_gratis = models.IntegerField(blank=True, null=True,default=0)
     taxas = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2, default=00.00)
     tipo = models.CharField(max_length=200,choices=TIPO,default=1)
+    
     def __unicode__(self):
         return unicode(self.plano)
 

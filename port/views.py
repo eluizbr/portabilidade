@@ -66,23 +66,25 @@ def financeiro(request):
 	cod_plano = cad.plano
 	id_cliente = cad.id
 
-	retorno = Retorno.objects.all().filter(reference=codigo_cliente)
-
-	plano = PlanoCliente.objects.get(cliente=user_id)
-	plano_nome = plano.nome_plano
-	tipo = plano.tipo
-	print tipo
-	consultas = plano.consultas
-	expira = plano.expira_em
+	x = PlanoCliente.objects.get(cliente=user_id)
+	plano_nome = x.nome_plano
+	tipo = x.tipo
+	consultas = x.consultas
+	expira = x.expira_em
 
 	retorno = Retorno.objects.all().filter(reference=codigo_cliente)
-
+	
+	print request.POST
 	if request.method == 'POST' and 'plano' in request.POST:
+
 		form = CompraFrom(request.POST)
-		
+		print 'aqui'
 		if form.is_valid():
-			select = form.cleaned_data.get('plano')
-			qs = Plano.objects.get(plano=select)
+			print 'aqui'
+			selecao = form.cleaned_data.get('plano')
+			print selecao
+			qs = Plano.objects.get(plano=selecao)
+			print qs
 			id_plano = qs.id
 			planos = qs.plano
 			descricao = qs.descricao
@@ -94,10 +96,12 @@ def financeiro(request):
 			valor_total = valor + taxa
 
 			consultas_gratis = qs.consultas_gratis
+			tipo = qs.tipo
 
+			print request.POST
 
 			if request.method == 'POST' and 'selecionar' in request.POST:
-				pass
+				print 'selecionar'
 			if request.method == 'POST' and 'comprar' in request.POST:
 				### INICIO PAGSEGURO ###
 				compra.pagseguro(id_plano,descricao,valor,codigo_cliente,taxa)
@@ -108,6 +112,7 @@ def financeiro(request):
 
 		form = CompraFrom()
 
+	print locals()
 	return render(request, 'financeiro.html', locals())
 	
 @login_required

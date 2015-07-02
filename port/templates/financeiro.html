@@ -20,7 +20,7 @@
             </div>
             <div class="col-xs-6">
             	{% if tipo == '0' %}
-            		<h4>Consultas ilimitadas<span class="fw-semi-bold"> até <strong>{{expira|date:"d F Y"}}</strong></span></h4>
+            		<h4>Consultas ilimitadas<span class="fw-semi-bold"> até <strong>{{expira}}</strong></span></h4>
             	{% else %}
             		<h4>Consultas disponíveis:  <span class="fw-semi-bold">{{consultas}}</span></h4>
             	{% endif %}
@@ -133,7 +133,11 @@
 					                        <th class="text-align-center">Valor total a pagar</th>
 					                    </tr>
 									{% else %}
-										<h3 class="text-align-center">Selecione um <span class="fw-semi-bold">plano</span></h3>
+										<h3 class="text-align-center">Selecione um <span class="fw-semi-bold">plano</span>
+											<br>
+											<h3 class="text-align-center"><span class="fw-semi-bold">PagSeguro</span>
+											<br><br>
+										<img align="center" src="{% static "img/pagseguro.png"%}" alt="..."></h3>
 									{% endif %}
 			                    </thead>
 			                    <tbody>
@@ -163,14 +167,16 @@
 			        <div class="row">
 			            <div class="col-sm-offset-5 col-sm-7">
 			                {% if planos %}
-			                	<button type="submit" value="{{planos}}" name="comprar" class="btn btn-primary">Comprar este plano</button>
-			                	<button type="submit" name="selecionar" class="btn btn-inverse">Selecionar outro plano</button>
+			                	<button type="submit" value="{{planos}}" name="comprar" class="btn btn-primary">Pagar com o PagSeguro</button>
+								<button type="submit" name="selecionar" class="btn btn-inverse">Selecionar outro plano</button>
 			                {% else %}
 			                	<button type="submit" name="selecionar" class="btn btn-inverse">Selecionar plano</button>
 			                {% endif %}
 			            </div>
+
 			        </div>
 			    </div>
+
 				</div>
 		</form>
 	</div>

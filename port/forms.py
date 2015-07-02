@@ -18,4 +18,4 @@ class CompraFrom(forms.ModelForm):
 	class Meta:
 		model = Plano
 		fields = '__all__'
-		exclude = ['consultas_gratis']
+		exclude = ['consultas_gratis','taxas','tipo']
