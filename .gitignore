@@ -15,3 +15,5 @@ numeros.txt
 static/admin/js/LICENSE-JQUERY.txt
 
 utils.txt
+
+*.log

@@ -22,29 +22,27 @@ from models import Cadastro, Plano, Retorno
 from django.contrib.auth.models import User
 from pagseguro.api import PagSeguroItem, PagSeguroApi
 import compra
+from post_office import mail
 
 
 @csrf_exempt
 def contato(request):
     name = request.POST.get('name', '')
+    phone = request.POST.get('phone', '')
     email = request.POST.get('email', '')
     subject = request.POST.get('subject', '')
     message = request.POST.get('message', '')
- 
+
     if name and message and email:
-        txtmessage = name + "\n"
-        txtmessage += message
-        try:
-            send_mail(
-                subject,
-                txtmessage,
-                email,
-                ['comercial@cdr-port.net'],
-                fail_silently=False
-            )
-            return redirect('http://cdr-port.net')
-        except BadHeaderError:
-            return HttpResponse(u"Cabeçalho inválido.")
+
+		mail.send(
+		    ['eluizbr@gmail.com', 'fchevitarese@gmail.com'],
+		    sender=settings.DEFAULT_FROM_EMAIL,
+		    template='contato',
+		    context={'name':name,'subject':subject, 'message':message, 'email':email, 'phone':phone},
+		)
+        	return redirect('http://cdr-port.net')
+
     else:
         return HttpResponse("Preencha todos os campos.")
 

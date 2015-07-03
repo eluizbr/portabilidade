@@ -13,154 +13,154 @@
 
 {% block content %}
 
-		<form method="POST" action="{% url 'criar-user' %}" role="form"> {% csrf_token %}
-		    <div class="row mb-lg">
-	            <div class="col-md-10">
-	                <div id="tabs1c" class="tab-content mb-lg">
-	                    <div class="tab-pane active clearfix" id="meusdados">
-						        <div class="row">
-						            <div class="col-md-12">
-						            	<legend>CHAVE:  <strong> {{cod_cliente}}</strong> </legend>
-						                <section class="widget">
-						                    <div class="widget-body  bg-gray-lighter">
-		                                    <div class="modal-body bg-gray-lighter">
-		                                            <div class="row">
-		                                                <div class="col-md-6">
-		                                               {{ form.cod_cliente_errors }}
-		                                               {{ form.user_errors }}
-		                                                    <div class="form-group">
+<form method="POST" action="{% url 'criar-user' %}" role="form"> {% csrf_token %}
+    <div class="row mb-lg">
+        <div class="col-md-10">
+            <div id="tabs1c" class="tab-content mb-lg">
+                <div class="tab-pane active clearfix" id="meusdados">
+				        <div class="row">
+				            <div class="col-md-12">
+				            	<legend>CHAVE:  <strong> {{cod_cliente}}</strong> </legend>
+				                <section class="widget">
+				                    <div class="widget-body  bg-gray-lighter">
+                                    <div class="modal-body bg-gray-lighter">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                               {{ form.cod_cliente_errors }}
+                                               {{ form.user_errors }}
+                                                    <div class="form-group">
 
-		                                                        {{form.first_name|bootstrap}}
-		                                                    </div>
-		                                                </div>
-		                                                <div class="col-md-6">
-		                                                {{ form.nome.errors }}
-		                                                    <div class="form-group">
-		                                                        {{form.last_name|bootstrap}}
-		                                                    </div>
-		                                                </div>
-		                                                <div class="col-md-4">
-		                                                    <div class="form-group">
-		                                                        {{form.cpf|bootstrap}}
-		                                                    </div>
-		                                                </div>
-		                                                <div class="col-md-4">
-		                                                    <div class="form-group">
-		                                                        {{form.email|bootstrap}}
-		                                                    </div>
-		                                                </div>
-		                                                <div class="col-md-4">
-		                                                    <div class="form-group">
-		                                                        {{form.telefoneF|bootstrap}}
-		                                                    </div>
-		                                                </div>
-		                                                <div class="col-md-4">
-		                                                    <div class="form-group">
-		                                                        {{form.telefoneM|bootstrap}}
-		                                                    </div>
-		                                                </div>
-		                                            </div>
-		                                    </div>
-						                    </div>
-						                </section>
-						            	<legend><strong>Empresa</strong></legend>
-						                <section class="widget">
-						                    <div class="widget-body  bg-gray-lighter">
+                                                        {{form.first_name|bootstrap}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                {{ form.nome.errors }}
+                                                    <div class="form-group">
+                                                        {{form.last_name|bootstrap}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        {{form.cpf|bootstrap}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        {{form.email|bootstrap}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        {{form.telefoneF|bootstrap}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        {{form.telefoneM|bootstrap}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    </div>
+				                    </div>
+				                </section>
+				            	<legend><strong>Empresa</strong></legend>
+				                <section class="widget">
+				                    <div class="widget-body  bg-gray-lighter">
+                                    <div class="modal-body bg-gray-lighter">
+                                            <div class="row">
+                                                <div class="col-md-8">
+                                                    <div class="form-group">
+                                                        {{form.empresa|bootstrap}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        {{form.cnpj|bootstrap}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        {{form.ie|bootstrap}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <div class="form-group">
+                                                        {{form.nome|bootstrap}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group">
+                                                        {{form.email_contato|bootstrap}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        {{form.telefoneF|bootstrap}}
+                                                    </div>
+                                                </div>
+			                                    <div class="col-sm-2">
+			                                       {{form.tipo|bootstrap}}
+			                                    </div>
+                                            </div>
+                                    </div>
+				                    </div>
+				                </section>
+				                <legend><strong>Endereço</strong></legend>
+				                <section class="widget">
+				                    <div class="widget-body  bg-gray-lighter">
 		                                    <div class="modal-body bg-gray-lighter">
 		                                            <div class="row">
-		                                                <div class="col-md-8">
-		                                                    <div class="form-group">
-		                                                        {{form.empresa|bootstrap}}
-		                                                    </div>
+		                                                <div class="col-md-6">
+		                                                    {{form.endereco|bootstrap}}
 		                                                </div>
-		                                                <div class="col-md-2">
+		                                                <div class="col-md-3">
 		                                                    <div class="form-group">
-		                                                        {{form.cnpj|bootstrap}}
-		                                                    </div>
-		                                                </div>
-		                                                <div class="col-md-2">
-		                                                    <div class="form-group">
-		                                                        {{form.ie|bootstrap}}
-		                                                    </div>
-		                                                </div>
-		                                                <div class="col-md-5">
-		                                                    <div class="form-group">
-		                                                        {{form.nome|bootstrap}}
+		                                                        {{form.numero|bootstrap}}
 		                                                    </div>
 		                                                </div>
 		                                                <div class="col-md-3">
 		                                                    <div class="form-group">
-		                                                        {{form.email_contato|bootstrap}}
+		                                                        {{form.complemento|bootstrap}}
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-4">
+		                                                    <div class="form-group">
+		                                                        {{form.bairro|bootstrap}}
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-4">
+		                                                    <div class="form-group">
+		                                                        {{form.cidade|bootstrap}}
 		                                                    </div>
 		                                                </div>
 		                                                <div class="col-md-2">
 		                                                    <div class="form-group">
-		                                                        {{form.telefoneF|bootstrap}}
+		                                                        {{form.estado|bootstrap}}
 		                                                    </div>
 		                                                </div>
-					                                    <div class="col-sm-2">
-					                                       {{form.tipo|bootstrap}}
-					                                    </div>
+		                                                <div class="col-md-2">
+		                                                    <div class="form-group">
+		                                                        {{form.cep|bootstrap}}
+		                                                    </div>
+		                                                </div>
 		                                            </div>
 		                                    </div>
-						                    </div>
-						                </section>
-						                <legend><strong>Endereço</strong></legend>
-						                <section class="widget">
-						                    <div class="widget-body  bg-gray-lighter">
-				                                    <div class="modal-body bg-gray-lighter">
-				                                            <div class="row">
-				                                                <div class="col-md-6">
-				                                                    {{form.endereco|bootstrap}}
-				                                                </div>
-				                                                <div class="col-md-3">
-				                                                    <div class="form-group">
-				                                                        {{form.numero|bootstrap}}
-				                                                    </div>
-				                                                </div>
-				                                                <div class="col-md-3">
-				                                                    <div class="form-group">
-				                                                        {{form.complemento|bootstrap}}
-				                                                    </div>
-				                                                </div>
-				                                                <div class="col-md-4">
-				                                                    <div class="form-group">
-				                                                        {{form.bairro|bootstrap}}
-				                                                    </div>
-				                                                </div>
-				                                                <div class="col-md-4">
-				                                                    <div class="form-group">
-				                                                        {{form.cidade|bootstrap}}
-				                                                    </div>
-				                                                </div>
-				                                                <div class="col-md-2">
-				                                                    <div class="form-group">
-				                                                        {{form.estado|bootstrap}}
-				                                                    </div>
-				                                                </div>
-				                                                <div class="col-md-2">
-				                                                    <div class="form-group">
-				                                                        {{form.cep|bootstrap}}
-				                                                    </div>
-				                                                </div>
-				                                            </div>
-				                                    </div>
-						                    </div>
-						                </section>
-				                            <div class="form-actions">
-				                                <div class="row">
-				                                    <div class="col-sm-offset-5 col-sm-7">
-				                                        <button type="submit" class="btn btn-inverse">Atualizar dados</button>
-				                                    </div>
-				                                </div>
-				                            </div>
-						            </div>
-						        </div>
-	                    </div>
-	                </div>
-	            </div>
-	        </div>
-		</form>
+				                    </div>
+				                </section>
+		                            <div class="form-actions">
+		                                <div class="row">
+		                                    <div class="col-sm-offset-5 col-sm-7">
+		                                        <button type="submit" class="btn btn-inverse">Atualizar dados</button>
+		                                    </div>
+		                                </div>
+		                            </div>
+				            </div>
+				        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
 
 
 {% endblock content %}
