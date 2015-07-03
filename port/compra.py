@@ -11,6 +11,7 @@ from datetime import datetime
 import decimal
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
+from post_office import mail
 
 
 def pagseguro(id,descricao,valor,codigo,taxa):
@@ -142,12 +143,15 @@ def atualiza_pago(id_pagseguro,usuario,status):
 		print 'ja tem <--------'
 		# Pega o plano no cadastro do cliente
 		p = Cadastro.objects.get(id=user)
-		p = p.plano
+		plano = p.plano
+		nome = p.first_name
+		email = p.email
 		print 'Cadastro %s' %p
 		
 		# Pega o plano comprado
 		d = Retorno.objects.get(code=id_pagseguro)
 		plano_id = d.id_plano
+		code = d.code
 		print 'Plano contratado %s' %plano_id
 
 		b = PlanoCliente.objects.get(cliente=user)
@@ -156,7 +160,7 @@ def atualiza_pago(id_pagseguro,usuario,status):
 
 		if b != p:
 			print 'planos sao diferentes'
-			PlanoCliente.objects.filter(plano=b).update(plano=p)
+			PlanoCliente.objects.filter(plano=b).update(plano=plano)
 			b = PlanoCliente.objects.get(cliente=user)
 			b = b.plano
 			print 
@@ -188,4 +192,11 @@ def atualiza_pago(id_pagseguro,usuario,status):
 			PlanoCliente.objects.filter(cliente=user).update(consultas=novo_saldo,plano=plano_id,nome_plano=descricao)
 			Retorno.objects.filter(code=id_pagseguro).update(controle=1,consultas=results,lastEventDate=agora,status=status)
 			Cadastro.objects.filter(id=user).update(plano=plano_id)
+
+			mail.send(
+			    [email],
+			    sender=settings.DEFAULT_FROM_EMAIL,
+			    template='status_3',
+			    context={'nome': nome,'consultas': results, 'code':code},
+			)
 

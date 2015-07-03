@@ -23,6 +23,7 @@ from django.contrib.auth.models import User
 from pagseguro.api import PagSeguroItem, PagSeguroApi
 import compra
 
+
 @csrf_exempt
 def contato(request):
     name = request.POST.get('name', '')
@@ -81,15 +82,23 @@ def financeiro_info(request,id):
 @login_required
 def financeiro(request):
 
+
+
 	user = User.objects.get(pk=request.user.id)
 	todos = Plano.objects.all()
 
 	cad = Cadastro.objects.get(user=user)
 	user_id = cad.id
+	nome = cad.first_name
+	email = cad.email
 	codigo_cliente = cad.cod_cliente
 	cod_cliente = cad.chave
 	cod_plano = cad.plano
 	id_cliente = cad.id
+
+	z = Retorno.objects.get(code='39D14EB23E004EE58F5CF34EEEE68F93')
+	code = z.code
+	consultasZ = z.consultas
 
 	x = PlanoCliente.objects.get(cliente=user_id)
 	plano_nome = x.nome_plano
@@ -97,17 +106,15 @@ def financeiro(request):
 	consultas = x.consultas
 	expira = x.expira_em
 
+
 	retorno = Retorno.objects.all().filter(reference=codigo_cliente)
 	
 	if request.method == 'POST' and 'plano' in request.POST:
 
 		form = CompraFrom(request.POST)
 		if form.is_valid():
-			print 'aqui'
 			selecao = form.cleaned_data.get('plano')
-			print selecao
 			qs = Plano.objects.get(plano=selecao)
-			print qs
 			id_plano = qs.id
 			planos = qs.plano
 			descricao = qs.descricao
@@ -125,7 +132,7 @@ def financeiro(request):
 			tipo = qs.tipo
 
 			if request.method == 'POST' and 'selecionar' in request.POST:
-				print 'selecionar'
+				pass
 			if request.method == 'POST' and 'comprar' in request.POST:
 				### INICIO PAGSEGURO ###
 				compra.pagseguro(id_plano,descricao,valor,codigo_cliente,taxa)
@@ -228,6 +235,8 @@ def meus_dados(request):
 @login_required
 def operadoras(request):
 
+
+
 	## Conexão ao banco MySQL
 	try:
 		c = connection.cursor()
@@ -240,8 +249,6 @@ def operadoras(request):
 		except ObjectDoesNotExist:
 
 			return redirect('/portabilidade/criar-user/')
-
-
 		#plano = PlanoCliente.objects.values_list('consultas').filter(cliente=request.user.id)
 		p = PlanoCliente.objects.get(cliente=id_cliente)
 		plano = p.consultas
