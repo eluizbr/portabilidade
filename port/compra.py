@@ -27,14 +27,19 @@ def pagseguro(id,descricao,valor,codigo,taxa):
 	return url
 
 #http://eluizbr.asuscomm.com:8000/portabilidade/retorno/?id_pagseguro=36053808D9A64EFB942131A7B02C15F5
-def registra_compra(id_pagseguro,usuario):
-	
-	print usuario
-	u = Cadastro.objects.get(id=usuario)
-	user = u.id
-	print 'o usuario é %s' %user
+def registra_compra(id_pagseguro):
+
 	pagseguro_api = PagSeguroApi()
 	data = pagseguro_api.get_transaction(id_pagseguro)
+	reference = data['transaction']['reference']
+
+	#print 'usuario de retorno é %s' %usuario
+	u = Cadastro.objects.get(cod_cliente=reference)
+	user = u.id
+	usuario = u.user_id
+	email_cad = u.email
+	print 'o usuario é %s' %user
+
 	id_pagseguro = id_pagseguro.replace("-", "")
 	agora = datetime.now()
 
@@ -94,8 +99,32 @@ def registra_compra(id_pagseguro,usuario):
 								paymentMethod=paymentMethod,paymentMethodCode=paymentMethodCode,grossAmount=grossAmount,
 								discountAmount=discountAmount,netAmount=netAmount,extraAmount=extraAmount,item=item,id_plano=id_plano,
 								name=name,email=email,phone=areaCode+phone)
+		mail.send(
+		    [email_cad],
+		    sender=settings.DEFAULT_FROM_EMAIL,
+		    template='status_1',
+		    context={'nome': name},
+		)
 		
 		status = int(status)
+
+		if status == 2:
+
+			mail.send(
+			    [email_cad],
+			    sender=settings.DEFAULT_FROM_EMAIL,
+			    template='status_2',
+			    context={'nome': name},
+			)
+
+		if status == 7:
+
+			mail.send(
+			    [email_cad],
+			    sender=settings.DEFAULT_FROM_EMAIL,
+			    template='status_7',
+			    context={'nome': name},
+			)
 
 		if status == 3:
 			atualiza_pago(id_pagseguro,usuario,status)
@@ -105,7 +134,7 @@ def atualiza_pago(id_pagseguro,usuario,status):
 
 	u = Cadastro.objects.get(user_id=usuario)
 	user = u.id
-	print user
+	print 'id do user é %s' %user
 	agora = datetime.now()
 	pega_plano_cadastro = Cadastro.objects.values_list('plano').filter(id=user)[0]
 	pega_plano_cadastro = pega_plano_cadastro[0]
@@ -152,6 +181,13 @@ def atualiza_pago(id_pagseguro,usuario,status):
 		d = Retorno.objects.get(code=id_pagseguro)
 		plano_id = d.id_plano
 		code = d.code
+		reference = d.reference
+		data = d.date
+		nome = d.name
+		email_C = d.email
+		phone = d.phone
+		valor_R = d.grossAmount + d.extraAmount
+		print valor
 		print 'Plano contratado %s' %plano_id
 
 		b = PlanoCliente.objects.get(cliente=user)
@@ -171,9 +207,9 @@ def atualiza_pago(id_pagseguro,usuario,status):
 		consultas = int(x.consultas)
 		print 'saldo atual é %s' %(consultas)
 
-
 		z = Plano.objects.get(id=plano_id)
 		valor = int(z.valor)
+		nome_plano = z.plano
 		print valor
 		valor_consulta = z.valor_consulta
 		print valor_consulta
@@ -197,6 +233,7 @@ def atualiza_pago(id_pagseguro,usuario,status):
 			    [email],
 			    sender=settings.DEFAULT_FROM_EMAIL,
 			    template='status_3',
-			    context={'nome': nome,'consultas': results, 'code':code},
+			    context={'nome': nome,'consultas': results, 'code':code,'reference':reference,'data':data,
+					    'nome':nome,'valor_R':valor_R,'nome_plano':nome_plano,'results':results,'email_C':email_C,'phone':phone},
 			)
 

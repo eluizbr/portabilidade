@@ -1,123 +1,42 @@
 # -*- coding: UTF-8 -*-
-from __future__ import absolute_import
-from celery import task
+
+from django.shortcuts import redirect, HttpResponseRedirect, render
+from django.core.urlresolvers import reverse
+from django.test.utils import setup_test_environment
 from django.conf import settings
-from portabilidade.celery import app
-from django.shortcuts import render,get_object_or_404
-from django.db import IntegrityError
-from django.http import HttpResponse
-from port.models import Portados, NaoPortados, Cadastro, Cdr, Prefixo, PlanoCliente, Plano, Retorno
-from post_office import mail
 from pagseguro.api import PagSeguroItem, PagSeguroApi
-from django.core.exceptions import ObjectDoesNotExist
+from pagseguro.signals import checkout_realizado
+from models import Retorno, Cadastro, PlanoCliente, Plano
 from datetime import datetime
 import decimal
+from django.db import IntegrityError
+from django.core.exceptions import ObjectDoesNotExist
+from post_office import mail
 
-@task
-def insert_cdr(request,numero):
 
-	chave = request
-	numero = numero
-	tamanho = len(numero)
-	portado = Portados.objects.values_list('numero').filter(numero=numero)
+def pagseguro(id,descricao,valor,codigo,taxa):
+	print id,descricao,valor,codigo
 
-	z = Cadastro.objects.get(chave=chave)
-	id_user = z.id
-	print id_user
+	compra = PagSeguroItem(id=id,description=descricao,amount=valor,quantity=1)
 
-	x = PlanoCliente.objects.get(cliente=id_user)
-	plano_id_cliente = x.plano
-	print 'o ID do plano e %s' %plano_id_cliente 
-	consultas = x.consultas
-	print 'consultas restantes %s' %consultas
-	gratis = x.consultas_gratis
-	print 'consultas gratis restantes %s' %gratis
-	tipo = x.tipo
-	tipo = int(tipo)
-	print 'tipo de plano é %s' %tipo
+	pagseguro_api = PagSeguroApi(reference=codigo,extraAmount=taxa)
+	pagseguro_api.add_item(compra)
+	data = pagseguro_api.checkout()
+	url = data['redirect_url']
 
-	y = Plano.objects.get(id=plano_id_cliente)
-	valor_plano = y.valor_consulta
-	print 'o valor por consulta e %s' %valor_plano
+	return url
 
-	### INICIO Remover credito ###
-	if tipo == 1:
-		total_consultas = consultas - 1
-		print 'restou apenas %s creditos' %total_consultas
-
-	else:
-		total_consultas = 0
-		print 'restou apenas %s creditos' %total_consultas		
-	### FIM Remover credito ###
-
-	if portado:
-		portado = Portados.objects.values_list('rn1').filter(numero=numero)
-
-		if tamanho == 10:
-			prefix = numero[0:6]
-		elif tamanho == 11:
-			prefix = numero[0:7]
-
-		dados = Prefixo.objects.values('ddd','prefixo','cidade','estado','operadora','tipo', 'rn1').filter(prefixo=prefix)
-
-		for item in dados:
-			ddd = item['ddd']
-			prefixo = item['prefixo']
-			cidade = item['cidade']
-			estado = item['estado']
-			operadora = item['operadora']
-			tipo = item['tipo']
-			rn1 = item['rn1']
-
-			key = get_object_or_404(Cadastro, chave=chave)		
-			Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, operadora=operadora,\
-										 cidade=cidade, estado=estado, tipo=tipo,portado=1,valor=valor_plano)
-
-			PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
-
-	else:
-
-		if tamanho == 10:
-			prefix = numero[0:6]
-		elif tamanho == 11:
-			prefix = numero[0:7]
-
-		dados = Prefixo.objects.values('ddd','prefixo','cidade','estado','operadora','tipo', 'rn1').filter(prefixo=prefix)
-
-		for item in dados:
-			ddd = item['ddd']
-			prefixo = item['prefixo']
-			cidade = item['cidade']
-			estado = item['estado']
-			operadora = item['operadora']
-			tipo = item['tipo']
-			rn1 = item['rn1']
-
-			key = get_object_or_404(Cadastro, chave=chave)
-			#print 'a chave e %s' %key		
-			Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, operadora=operadora,\
-										 cidade=cidade, estado=estado, tipo=tipo,valor=valor_plano)
-			
-			PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
-			#print key,estado,cidade,operadora,tipo
-
-@task
-def atualiza_compra(retorno):
-
-	id_pagseguro = retorno.replace("-", "")
-	pagseguro_api = PagSeguroApi()
-	data = pagseguro_api.get_transaction(id_pagseguro)
-	reference = data['transaction']['reference']
-
-	#print 'usuario de retorno é %s' %usuario
-	u = Cadastro.objects.get(cod_cliente=reference)
+#http://eluizbr.asuscomm.com:8000/portabilidade/retorno/?id_pagseguro=36053808D9A64EFB942131A7B02C15F5
+def registra_compra(id_pagseguro,usuario):
+	
+	print 'usuario de retorno é %s' %usuario
+	u = Cadastro.objects.get(id=usuario)
 	user = u.id
-	nome = u.nome
-	usuario = u.user_id
 	email_cad = u.email
 	print 'o usuario é %s' %user
-
-	#id_pagseguro = id_pagseguro.replace("-", "")
+	pagseguro_api = PagSeguroApi()
+	data = pagseguro_api.get_transaction(id_pagseguro)
+	id_pagseguro = id_pagseguro.replace("-", "")
 	agora = datetime.now()
 
 	try:
@@ -146,27 +65,9 @@ def atualiza_compra(retorno):
 			else:
 				print 'é igual'
 				### Atualiza da data da ultima consulta
-
 				if status == 1:
-					print 'status 1'
 					Retorno.objects.filter(code=retorno).update(lastEventDate=agora)
 
-				if status == 2:
-					print 'status 2'
-					mail.send(
-					    [email_cad],
-					    sender=settings.DEFAULT_FROM_EMAIL,
-					    template='status_2',
-					    context={'nome': nome},
-					)
-				if status == 7:
-
-					mail.send(
-					    [email_cad],
-					    sender=settings.DEFAULT_FROM_EMAIL,
-					    template='status_7',
-					    context={'nome': nome},
-					)
 
 	except ObjectDoesNotExist:
 
@@ -203,21 +104,11 @@ def atualiza_compra(retorno):
 		
 		status = int(status)
 
-		if status == 2:
-
-			mail.send(
-			    [email_cad],
-			    sender=settings.DEFAULT_FROM_EMAIL,
-			    template='status_2',
-			    context={'nome': name},
-			)
-
 		if status == 3:
 			atualiza_pago(id_pagseguro,usuario,status)
 
 
 def atualiza_pago(id_pagseguro,usuario,status):
-
 
 	u = Cadastro.objects.get(user_id=usuario)
 	user = u.id
@@ -324,11 +215,3 @@ def atualiza_pago(id_pagseguro,usuario,status):
 					    'nome':nome,'valor_R':valor_R,'nome_plano':nome_plano,'results':results,'email_C':email_C,'phone':phone},
 			)
 
-@task
-def procura():
-
-	x = Retorno.objects.values_list('code').filter(status=1)
-	for v in x:
-		code = v[0]
-		print code
-		atualiza_compra(code)

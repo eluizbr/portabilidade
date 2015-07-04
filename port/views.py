@@ -9,7 +9,7 @@ from django.core.mail import send_mail, BadHeaderError
 from django.contrib.auth.decorators import login_required
 from models import Portados, NaoPortados, Cdr, Prefixo, PlanoCliente, Retorno
 from ratelimit.decorators import ratelimit
-from tasks import insert_cdr
+from tasks import insert_cdr, atualiza_compra
 from django.conf import settings
 import MySQLdb
 from django.db import connection
@@ -232,8 +232,6 @@ def meus_dados(request):
 
 @login_required
 def operadoras(request):
-
-
 
 	## Conexão ao banco MySQL
 	try:
@@ -462,7 +460,32 @@ def consulta(request,numero):
 def retorno(request):
 
 	retorno = request.GET['id_pagseguro']
-	compra.registra_compra(retorno,request.user.id)
+	print retorno
+	try:
+
+		x = Retorno.objects.get(code=retorno)
+		reference = x.reference
+		z = Cadastro.objects.get(cod_cliente=reference)
+		user_id = z.id
+		print 'pegou o PK %s' %user_id
+		#compra.registra_compra(retorno,user_id)
+		atualiza_compra.apply_async(kwargs={'retorno': retorno},countdown=1)		
+
+	
+	except ObjectDoesNotExist:
+
+		retorno = request.GET['id_pagseguro']
+		#compra.registra_compra(retorno)
+		atualiza_compra.apply_async(kwargs={'retorno': retorno},countdown=1)
+	
 	return redirect('http://eluizbr.asuscomm.com:8000/portabilidade/financeiro/')
 
+
+def procura(request):
+
+	x = Retorno.objects.values_list('code').filter(status=4)
+	#code = x.code
+	for v in x:
+		code = v[0]
+		print code
 
