@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+from django.http import Http404
 from django.conf.urls import patterns, include, url
 from . import views
 
@@ -18,4 +19,5 @@ urlpatterns = patterns('',
     url(r'^(?P<numero>\d+)$', views.consulta, name='consulta'),
     url(r'^retorno/$', views.retorno, name='retorno'),
     url(r'^retorno/pagseguro/', include('pagseguro.urls')),
+
 )

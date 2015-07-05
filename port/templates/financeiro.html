@@ -107,8 +107,10 @@
 	                            data-width="auto" name="plano"
 	                            tabindex="-1" id="simple-select">
 	                        <option>{{planos}}</option>
-	                        {% for plano in todos %}
-	                        	<option  value="{{plano}}">{{plano}}</option>
+	                        {% for plano,valor in todos %}
+	                        	{% if valor != 0.00 %}
+	                        		<option  value="{{plano}}">{{plano}}</option>
+	                        	{% endif %}
 	                        {% endfor %}
 	                    </select>
 	                </div>
@@ -123,7 +125,6 @@
 			                    <thead>
 			                    	{% if planos %}
 					                    <tr>
-
 					                        <th class="text-align-center">Plano</th>
 					                        <th class="text-align-center">Descrição</th>
 					                        <th class="text-align-center">Total de contultas</th>

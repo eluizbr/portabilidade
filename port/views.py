@@ -24,7 +24,6 @@ from pagseguro.api import PagSeguroItem, PagSeguroApi
 import compra
 from post_office import mail
 
-
 @csrf_exempt
 def contato(request):
     name = request.POST.get('name', '')
@@ -83,7 +82,7 @@ def financeiro(request):
 
 
 	user = User.objects.get(pk=request.user.id)
-	todos = Plano.objects.all()
+	
 
 	cad = Cadastro.objects.get(user=user)
 	user_id = cad.id
@@ -94,15 +93,17 @@ def financeiro(request):
 	cod_plano = cad.plano
 	id_cliente = cad.id
 
-	z = Retorno.objects.get(code='39D14EB23E004EE58F5CF34EEEE68F93')
-	code = z.code
-	consultasZ = z.consultas
-
 	x = PlanoCliente.objects.get(cliente=user_id)
 	plano_nome = x.nome_plano
 	tipo = x.tipo
 	consultas = x.consultas
 	expira = x.expira_em
+	id_plano = x.plano
+	v = Plano.objects.get(id=id_plano)
+	valor_plano = v.valor
+
+	todos = Plano.objects.values_list('plano','valor')
+
 
 
 	retorno = Retorno.objects.all().filter(reference=codigo_cliente)
@@ -134,7 +135,6 @@ def financeiro(request):
 			if request.method == 'POST' and 'comprar' in request.POST:
 				### INICIO PAGSEGURO ###
 				compra.pagseguro(id_plano,descricao,valor,codigo_cliente,taxa)
-				print compra.pagseguro(id_plano,descricao,valor,codigo_cliente,taxa)
 				return redirect(compra.pagseguro(id_plano,descricao,valor,codigo_cliente,taxa))
 				### FIM PAGSEGURO ###
 	else:
@@ -164,13 +164,11 @@ def criar_user(request):
 				### Se o plano não exite, então cria...
 				cad = Cadastro.objects.get(user=user)
 				user_id = cad.id
-				print 'o usuario novo é %s' %user_id
 				z = PlanoCliente.objects.get(cliente=user_id)
 				cliente = z.cliente
 				plano = z.plano
-				print cliente, plano
 			except PlanoCliente.DoesNotExist:
-				z = PlanoCliente(consultas=0,consultas_gratis=0,cliente=user_id,plano=1,nome_plano='Ilimitado',criado_em=data,expira_em=mes,tipo=0)
+				z = PlanoCliente(consultas=500,consultas_gratis=0,cliente=user_id,plano=1,nome_plano='500 Grátis',criado_em=data,expira_em=mes,tipo=1)
 				z.save()
 				### Se o plano não exite, então cria...
 			return redirect('/portabilidade/meus-dados/')
@@ -199,7 +197,6 @@ def meus_dados(request):
 		
 		try:
 			p = Cadastro.objects.get(user_id=request.user.id)
-			print p
 			if form.is_valid():
 				obj = form.save(commit=False)
 				obj.save()
@@ -249,6 +246,7 @@ def operadoras(request):
 		p = PlanoCliente.objects.get(cliente=id_cliente)
 		plano = p.consultas
 		tipo = p.tipo
+		id_plano = p.plano
 		expira = p.expira_em
 		operadoras = Cdr.objects.values('operadora','tipo').order_by('operadora').annotate(Count('cidade')).filter(cliente=id_cliente)
 		tipo_numero = Cdr.objects.values('tipo').annotate(Count('tipo')).filter(cliente=id_cliente)
@@ -379,7 +377,6 @@ def consulta(request,numero):
 
 	diferenca = diffDate(date(expira_y,expira_m,expira_d),date(hoje.year,hoje.month,hoje.day))
 	diferenca = int(diferenca)
-	print diferenca
 	
 	if diferenca >= 30:
 		PlanoCliente.objects.filter(cliente=id_user).update(consultas=0,plano=1,nome_plano='Escolha um plano',tipo=1)
@@ -460,14 +457,12 @@ def consulta(request,numero):
 def retorno(request):
 
 	retorno = request.GET['id_pagseguro']
-	print retorno
 	try:
 
 		x = Retorno.objects.get(code=retorno)
 		reference = x.reference
 		z = Cadastro.objects.get(cod_cliente=reference)
 		user_id = z.id
-		print 'pegou o PK %s' %user_id
 		#compra.registra_compra(retorno,user_id)
 		atualiza_compra.apply_async(kwargs={'retorno': retorno},countdown=1)		
 
@@ -478,14 +473,12 @@ def retorno(request):
 		#compra.registra_compra(retorno)
 		atualiza_compra.apply_async(kwargs={'retorno': retorno},countdown=1)
 	
-	return redirect('http://eluizbr.asuscomm.com:8000/portabilidade/financeiro/')
+	return redirect('/portabilidade/financeiro/')
 
 
 def procura(request):
 
 	x = Retorno.objects.values_list('code').filter(status=4)
-	#code = x.code
 	for v in x:
 		code = v[0]
-		print code
 
