@@ -389,6 +389,7 @@ def consulta(request,numero):
 	else:
 
 		rn1 = len(numero)
+		
 
 		try:
 
@@ -410,38 +411,36 @@ def consulta(request,numero):
 						rn1 = str(numero)[0:6]
 						rn1 = NaoPortados.objects.values_list('rn1').filter(prefixo=rn1)
 						rn1 = str(rn1)[5:7]
-						insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=1)
 
 				elif rn1 == 10:
 					rn1 = Portados.objects.values_list('rn1').filter(numero=numero)
 					rn1 = str(rn1)[5:7]
-					insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=1)
+					print rn1
 
 
 					if not rn1:
 						rn1 = str(numero)[0:6]
 						rn1 = NaoPortados.objects.values_list('rn1').filter(prefixo=rn1)
 						rn1 = str(rn1)[5:7]
-						insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=1)
 
 				elif rn1 == 11:
 					rn1 = Portados.objects.values_list('rn1').filter(numero=numero)
 					rn1 = str(rn1)[5:7]
-					insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=1)
 
 					if not rn1:
 						rn1 = str(numero)[0:7]
 						rn1 = NaoPortados.objects.values_list('rn1').filter(prefixo=rn1)
 						rn1 = str(rn1)[5:7]
-						insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=1)
 				
 				elif rn1 <= 10:
 				
 					rn1 = 0
 					response = HttpResponse(rn1, content_type='text/plain')
+					insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=10)
 					return response			
 
 				response = HttpResponse(rn1, content_type='text/plain')
+				insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=10)
 				return response
 			else:
 
@@ -464,14 +463,14 @@ def retorno(request):
 		z = Cadastro.objects.get(cod_cliente=reference)
 		user_id = z.id
 		#compra.registra_compra(retorno,user_id)
-		atualiza_compra.apply_async(kwargs={'retorno': retorno},countdown=1)		
+		atualiza_compra.apply_async(kwargs={'retorno': retorno},countdown=10)		
 
 	
 	except ObjectDoesNotExist:
 
 		retorno = request.GET['id_pagseguro']
 		#compra.registra_compra(retorno)
-		atualiza_compra.apply_async(kwargs={'retorno': retorno},countdown=1)
+		atualiza_compra.apply_async(kwargs={'retorno': retorno},countdown=10)
 	
 	return redirect('/portabilidade/financeiro/')
 

@@ -44,39 +44,25 @@ def insert_cdr(request,numero):
 	### FIM Remover credito ###
 
 	if portado:
-		portado = Portados.objects.values_list('rn1').filter(numero=numero)[0]
-		portado = portado[0]
-		#print portado
+		portado = Portados.objects.values_list('rn1').filter(numero=numero)
 
 		if tamanho == 10:
 			prefix = numero[0:6]
-			#print 'prifxo 1'
+			print 'prifxo 1'
 		elif tamanho == 11:
 			prefix = numero[0:7]
-			#print 'prifxo 2'
+			print 'prifxo 2'
 
-		dados = Prefixo.objects.get(prefixo=prefix)
-		##print 'dados é = %s' %dados
+		dados = Prefixo.objects.values('ddd','prefixo','cidade','estado','operadora','tipo', 'rn1').filter(prefixo=prefix)
 
-		ddd = dados.ddd
-		prefixo = dados.prefixo
-		#print prefixo
-		cidade = dados.cidade
-		#print cidade
-		estado = dados.estado
-		operadora = dados.operadora
-		#print operadora
-		tipo = dados.tipo
-		#print tipo
-		rn1 = dados.rn1
-		#print rn1
-		x = Prefixo.objects.values('rn1','operadora').filter(rn1=portado).distinct()
-
-		for z in x:
-			rn1 = z['rn1']
-			operadora = z['operadora']
-			
-			print operadora,rn1
+		for item in dados:
+			ddd = item['ddd']
+			prefixo = item['prefixo']
+			cidade = item['cidade']
+			estado = item['estado']
+			operadora = item['operadora']
+			tipo = item['tipo']
+			rn1 = item['rn1']
 
 			key = get_object_or_404(Cadastro, chave=chave)		
 			Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, operadora=operadora,\

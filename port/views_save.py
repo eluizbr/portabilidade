@@ -4,10 +4,12 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseRedirect, HttpRequest
 from django.template import RequestContext
 from django.db.models import Count
+from django.views.decorators.csrf import csrf_exempt
+from django.core.mail import send_mail, BadHeaderError
 from django.contrib.auth.decorators import login_required
 from models import Portados, NaoPortados, Cdr, Prefixo, PlanoCliente, Retorno
 from ratelimit.decorators import ratelimit
-from tasks import insert_cdr
+from tasks import insert_cdr, atualiza_compra
 from django.conf import settings
 import MySQLdb
 from django.db import connection
@@ -20,12 +22,52 @@ from models import Cadastro, Plano, Retorno
 from django.contrib.auth.models import User
 from pagseguro.api import PagSeguroItem, PagSeguroApi
 import compra
+from post_office import mail
 
+@csrf_exempt
+def contato(request):
+    name = request.POST.get('name', '')
+    phone = request.POST.get('phone', '')
+    email = request.POST.get('email', '')
+    subject = request.POST.get('subject', '')
+    message = request.POST.get('message', '')
+
+    if name and message and email:
+
+		mail.send(
+		    ['eluizbr@gmail.com', 'fchevitarese@gmail.com'],
+		    sender=settings.DEFAULT_FROM_EMAIL,
+		    template='contato',
+		    context={'name':name,'subject':subject, 'message':message, 'email':email, 'phone':phone},
+		)
+        	return redirect('http://cdr-port.net')
+
+    else:
+        return HttpResponse("Preencha todos os campos.")
 
 @login_required
 def index(request):
 
-	return render(request, 'index.html')
+	#return render(request, 'index.html')
+
+	return redirect('operadoras')
+
+@login_required
+def asterisk(request):
+
+	user = User.objects.get(pk=request.user.id)
+	cad = Cadastro.objects.get(user=user)
+	chave = cad.chave
+
+	return render(request, 'asterisk.html', locals())
+
+@login_required
+def csp(request):
+
+	operadora = Prefixo.objects.values('rn1','operadora','tipo').distinct()
+
+	return render(request, 'csp.html', locals())
+
 
 @login_required
 def financeiro_info(request,id):
@@ -34,85 +76,83 @@ def financeiro_info(request,id):
     return render(request,'financeiro_info.html', locals())
 
 
-def comprar(request):
-	print request.GET
-	print request
-	if request.method == 'GET' and 'selecionar' in request.GET:
-		print 'selecionou...'
-	### INICIO PAGSEGURO ###
-	# compra.pagseguro(id_plano,descricao,valorD,codigo_cliente)
-	# print compra.pagseguro(id_plano,descricao,valorD,codigo_cliente)
-	# return redirect(compra.pagseguro(id_plano,descricao,valorD,codigo_cliente))
-	### FIM PAGSEGURO ###
-
-	return render(request, 'comprar.html', locals())
-
 @login_required
 def financeiro(request):
 
+
+
 	user = User.objects.get(pk=request.user.id)
-	todos = Plano.objects.all()
+	
 
 	cad = Cadastro.objects.get(user=user)
 	user_id = cad.id
+	nome = cad.first_name
+	email = cad.email
 	codigo_cliente = cad.cod_cliente
 	cod_cliente = cad.chave
 	cod_plano = cad.plano
 	id_cliente = cad.id
 
+	x = PlanoCliente.objects.get(cliente=user_id)
+	plano_nome = x.nome_plano
+	tipo = x.tipo
+	consultas = x.consultas
+	expira = x.expira_em
+	id_plano = x.plano
+	v = Plano.objects.get(id=id_plano)
+	valor_plano = v.valor
 
-	plano = PlanoCliente.objects.get(cliente=user_id)
-	plano_nome = plano.nome_plano
-	consultas = plano.consultas
+	todos = Plano.objects.values_list('plano','valor')
+
+
 
 	retorno = Retorno.objects.all().filter(reference=codigo_cliente)
+	
+	if request.method == 'POST' and 'plano' in request.POST:
 
-	if request.method == 'GET' and 'plano' in request.GET:
-		form = CompraFrom(request.GET)
-		
+		form = CompraFrom(request.POST)
 		if form.is_valid():
-			select = form.cleaned_data.get('plano')
-			qs = Plano.objects.get(plano=select)
+			selecao = form.cleaned_data.get('plano')
+			qs = Plano.objects.get(plano=selecao)
 			id_plano = qs.id
 			planos = qs.plano
 			descricao = qs.descricao
 			valor = qs.valor
+			taxa = qs.taxas
+			valorD = int(valor)
 			valor_consulta = qs.valor_consulta
-			print id_plano,descricao, valor, valor_consulta
+			try:
+				total = int(valorD / valor_consulta)
+			except ZeroDivisionError:
+				total = 0
+			valor_total = valor + taxa
 
-			if request.method == 'GET' and 'selecionar' in request.GET:
-				print 'selecionar...'
-			if request.method == 'GET' and 'comprar' in request.GET:
+			consultas_gratis = qs.consultas_gratis
+			tipo = qs.tipo
+
+			if request.method == 'POST' and 'selecionar' in request.POST:
+				pass
+			if request.method == 'POST' and 'comprar' in request.POST:
 				### INICIO PAGSEGURO ###
-				compra.pagseguro(id_plano,descricao,valor,codigo_cliente)
-				print compra.pagseguro(id_plano,descricao,valor,codigo_cliente)
-				return redirect(compra.pagseguro(id_plano,descricao,valor,codigo_cliente))
+				compra.pagseguro(id_plano,descricao,valor,codigo_cliente,taxa)
+				return redirect(compra.pagseguro(id_plano,descricao,valor,codigo_cliente,taxa))
 				### FIM PAGSEGURO ###
 	else:
 
 		form = CompraFrom()
 
-
 	return render(request, 'financeiro.html', locals())
 	
-
-
-
 @login_required
-def meus_dados(request):
+def criar_user(request):
 
-
+	data = datetime.datetime.now()
+	mes = data + timedelta(days=30)
 	user = User.objects.get(pk=request.user.id)
-	print user
 
-	cad = Cadastro.objects.get(user=user)
-	user_id = cad.id
-	codigo_cliente = cad.cod_cliente
-	cod_cliente = cad.chave
-	
 	if request.method == 'POST':
-		form = CadastroForm(request.POST or None, instance=cad)
-		
+		form = CadastroForm(request.POST)
+			
 		if form.is_valid():
 			obj = form.save(commit=False)
 			#obj.email = user.email
@@ -122,15 +162,67 @@ def meus_dados(request):
 
 			try:
 				### Se o plano não exite, então cria...
-				z = PlanoCliente.objects.get(cliente=request.user.id)
+				cad = Cadastro.objects.get(user=user)
+				user_id = cad.id
+				z = PlanoCliente.objects.get(cliente=user_id)
+				cliente = z.cliente
+				plano = z.plano
 			except PlanoCliente.DoesNotExist:
-				z = PlanoCliente(consultas=0,consultas_gratis=0,cliente=user_id,plano=1,nome_plano='Sem Plano')
+				z = PlanoCliente(consultas=500,consultas_gratis=0,cliente=user_id,plano=1,nome_plano='500 Grátis',criado_em=data,expira_em=mes,tipo=1)
 				z.save()
 				### Se o plano não exite, então cria...
+			return redirect('/portabilidade/meus-dados/')
+	else:
+
+		form = CadastroForm()
+
+	return render(request, 'criar_user.html', locals())	
+
+
+@login_required
+def meus_dados(request):
+
+	user = User.objects.get(pk=request.user.id)
+
+	try:
+		cad = Cadastro.objects.get(user=user)
+		user_id = cad.id
+		codigo_cliente = cad.cod_cliente
+		cod_cliente = cad.chave
+	except Cadastro.DoesNotExist:
+		return redirect('/portabilidade/criar-user/')
+	
+	if request.method == 'POST':
+		form = CadastroForm(request.POST or None, instance=cad)
+		
+		try:
+			p = Cadastro.objects.get(user_id=request.user.id)
+			if form.is_valid():
+				obj = form.save(commit=False)
+				obj.save()
+			else:
+
+				form = CadastroForm(instance=cad)
+
+		except Cadastro.DoesNotExist:
+			
+			if form.is_valid():
+				obj = form.save(commit=False)
+				#obj.email = user.email
+				obj.user = user
+				obj.cod_cliente = int(random.randint(10000000, 99000000))
+				obj.save()
+
+				try:
+					### Se o plano não exite, então cria...
+					z = PlanoCliente.objects.get(cliente=request.user.id)
+				except PlanoCliente.DoesNotExist:
+					z = PlanoCliente(consultas=0,consultas_gratis=0,cliente=user_id,plano=1,nome_plano='Sem Plano')
+					z.save()
+					### Se o plano não exite, então cria...
 	else:
 
 		form = CadastroForm(instance=cad)
-
 
 	return render(request, 'meus_dados.html', locals())
 
@@ -142,17 +234,28 @@ def operadoras(request):
 	try:
 		c = connection.cursor()
 		
-		id_cliente = Cadastro.objects.values_list('id').filter(user_id=request.user.id)[0]
-		plano = PlanoCliente.objects.values_list('consultas').filter(cliente=request.user.id)
+		#id_cliente = Cadastro.objects.values_list('id').filter(user_id=request.user.id)[0]
+		try:
+			x = Cadastro.objects.get(user_id=request.user.id)
+			id_cliente = x.id
+		
+		except ObjectDoesNotExist:
+
+			return redirect('/portabilidade/criar-user/')
+		#plano = PlanoCliente.objects.values_list('consultas').filter(cliente=request.user.id)
+		p = PlanoCliente.objects.get(cliente=id_cliente)
+		plano = p.consultas
+		tipo = p.tipo
+		id_plano = p.plano
+		expira = p.expira_em
 		operadoras = Cdr.objects.values('operadora','tipo').order_by('operadora').annotate(Count('cidade')).filter(cliente=id_cliente)
 		tipo_numero = Cdr.objects.values('tipo').annotate(Count('tipo')).filter(cliente=id_cliente)
-		ultimos_numero = operadoras = Cdr.objects.values('numero','operadora','tipo','data_hora').order_by('-id').filter(cliente=id_cliente)[:5][::1]
+		ultimos_numero = operadoras = Cdr.objects.values('numero','operadora','tipo','data_hora','valor').order_by('-id').filter(cliente=id_cliente)[:5][::1]
 
 		try:
-
-			id_cliente = id_cliente[0]
-			consultas = PlanoCliente.objects.values_list('consultas').filter(cliente=id_cliente)[0]
-			consultas = consultas[0]
+			#id_cliente = id_cliente	
+			#consultas = PlanoCliente.objects.values_list('consultas').filter(cliente=id_cliente)[0]
+			consultas = p.consultas
 
 		except ZeroDivisionError:
 			
@@ -203,7 +306,8 @@ def operadoras(request):
 		total ="""SELECT DISTINCT operadora,
 						  COUNT( IF( tipo='FIXO', 1, NULL ) ) AS fixo,
 						  COUNT( IF( tipo='MOVEL', 1, NULL ) ) AS movel,
-						  COUNT( IF( tipo='RADIO', 1, NULL ) ) AS radio
+						  COUNT( IF( tipo='RADIO', 1, NULL ) ) AS radio,
+						  SUM(valor) AS valor
 						FROM port_cdr WHERE cliente_id = %d
 						GROUP BY operadora""" % id_cliente
 		total = c.execute(total)
@@ -230,7 +334,7 @@ def operadoras(request):
 
 		# teste2 = teste.filter(cidade='Belo Horizonte')
 		
-		portados = Cdr.objects.values('portado').annotate(cnt=Count('portado')).order_by('portado')
+		portados = Cdr.objects.values('portado').annotate(cnt=Count('portado')).order_by('portado').filter(cliente_id=id_cliente)
 		total_items = Cdr.objects.count()
 		total_items = float(total_items)
 
@@ -242,80 +346,147 @@ def operadoras(request):
 	except IndexError:
 		return redirect('/portabilidade/meus-dados/')
 
+def diffDate(data1, data2):
+   d1 = data1
+   d2 = data2
+   delta = d2-d1
+   r = delta.days if (delta.days > 0) else "0"
+   return r
 
 #@ratelimit(key='ip', rate='60/m', block=True)
 def consulta(request,numero):
 
+	hoje = datetime.datetime.now()
 	segredo = request.GET['key']
 	segredo = str(segredo)
 
-	insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=1)
-	rn1 = len(numero)
+	s = Cadastro.objects.get(chave=segredo)
+	id_user = s.id
 
-	try:
+	c = PlanoCliente.objects.get(cliente=id_user)
+	saldo = c.consultas
+	saldo = int(saldo)
+	tipo = c.tipo
+	tipo = int(tipo)
 
-		key = request.GET['key']
-		key = str(key)
-
-		chave = Cadastro.objects.values_list('chave').filter(chave=key)[0]
-		chave = chave[0]
-		chave = str(chave)
+	expira = c.expira_em
+	expira_y = int(expira.strftime("%Y"))
+	expira_m = int(expira.strftime("%m"))
+	expira_d = int(expira.strftime("%d"))
 
 
-		if key == chave:
+	diferenca = diffDate(date(expira_y,expira_m,expira_d),date(hoje.year,hoje.month,hoje.day))
+	diferenca = int(diferenca)
+	
+	if diferenca >= 30:
+		PlanoCliente.objects.filter(cliente=id_user).update(consultas=0,plano=1,nome_plano='Escolha um plano',tipo=1)
 
-			if rn1 == 9:
+	if (saldo <= 0) and (tipo == 1):
 
-				rn1 = Portados.objects.values_list('rn1').filter(numero=numero)
-				rn1 = str(rn1)[5:7]
+		rn1 = 'Sem credito'
+		response = HttpResponse(rn1, content_type='text/plain')
+		return response
+	else:
 
-				if not rn1:
-					rn1 = str(numero)[0:6]
-					rn1 = NaoPortados.objects.values_list('rn1').filter(prefixo=rn1)
+		rn1 = len(numero)
+
+		try:
+
+			key = request.GET['key']
+			key = str(key)
+
+			chave = Cadastro.objects.values_list('chave').filter(chave=key)[0]
+			chave = chave[0]
+			chave = str(chave)
+
+			if key != chave:
+
+				if rn1 == 9:
+
+					rn1 = Portados.objects.values_list('rn1').filter(numero=numero)
 					rn1 = str(rn1)[5:7]
 
-			elif rn1 == 10:
-				rn1 = Portados.objects.values_list('rn1').filter(numero=numero)
-				rn1 = str(rn1)[5:7]
+					if not rn1:
+						rn1 = str(numero)[0:6]
+						#rn1 = NaoPortados.objects.values_list('rn1').filter(prefixo=rn1)
+						x = NaoPortados.objects.get(prefixo=rn1)
+						rn1 = x.rn1
+						insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=1)
+						print 'passou 1'
 
-				if not rn1:
-					rn1 = str(numero)[0:6]
-					rn1 = NaoPortados.objects.values_list('rn1').filter(prefixo=rn1)
+				elif rn1 == 10:
+					rn1 = Portados.objects.values_list('rn1').filter(numero=numero)
 					rn1 = str(rn1)[5:7]
+					print rn1
+					insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=1)
+					print 'passou 2'
 
-			elif rn1 == 11:
-				rn1 = Portados.objects.values_list('rn1').filter(numero=numero)
-				rn1 = str(rn1)[5:7]
 
-				if not rn1:
-					rn1 = str(numero)[0:7]
-					rn1 = NaoPortados.objects.values_list('rn1').filter(prefixo=rn1)
+					if not rn1:
+						rn1 = str(numero)[0:6]
+						rn1 = NaoPortados.objects.values_list('rn1').filter(prefixo=rn1)
+						rn1 = str(rn1)[5:7]
+						print rn1
+						insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=1)
+						print 'passou 3'
+
+				elif rn1 == 11:
+					rn1 = Portados.objects.values_list('rn1').filter(numero=numero)
 					rn1 = str(rn1)[5:7]
-			
-			elif rn1 <= 10:
-			
+					insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=1)
+					print 'passou 4'
+
+					if not rn1:
+						rn1 = str(numero)[0:7]
+						rn1 = NaoPortados.objects.values_list('rn1').filter(prefixo=rn1)
+						rn1 = str(rn1)[5:7]
+						insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=1)
+						print 'passou 5'
+				
+				elif rn1 <= 10:
+				
+					rn1 = 0
+					response = HttpResponse(rn1, content_type='text/plain')
+					return response			
+
+				response = HttpResponse(rn1, content_type='text/plain')
+				return response
+			else:
+
 				rn1 = 0
 				response = HttpResponse(rn1, content_type='text/plain')
-				return response			
-
-			response = HttpResponse(rn1, content_type='text/plain')
-			return response
-		else:
+				return response
+		except:
 
 			rn1 = 0
 			response = HttpResponse(rn1, content_type='text/plain')
 			return response
-	except:
-
-		rn1 = 0
-		response = HttpResponse(rn1, content_type='text/plain')
-		return response
 
 def retorno(request):
 
-
 	retorno = request.GET['id_pagseguro']
-	compra.registra_compra(retorno,request.user.id)
-	return redirect('http://eluizbr.asuscomm.com:8000/portabilidade/financeiro/')
+	try:
 
+		x = Retorno.objects.get(code=retorno)
+		reference = x.reference
+		z = Cadastro.objects.get(cod_cliente=reference)
+		user_id = z.id
+		#compra.registra_compra(retorno,user_id)
+		atualiza_compra.apply_async(kwargs={'retorno': retorno},countdown=1)		
+
+	
+	except ObjectDoesNotExist:
+
+		retorno = request.GET['id_pagseguro']
+		#compra.registra_compra(retorno)
+		atualiza_compra.apply_async(kwargs={'retorno': retorno},countdown=1)
+	
+	return redirect('/portabilidade/financeiro/')
+
+
+def procura(request):
+
+	x = Retorno.objects.values_list('code').filter(status=4)
+	for v in x:
+		code = v[0]
 
