@@ -4,6 +4,7 @@ billiard==3.3.0.20
 celery==3.1.18
 Django==1.8.2
 django-bootstrap-form==3.2
+django-bootstrap-pagination==1.5.1
 django-pagseguro2==1.0.10
 django-post-office==1.1.2
 django-ratelimit==0.5.0
