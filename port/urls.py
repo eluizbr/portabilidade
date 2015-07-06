@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 from django.http import Http404
 from django.conf.urls import patterns, include, url
-from . import views
+from port import views
 
 
 urlpatterns = patterns('',
@@ -10,6 +10,7 @@ urlpatterns = patterns('',
     url(r'^contato/$', views.contato, name='contato'),
     url(r'^asterisk/$', views.asterisk, name='asterisk'),
     url(r'^csp/$', views.csp, name='csp'),
+    url(r'^cdr/$', views.cdr, name='cdr'),
     url(r'^operadoras/$', views.operadoras, name='operadoras'),
     url(r'^criar-user/$', views.criar_user, name='criar-user'),
     url(r'^meus-dados/$', views.meus_dados, name='meus-dados'),

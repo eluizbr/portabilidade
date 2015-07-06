@@ -9,6 +9,11 @@
     <strong>{{user}}</strong>&nbsp;
 {% endblock %}
 
+{% block menu_1 %}
+                    <li class="active"><a href="{% url 'operadoras' %}">Operadoras</a></li>
+                    <li><a href="{% url 'cdr' %}">CDR</a></li>
+{% endblock menu_1 %}
+
 {% block lista_server %}{% endblock lista_server %}
 
 {% block content %}

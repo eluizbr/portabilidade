@@ -23,6 +23,7 @@ from django.contrib.auth.models import User
 from pagseguro.api import PagSeguroItem, PagSeguroApi
 import compra
 from post_office import mail
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 @csrf_exempt
 def contato(request):
@@ -66,6 +67,18 @@ def csp(request):
 
 	operadora = Prefixo.objects.values('rn1','operadora','tipo').distinct()
 
+	paginator = Paginator(operadora, 15)
+	page = request.GET.get('page')
+
+	try:
+		contacts = paginator.page(page)
+	
+	except PageNotAnInteger:
+		contacts = paginator.page(1)
+
+	except EmptyPage:
+		contacts = paginator.page(paginator.num_pages)
+
 	return render(request, 'csp.html', locals())
 
 
@@ -79,11 +92,8 @@ def financeiro_info(request,id):
 @login_required
 def financeiro(request):
 
-
-
 	user = User.objects.get(pk=request.user.id)
 	
-
 	cad = Cadastro.objects.get(user=user)
 	user_id = cad.id
 	nome = cad.first_name
@@ -228,6 +238,52 @@ def meus_dados(request):
 
 
 @login_required
+def cdr(request):
+
+	user = User.objects.get(pk=request.user.id)
+	cad = Cadastro.objects.get(user=user)
+	user_id = cad.id
+
+	numero = request.GET.get('numero', '')
+	operadora = request.GET.get('operadora', '')
+	estado = request.GET.get('estado', '')
+	cidade = request.GET.get('cidade', '')
+	portado = request.GET.get('portado', '')
+	tipo = request.GET.get('tipo', '')
+	rn1 = request.GET.get('rn1', '')
+
+	results = Cdr.objects.all().filter(cliente_id=cad.id)
+	n_numero = results.values_list('numero').distinct()
+	n_operadora = results.values_list('operadora').distinct()
+	n_cidade = results.values_list('cidade').distinct()
+	n_estado = results.values_list('estado').distinct()
+	n_portado = results.values_list('portado').distinct()
+	n_tipo = results.values_list('tipo').distinct()
+	n_rn1 = results.values_list('rn1').distinct()
+
+	results_v = results.filter(numero__startswith=numero,operadora__contains=operadora,cidade__contains=cidade,
+								estado__contains=estado,portado__contains=portado,tipo__contains=tipo,rn1__contains=rn1)
+
+	if request.method == 'GET':
+		results = results_v
+	else:
+		results = results
+
+	paginator = Paginator(results, 15)
+	page = request.GET.get('page')
+
+	try:
+		contacts = paginator.page(page)
+	
+	except PageNotAnInteger:
+		contacts = paginator.page(1)
+
+	except EmptyPage:
+		contacts = paginator.page(paginator.num_pages)
+
+	return render(request, 'cdr.html', locals())
+
+@login_required
 def operadoras(request):
 
 	## Conexão ao banco MySQL
@@ -333,6 +389,18 @@ def operadoras(request):
 		total_consultas = Cdr.objects.all().count()
 
 		# teste2 = teste.filter(cidade='Belo Horizonte')
+
+		paginator = Paginator(total, 5)
+		page = request.GET.get('page')
+
+		try:
+			contacts = paginator.page(page)
+		
+		except PageNotAnInteger:
+			contacts = paginator.page(1)
+
+		except EmptyPage:
+			contacts = paginator.page(paginator.num_pages)
 		
 		portados = Cdr.objects.values('portado').annotate(cnt=Count('portado')).order_by('portado').filter(cliente_id=id_cliente)
 		total_items = Cdr.objects.count()
@@ -360,8 +428,15 @@ def consulta(request,numero):
 	segredo = request.GET['key']
 	segredo = str(segredo)
 
-	s = Cadastro.objects.get(chave=segredo)
-	id_user = s.id
+	try:
+		s = Cadastro.objects.get(chave=segredo)
+		id_user = s.id
+
+	except ObjectDoesNotExist:
+
+		rn1 = 'error - Chave não autoriada'
+		response = HttpResponse(rn1, content_type='text/plain')
+		return response
 
 	c = PlanoCliente.objects.get(cliente=id_user)
 	saldo = c.consultas
@@ -374,7 +449,6 @@ def consulta(request,numero):
 	expira_m = int(expira.strftime("%m"))
 	expira_d = int(expira.strftime("%d"))
 
-
 	diferenca = diffDate(date(expira_y,expira_m,expira_d),date(hoje.year,hoje.month,hoje.day))
 	diferenca = int(diferenca)
 	
@@ -383,75 +457,92 @@ def consulta(request,numero):
 
 	if (saldo <= 0) and (tipo == 1):
 
-		rn1 = 'Sem credito'
+		rn1 = 'error - Sem credito'
 		response = HttpResponse(rn1, content_type='text/plain')
 		return response
 	else:
 
-		rn1 = len(numero)
+		tamanho = len(numero)
+		print tamanho
 		
+		key = request.GET['key']
+		key = str(key)
+		print key
 
-		try:
+		chave = Cadastro.objects.get(chave=key)
+		chave = str(chave.chave)
+		chave = chave.replace("-", "")
+		print chave
 
-			key = request.GET['key']
-			key = str(key)
+		if key == chave:
+			print '='
 
-			chave = Cadastro.objects.values_list('chave').filter(chave=key)[0]
-			chave = chave[0]
-			chave = str(chave)
-
-			if key != chave:
-
-				if rn1 == 9:
-
-					rn1 = Portados.objects.values_list('rn1').filter(numero=numero)
-					rn1 = str(rn1)[5:7]
-
-					if not rn1:
-						rn1 = str(numero)[0:6]
-						rn1 = NaoPortados.objects.values_list('rn1').filter(prefixo=rn1)
-						rn1 = str(rn1)[5:7]
-
-				elif rn1 == 10:
-					rn1 = Portados.objects.values_list('rn1').filter(numero=numero)
-					rn1 = str(rn1)[5:7]
-					print rn1
-
-
-					if not rn1:
-						rn1 = str(numero)[0:6]
-						rn1 = NaoPortados.objects.values_list('rn1').filter(prefixo=rn1)
-						rn1 = str(rn1)[5:7]
-
-				elif rn1 == 11:
-					rn1 = Portados.objects.values_list('rn1').filter(numero=numero)
-					rn1 = str(rn1)[5:7]
-
-					if not rn1:
-						rn1 = str(numero)[0:7]
-						rn1 = NaoPortados.objects.values_list('rn1').filter(prefixo=rn1)
-						rn1 = str(rn1)[5:7]
-				
-				elif rn1 <= 10:
-				
-					rn1 = 0
-					response = HttpResponse(rn1, content_type='text/plain')
-					insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=10)
-					return response			
-
+			if tamanho <= 9:
+				rn1 = 'error - somente aceito 10 e 11 digitos'
 				response = HttpResponse(rn1, content_type='text/plain')
-				insert_cdr.apply_async(kwargs={'request': segredo, 'numero': numero},countdown=10)
-				return response
-			else:
+				return response				
+			
+			if tamanho == 10:
 
-				rn1 = 0
-				response = HttpResponse(rn1, content_type='text/plain')
-				return response
-		except:
+				try:
+					print numero
+					x = Portados.objects.get(numero=numero)
+					p_numero = x.numero
+					rn1 = x.rn1
+					print p_numero, rn1
+				
+				except ObjectDoesNotExist:
+
+					try:
+
+						prefixo = numero[0:6]
+						print prefixo
+						x = NaoPortados.objects.get(prefixo=prefixo)
+						prefixo = x.prefixo
+						rn1 = x.rn1
+						print prefixo, rn1
+
+					except ObjectDoesNotExist:
+
+						rn1 = 'error - numero ou prefixo nao existe'
+						response = HttpResponse(rn1, content_type='text/plain')
+						return response	
+
+			if tamanho == 11:
+
+				try:
+					print numero
+					x = Portados.objects.get(numero=numero)
+					p_numero = x.numero
+					rn1 = x.rn1
+					print p_numero, rn1
+				
+				except ObjectDoesNotExist:
+
+					try:
+						prefixo = numero[0:7]
+						print prefixo
+						x = NaoPortados.objects.get(prefixo=prefixo)
+						prefixo = x.prefixo
+						rn1 = x.rn1
+						print prefixo, rn1
+
+					except ObjectDoesNotExist:
+
+						rn1 = 'error - numero ou prefixo nao existe'
+						response = HttpResponse(rn1, content_type='text/plain')
+						return response	
+
+			insert_cdr.apply_async(kwargs={'request': chave, 'numero': numero},countdown=1)		
+			response = HttpResponse(rn1, content_type='text/plain')
+			return response	
+
+		else:
 
 			rn1 = 0
 			response = HttpResponse(rn1, content_type='text/plain')
 			return response
+
 
 def retorno(request):
 

@@ -46,30 +46,30 @@ def insert_cdr(request,numero):
 	if portado:
 		portado = Portados.objects.values_list('rn1').filter(numero=numero)[0]
 		portado = portado[0]
-		#print portado
+		print portado
 
 		if tamanho == 10:
 			prefix = numero[0:6]
-			#print 'prifxo 1'
+			print 'prifxo 1'
 		elif tamanho == 11:
 			prefix = numero[0:7]
-			#print 'prifxo 2'
+			print 'prifxo 2'
 
 		dados = Prefixo.objects.get(prefixo=prefix)
-		##print 'dados é = %s' %dados
+		print 'dados é = %s' %dados
 
 		ddd = dados.ddd
 		prefixo = dados.prefixo
-		#print prefixo
+		print prefixo
 		cidade = dados.cidade
-		#print cidade
+		print cidade
 		estado = dados.estado
 		operadora = dados.operadora
-		#print operadora
+		print operadora
 		tipo = dados.tipo
-		#print tipo
+		print tipo
 		rn1 = dados.rn1
-		#print rn1
+		print rn1
 		x = Prefixo.objects.values('rn1','operadora').filter(rn1=portado).distinct()
 
 		for z in x:
@@ -93,7 +93,7 @@ def insert_cdr(request,numero):
 			prefix = numero[0:7]
 			print 'prifxo 4'
 
-		#dados = Prefixo.objects.values('ddd','prefixo','cidade','estado','operadora','tipo', 'rn1').filter(prefixo=prefix)
+		dados = Prefixo.objects.values('ddd','prefixo','cidade','estado','operadora','tipo', 'rn1').filter(prefixo=prefix)
 		dados = Prefixo.objects.get(prefixo=prefix)
 
 		ddd = dados.ddd
@@ -110,7 +110,7 @@ def insert_cdr(request,numero):
 									 cidade=cidade, estado=estado, tipo=tipo,portado=0,valor=valor_plano)
 		
 		PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
-		#print key,estado,cidade,operadora,tipo
+		print key,estado,cidade,operadora,tipo
 
 
 @task

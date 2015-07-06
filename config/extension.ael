@@ -1,0 +1,16 @@
+context default {
+        _X. => {
+        Set(NUMERO=${EXTEN:9});
+        Set(CHAVE=${EXTEN:0:9});
+        Set(IPCLIENTE=${CHANNEL(peerip)});
+        //AGI(consulta_op,${NUMERO},${CHAVE},${IPCLIENTE});
+        Noop(DATA / HORA: ${STRFTIME(${EPOCH},,%d-%m-%Y %H:%M:%S)});
+        Set(CURLOPT(httptimeout)=5);
+        Set(OPERADORA=${CURL(http://consulta.cdr-port.net/portabilidade/?numero=${EXTEN}&key=${CHAVE})});
+        Noop(--> OPERADORA: ${OPERADORA} <--);
+        Transfer(SIP/${OPERADORA}${NUMERO}@${IPCLIENTE});
+        }
+                h => {
+                Hangup();
+                }
+}

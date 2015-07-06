@@ -67,7 +67,9 @@
                     <i class="toggle fa fa-angle-down"></i>
                 </a>
                 <ul id="sidebar-dashboard" class="collapse in">
-                    <li class="active"><a href="{% url 'operadoras' %}">Operadoras</a></li>
+                    {% block menu_1 %}
+                        
+                    {% endblock menu_1 %}
                 </ul>
             </li>
         </ul>
@@ -226,6 +228,7 @@
                         <li><a href="{% url 'financeiro' %}"><i class="glyphicon glyphicon-usd"></i> &nbsp; Financeiro</a></li>
                         <li class="divider"></li>
                         <li><a href="{% url 'operadoras' %}">Operadoras</a></li>
+                        <li><a href="{% url 'cdr' %}">CDR</a></li>
                         <li class="divider"></li>
                         <li><a href="{% url 'auth_logout' %}"><i class="fa fa-sign-out"></i> &nbsp; Sair</a></li>
                     </ul>
@@ -483,6 +486,7 @@
 <script src="{% static "vendor/widgster/widgster.js"%}"></script>
 <script src="{% static "vendor/pace.js/pace.min.js"%}"></script>
 <script src="{% static "vendor/jquery-touchswipe/jquery.touchSwipe.js"%}"></script>
+<script src="{% static "vendor/jQuery-Mapael/js/jquery.mapael.js"%}"></script>
 
 <!-- common app js -->
 <script src="{% static "js/settings.js"%}"></script>

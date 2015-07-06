@@ -138,7 +138,7 @@ $(function(){
 
     function pjaxPageLoad(){
         $('.widget').widgster();
-        initMap();
+        //initMap();
         //initCalendar();
       //  initRickshaw();
         initAnimations();

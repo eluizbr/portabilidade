@@ -2,10 +2,16 @@
 {% load humanize %}
 {% load l10n %}
 {% load staticfiles %}
+{% load bootstrap_pagination %}
 
 {% block nome %}
     <strong>{{user}}</strong>&nbsp;
 {% endblock %}
+
+{% block menu_1 %}
+                    <li class="active"><a href="{% url 'operadoras' %}">Operadoras</a></li>
+                    <li><a href="{% url 'cdr' %}">CDR</a></li>
+{% endblock menu_1 %}
 
 {% block content %}
 
@@ -15,7 +21,7 @@
         <section class="widget">
 				<div class="widget-body">
 				    <div class="mt">
-				        <table id="datatable-table" class="table table-striped table-hover">
+				        <table class="table table-striped table-hover">
 				            <thead>
 				            <tr>
 				                <th class="no-sort hidden-xs">Operadora</th>
@@ -25,16 +31,21 @@
 				            </tr>
 				            </thead>
 				            <tbody>
-				            {% for r in operadora %}
+				            {% for r in contacts %}
 				            <tr>
 				                <td><span class="fw-semi-bold">{{r.operadora}}</span></td>
                                 <td><span class="fw-semi-bold">{{r.tipo}}</span></td>
 				                <td><span class="fw-semi-bold">{{r.rn1}}</span></td>
-                                <td><span class="fw-semi-bold">{{r.rn1|cut:"551"|cut:"552"|cut:"553"}}</span></td>
+                                <td><span class="fw-semi-bold">{{r.rn1}}</span></td>
 				            </tr>
 				           {% endfor %}
 				            </tbody>
 				        </table>
+                        <div class="row">
+                            <div class="col-sm-offset-4 col-sm-7 ">
+                                {% bootstrap_paginate contacts centered="true" previous_label="Anterior" next_label="Proximo" range=5 %}
+                            </div>
+                        </div>
 				    </div>
 				</div>
         </section>
