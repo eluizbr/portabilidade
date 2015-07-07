@@ -17,76 +17,186 @@
 {% block content %}
 
 
-<h1 class="page-title">Configurações - <span class="fw-semi-bold">Asterisk</span></h1>
+
+<h1 class="page-title">Configurações - <span class="fw-semi-bold">IPBX</span></h1>
 <section class="widget">
-	<h3>As configurações deveram ser feitas no arquivo <span class="fw-semi-bold">extensions.conf</span></h3><br>
+	<h3>As configurações deveram ser feitas no seu<span class="fw-semi-bold">IPBX</span></h3><br>
 
-    <div class="alert alert-danger">
-        <span class="fw-semi-bold">EXTEN:</span> É o número a ser consultado. Deverá ser enviado no formato: <strong>1140627333</strong>. Não pode ser enviado nenhum dígito a mais. Seram aceitos números com <strong>10</strong> ou <strong>11</strong> digitos. Número com tamanho diferente irá retornar <strong>0</strong>.<br><br>
-        <span class="fw-semi-bold">CHAVE:</span> As consultas só poderam ser realizadas com a sua <strong>CHAVE</strong>. <button class="btn btn-inverse" data-toggle="modal" data-target="#chave">Visulizar CHAVE</button><br><br>
-        <span class="fw-semi-bold">RETORNO:</span> Sempre será retornado apenas 5 dígitos na consulta. Para o <strong>CSP 55341 (TIM)</strong> por exemplo, o retorno será <strong>55341</strong>.<br><br>
-        <span class="fw-semi-bold">ATENÇÃO:</span> É necessário suporte a <strong>lib-cULR </strong> em seu asterisk. Mais informações <a href="https://wiki.asterisk.org/wiki/display/AST/cURL" target="_blank"><strong>clique aqui</strong></a>.<br>
-    </div>
-
-    <div class="widget-body">
-        </p>
-        <div class="alert alert-info alert-sm">
-            <span class="fw-semi-bold"></span> 
-            
-				<h5>
-				<strong>
-        		exten => _X.,1,Set(CSP=${CURL(http://consulta.cdr-port.net/portabilidade/${EXTEN}?key=CHAVE)})<br>
-				exten => _X.,n,NooP(O CSP para o número ${EXTEN} é ${CSP})<br>
-				exten => _X.,n,Dial(SIP/TRONCO/0${CSP}${EXTEN})<br>
-				</strong>
-				</h5>
-            
-
-        </div>
-    </div>
-
-    <div class="widget-body">
-        <header>
-            <h5>
-                <span class="fw-semi-bold">Redirecionando CSP para o chip especifico.</span>
+    <div class="panel panel-default">
+        <div class="panel-heading collapsed">
+            <h5 class="panel-title">
+                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+                    <strong>Configurações ASTERISK PURO</strong>
+                    <i class="fa fa-angle-down pull-right"></i>
+                </a>
             </h5>
-        </header>
-        </p>
-        <div class="alert alert-info alert-sm">
-            <span class="fw-semi-bold"></span> 
-            
-				<h5>
-				<strong>
-					exten => _X.,1,Set(CSP=${CURL(http://consulta.cdr-port.net/portabilidade/${EXTEN}?key=CHAVE)})<br>
-					exten => _X.,n,NooP(O CSP para o número ${EXTEN} é ${CSP})<br>
-                    ; RETORNO TIM<br>
-					exten => _X.,n,GotoIf($["${CSP}" = "55341"]?tim)<br>
-					exten => _X.,n(tim),Dial(dongle/tim/${EXTEN:3},,rt)<br>
-                    ; RETORNO CLARO<br>
-                    exten => _X.,n,GotoIf($["${CSP}" = "55321"]?claro)<br>
-                    exten => _X.,n(claro),Dial(dongle/claro/${EXTEN:3},,rt)<br>
-                    ; RETORNO OI<br>
-                    exten => _X.,n,GotoIf($["${CSP}" = "55331"]?oi)<br>
-                    exten => _X.,n(oi),Dial(dongle/oi/${EXTEN:3},,rt)<br>
-                    ; RETORNO OI BRT<br>
-                    exten => _X.,n,GotoIf($["${CSP}" = "55314"]?oibrt)<br>
-                    exten => _X.,n(oibrt),Dial(dongle/oibrt/${EXTEN:3},,rt)<br>
-                    ; RETORNO VIVO<br>
-                    exten => _X.,n,GotoIf($["${CSP}" = "55323"]?vivo)<br>
-                    exten => _X.,n(vivo),Dial(dongle/vivo/${EXTEN:3},,rt)<br>
-                    ; RETORNO CTBC/ALGAR<br>
-                    exten => _X.,n,GotoIf($["${CSP}" = "55312"]?algar)<br>
-                    exten => _X.,n(algar),Dial(dongle/algar/${EXTEN:3},,rt)<br>
-                    ; RETORNO NEXTEL<br>
-                    exten => _X.,n,GotoIf($["${CSP}" = "55351"]?nextel)<br>
-                    exten => _X.,n(nextel),Dial(dongle/nextel/${EXTEN:3},,rt)<br>
-					exten => _X.,n,Hangup()<br>
-				</strong>
-				</h5>
         </div>
+        <div id="collapseOne" class="panel-collapse collapse">
+            <div class="panel-body">
+                <div class="col-md-14">
+                <section class="widget">
+                <div class="widget-body">
+                    <div class="alert alert-danger">
+                        <span class="fw-semi-bold">EXTEN:</span> É o número a ser consultado. Deverá ser enviado no formato: <strong>1140627333</strong>. Não pode ser enviado nenhum dígito a mais. Seram aceitos números com <strong>10</strong> ou <strong>11</strong> digitos. Número com tamanho diferente irá retornar <strong>0</strong>.<br><br>
+                        <span class="fw-semi-bold">CHAVE:</span> As consultas só poderam ser realizadas com a sua chave.<br><br>
+                        <span class="fw-semi-bold">RETORNO:</span> Sempre será retornado 5 dígitos na consulta. Para o <strong>CSP 55341 (TIM)</strong> por exemplo, o retorno será <strong>55341</strong>.<br><br>
+                        <span class="fw-semi-bold">ATENÇÃO:</span> É necessário suporte a <strong>lib-cULR </strong> em seu asterisk. Mais informações <a href="https://wiki.asterisk.org/wiki/display/AST/cURL" target="_blank"><strong>clique aqui</strong></a>.<br>
+                    </div>
+
+                    <div class="widget-body">
+                        </p>
+                        <div class="alert alert-info alert-sm">
+                            <span class="fw-semi-bold"></span> 
+                            
+                                <h5>
+                                <strong>
+                                exten => _X.,1,Set(CSP=${CURL(http://consulta.cdr-port.net/portabilidade/${EXTEN}?key={{chave|cut:"-"}})})<br>
+                                exten => _X.,n,NooP(O CSP para o número ${EXTEN} é ${CSP})<br>
+                                exten => _X.,n,Dial(SIP/TRONCO/0${CSP}${EXTEN})<br>
+                                </strong>
+                                </h5>
+                            
+
+                        </div>
+                    </div>
+
+                    <div class="widget-body">
+                        <header>
+                            <h5>
+                                <span class="fw-semi-bold">Redirecionando CSP para o chip especifico.</span>
+                            </h5>
+                        </header>
+                        </p>
+                        <div class="alert alert-info alert-sm">
+                            <span class="fw-semi-bold"></span> 
+                            
+                                <h5>
+                                <strong>
+                                    exten => _X.,1,Set(CSP=${CURL(http://consulta.cdr-port.net/portabilidade/${EXTEN}?key={{chave|cut:"-"}})})<br>
+                                    exten => _X.,n,NooP(O CSP para o número ${EXTEN} é ${CSP})<br><br>
+                                    ; RETORNO TIM<br>
+                                    exten => _X.,n,GotoIf($["${CSP}" = "55341"]?tim)<br>
+                                    exten => _X.,n(tim),Dial(dongle/tim/${EXTEN:3},,rt)<br><br>
+                                    ; RETORNO CLARO<br>
+                                    exten => _X.,n,GotoIf($["${CSP}" = "55321"]?claro)<br>
+                                    exten => _X.,n(claro),Dial(dongle/claro/${EXTEN:3},,rt)<br><br>
+                                    ; RETORNO OI<br>
+                                    exten => _X.,n,GotoIf($["${CSP}" = "55331"]?oi)<br>
+                                    exten => _X.,n(oi),Dial(dongle/oi/${EXTEN:3},,rt)<br><br>
+                                    ; RETORNO OI BRT<br>
+                                    exten => _X.,n,GotoIf($["${CSP}" = "55314"]?oibrt)<br>
+                                    exten => _X.,n(oibrt),Dial(dongle/oibrt/${EXTEN:3},,rt)<br><br>
+                                    ; RETORNO VIVO<br>
+                                    exten => _X.,n,GotoIf($["${CSP}" = "55323"]?vivo)<br>
+                                    exten => _X.,n(vivo),Dial(dongle/vivo/${EXTEN:3},,rt)<br><br>
+                                    ; RETORNO CTBC/ALGAR<br>
+                                    exten => _X.,n,GotoIf($["${CSP}" = "55312"]?algar)<br>
+                                    exten => _X.,n(algar),Dial(dongle/algar/${EXTEN:3},,rt)<br><br>
+                                    ; RETORNO NEXTEL<br>
+                                    exten => _X.,n,GotoIf($["${CSP}" = "55351"]?nextel)<br>
+                                    exten => _X.,n(nextel),Dial(dongle/nextel/${EXTEN:3},,rt)<br>
+                                    exten => _X.,n,Hangup()<br>
+                                </strong>
+                                </h5>
+                        </div>
+                    </div>
+                </div>
+                </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading collapsed">
+            <h5 class="panel-title">
+                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+                    <strong>Configurações SIP REDIRECT</strong>
+                    <i class="fa fa-angle-down pull-right"></i>
+                </a>
+            </h5>
+        </div>
+        <div id="collapseTwo" class="panel-collapse collapse">
+            <div class="panel-body">
+                <div class="col-md-14">
+                    <section class="widget">
+                        <div class="widget-body">
+                            <div class="alert alert-danger">
+                                <span class="fw-semi-bold">EXTEN:</span> É o número a ser consultado. Deverá ser enviado no formato: <strong>1140627333</strong>. Não pode ser enviado nenhum dígito a mais. Seram aceitos números com <strong>10</strong> ou <strong>11</strong> digitos. Número com tamanho diferente irá retornar <strong>0</strong>.<br><br>
+                                <span class="fw-semi-bold">CHAVE:</span> As consultas só poderam ser realizadas com a sua CHAVE <strong>{{chave_cod}}</strong><br><br>
+                                <span class="fw-semi-bold">RETORNO:</span> Sempre será retornado apenas 5 dígitos na consulta. Para o <strong>CSP 55341 (TIM)</strong> por exemplo, o retorno será <strong>55341</strong>.<br><br>
+                            </div>
+                                <header>
+                                    <h5>
+                                        <span class="fw-semi-bold">Configuração básica para EXTENSIONS.CONF</span>
+                                    </h5>
+                                </header>
+                            <div class="widget-body">
+                                <div class="alert alert-info alert-sm">
+                                    <span class="fw-semi-bold"></span> 
+                                        <strong>
+                                            [default]<br><br>
+                        
+
+                                            exten => _X.,1,Dial(SIP/voip/{{chave_cod}}${EXTEN})<br>
+                                            exten => _X.,n,Hangup()<br><br>
+                                            [redirect]<br><br>
+
+                                            ;TIM (55341)<br>
+                                            exten => _55341.,1,NoCDR()<br>
+                                            exten => _55341.,n,Dial(SIP/TRONCO_TIM/041${EXTEN:5})<br><br>
+
+                                            ;CLARO (55321)<br>
+                                            exten => _55321.,1,NoCDR()<br>
+                                            exten => _55321.,n,Dial(SIP/TRONCO_CLARO/021${EXTEN:5})<br><br>
+
+                                            ;VIVO (55320 | 55323)<br>
+                                            exten => _5532[03].,1,NoCDR()<br>
+                                            exten => _5532[03].,n,Dial(SIP/TRONCO_VIVO/015${EXTEN:5})<br><br>
+
+                                            ;OI (55331 | 55314)<br>
+                                            exten => _553[13][14].,1,NoCDR()<br>
+                                            exten => _553[13][14].,n,Dial(SIP/TRONCO_OI/031${EXTEN:5})<br><br>
+
+                                            ;NEXTEL (55351 | 55377)<br>
+                                            exten => _553[57][17].,1,NoCDR()<br>
+                                            exten => _553[57][17].,n,Dial(SIP/TRONCO_NEXTEL/041${EXTEN:5})<br><br>
+                                        </strong>
+                                </div>
+                                <header>
+                                    <h5>
+                                        <span class="fw-semi-bold">Configuração básica para SIP.CONF</span>
+                                    </h5>
+                                </header>
+                                <div class="alert alert-info alert-sm">
+                                    <span class="fw-semi-bold"></span> 
+                                        <strong>
+                                            [consulta]<br>
+                                            domain=consulta.cdr-port.net<br>
+                                            type=peer<br>
+                                            domain=consulta.cdr-port.net<br>
+                                            fromdomain=consulta.cdr-port.net<br>
+                                            host=consulta.cdr-port.net<br>
+                                            secret=SENHA<br>
+                                            username=USER<br>
+                                            defaultuser=USER<br>
+                                            fromuser=USER<br>
+                                            port=5060<br>
+                                            context=redirect<br>
+                        
+                                        </strong>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 </section>
-
+<!--
 <div class="modal fade" id="chave" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -103,6 +213,7 @@
         </div>
     </div>
 </div>
+-->
 
 {% endblock content %}
 

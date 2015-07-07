@@ -1,3 +1,5 @@
+;ORIGINAL
+
 context default {
         _X. => {
         Set(NUMERO=${EXTEN:9});
@@ -6,7 +8,7 @@ context default {
         //AGI(consulta_op,${NUMERO},${CHAVE},${IPCLIENTE});
         Noop(DATA / HORA: ${STRFTIME(${EPOCH},,%d-%m-%Y %H:%M:%S)});
         Set(CURLOPT(httptimeout)=5);
-        Set(OPERADORA=${CURL(http://consulta.cdr-port.net/portabilidade/?numero=${EXTEN}&key=${CHAVE})});
+        Set(OPERADORA=${CURL(127.0.0.1/consultaOperadora.php?numero=${NUMERO}&chave=${CHAVE})});
         Noop(--> OPERADORA: ${OPERADORA} <--);
         Transfer(SIP/${OPERADORA}${NUMERO}@${IPCLIENTE});
         }
@@ -14,3 +16,78 @@ context default {
                 Hangup();
                 }
 }
+
+;CDRPORT
+
+context default {
+        _X. => {
+        Set(NUMERO=${EXTEN});
+        Set(CHAVE=${EXTEN:0:9});
+        Set(IPCLIENTE=${CHANNEL(peerip)});
+        //AGI(consulta_op,${NUMERO},${CHAVE},${IPCLIENTE});
+        Noop(DATA / HORA: ${STRFTIME(${EPOCH},,%d-%m-%Y %H:%M:%S)});
+        Set(CURLOPT(httptimeout)=5);
+        Set(OPERADORA=${CURL(http://consulta.cdr-port.net/portabilidade/${EXTEN:9}?key=${CHAVE})});
+        Noop(--> OPERADORA: ${OPERADORA} <--);
+        Transfer(SIP/${OPERADORA}${NUMERO}@${IPCLIENTE});
+        }
+                h => {
+                Hangup();
+                }
+}
+
+
+;SIP
+
+
+[consulta]
+domain=consulta.cdr-port.net
+type=peer
+domain=consulta.cdr-port.net
+fromdomain=consulta.cdr-port.net
+host=consulta.cdr-port.net
+secret=88285069
+username=9998
+defaultuser=9998
+fromuser=9998
+port=5060
+context=redirect
+
+
+
+;EXTENSIONS
+
+
+
+[default]
+
+
+exten => _X.,1,Dial(SIP/voip/${EXTEN})
+exten => _X.,n,Hangup()
+
+
+
+[redirect]
+
+
+
+;TIM (55341)
+exten => _55341.,1,NoCDR()
+exten => _55341.,n,Dial(SIP/TRONCO_TIM/041${EXTEN:5})
+
+;CLARO (55321)
+exten => _55321.,1,NoCDR()
+exten => _55321.,n,Dial(SIP/TRONCO_CLARO/021${EXTEN:5})
+
+;VIVO (55320 | 55323)
+exten => _5532[03].,1,NoCDR()
+exten => _5532[03].,n,Dial(SIP/TRONCO_VIVO/015${EXTEN:5})
+
+;OI (55331 | 55314)
+exten => _553[13][14].,1,NoCDR()
+exten => _553[13][14].,n,Dial(SIP/TRONCO_OI/031${EXTEN:5})
+
+;NEXTEL (55351 | 55377)
+exten => _553[57][17].,1,NoCDR()
+exten => _553[57][17].,n,Dial(SIP/TRONCO_NEXTEL/041${EXTEN:5})
+

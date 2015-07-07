@@ -59,6 +59,7 @@ def asterisk(request):
 	user = User.objects.get(pk=request.user.id)
 	cad = Cadastro.objects.get(user=user)
 	chave = cad.chave
+	chave_cod = cad.cod_cliente
 
 	return render(request, 'asterisk.html', locals())
 
@@ -244,6 +245,7 @@ def cdr(request):
 	cad = Cadastro.objects.get(user=user)
 	user_id = cad.id
 
+
 	numero = request.GET.get('numero', '')
 	operadora = request.GET.get('operadora', '')
 	estado = request.GET.get('estado', '')
@@ -285,6 +287,7 @@ def cdr(request):
 
 @login_required
 def operadoras(request):
+	
 
 	## Conexão ao banco MySQL
 	try:
@@ -294,6 +297,7 @@ def operadoras(request):
 		try:
 			x = Cadastro.objects.get(user_id=request.user.id)
 			id_cliente = x.id
+			chave_cod = x.cod_cliente
 		
 		except ObjectDoesNotExist:
 
@@ -429,8 +433,15 @@ def consulta(request,numero):
 	segredo = str(segredo)
 
 	try:
-		s = Cadastro.objects.get(chave=segredo)
-		id_user = s.id
+		if len(segredo) == 8:
+			s = Cadastro.objects.get(cod_cliente=segredo)
+			id_user = s.id
+
+		else:
+
+			s = Cadastro.objects.get(chave=segredo)
+			id_user = s.id
+
 
 	except ObjectDoesNotExist:
 
@@ -469,11 +480,21 @@ def consulta(request,numero):
 		key = str(key)
 		print key
 
-		chave = Cadastro.objects.get(chave=key)
-		chave = str(chave.chave)
-		chave = chave.replace("-", "")
-		print chave
 
+		if len(segredo) == 8:
+
+			chave = Cadastro.objects.get(cod_cliente=key)
+			chave = chave.cod_cliente
+			chave = str(chave)
+
+
+		else:
+
+			chave = Cadastro.objects.get(chave=key)
+			chave = str(chave.chave)
+			chave = chave.replace("-", "")
+
+		print type(key), type(chave)
 		if key == chave:
 			print '='
 
@@ -533,7 +554,7 @@ def consulta(request,numero):
 						response = HttpResponse(rn1, content_type='text/plain')
 						return response	
 
-			insert_cdr.apply_async(kwargs={'request': chave, 'numero': numero},countdown=1)		
+			insert_cdr.apply_async(kwargs={'request': chave, 'numero': numero},countdown=10)		
 			response = HttpResponse(rn1, content_type='text/plain')
 			return response	
 

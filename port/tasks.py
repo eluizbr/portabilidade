@@ -22,8 +22,16 @@ def insert_cdr(request,numero):
 	portado = Portados.objects.values_list('numero').filter(numero=numero)
 	print portado
 
-	z = Cadastro.objects.get(chave=chave)
-	id_user = z.id
+	print chave
+	if len(chave) == 8:
+
+		z = Cadastro.objects.get(cod_cliente=chave)
+		id_user = z.id
+
+	else:
+
+		z = Cadastro.objects.get(chave=chave)
+		id_user = z.id
 
 	x = PlanoCliente.objects.get(cliente=id_user)
 	plano_id_cliente = x.plano
@@ -78,7 +86,11 @@ def insert_cdr(request,numero):
 			
 			print operadora,rn1
 
-			key = get_object_or_404(Cadastro, chave=chave)		
+			if len(chave) == 8:
+				key = get_object_or_404(Cadastro, cod_cliente=chave)
+			else:
+				key = get_object_or_404(Cadastro, chave=chave)		
+			
 			Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, operadora=operadora,\
 										 cidade=cidade, estado=estado, tipo=tipo,portado=1,valor=valor_plano)
 
@@ -104,7 +116,10 @@ def insert_cdr(request,numero):
 		tipo = dados.tipo
 		rn1 = dados.rn1
 
-		key = get_object_or_404(Cadastro, chave=chave)
+		if len(chave) == 8:
+			key = get_object_or_404(Cadastro, cod_cliente=chave)
+		else:
+			key = get_object_or_404(Cadastro, chave=chave)	
 		#print 'a chave e %s' %key		
 		Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, operadora=operadora,\
 									 cidade=cidade, estado=estado, tipo=tipo,portado=0,valor=valor_plano)
