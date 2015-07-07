@@ -21,13 +21,13 @@ context default {
 
 context default {
         _X. => {
-        Set(NUMERO=${EXTEN});
-        Set(CHAVE=${EXTEN:0:9});
+        Set(NUMERO=${EXTEN:8});
+        Set(CHAVE=${EXTEN:0:8});
         Set(IPCLIENTE=${CHANNEL(peerip)});
         //AGI(consulta_op,${NUMERO},${CHAVE},${IPCLIENTE});
         Noop(DATA / HORA: ${STRFTIME(${EPOCH},,%d-%m-%Y %H:%M:%S)});
         Set(CURLOPT(httptimeout)=5);
-        Set(OPERADORA=${CURL(http://consulta.cdr-port.net/portabilidade/${EXTEN:9}?key=${CHAVE})});
+        Set(OPERADORA=${CURL(http://consulta.cdr-port.net/portabilidade/${EXTEN:8}?key=7368b4d9dc9a4f7093c5d911d37d09bd)});
         Noop(--> OPERADORA: ${OPERADORA} <--);
         Transfer(SIP/${OPERADORA}${NUMERO}@${IPCLIENTE});
         }
@@ -62,7 +62,7 @@ context=redirect
 [default]
 
 
-exten => _X.,1,Dial(SIP/voip/${EXTEN})
+exten => _X.,1,Dial(SIP/voip/CHAVE${EXTEN})
 exten => _X.,n,Hangup()
 
 
@@ -90,4 +90,11 @@ exten => _553[13][14].,n,Dial(SIP/TRONCO_OI/031${EXTEN:5})
 ;NEXTEL (55351 | 55377)
 exten => _553[57][17].,1,NoCDR()
 exten => _553[57][17].,n,Dial(SIP/TRONCO_NEXTEL/041${EXTEN:5})
+
+
+[cdrport]
+type = peer
+context = tutorial
+secret = 88285069
+host = dynamic
 

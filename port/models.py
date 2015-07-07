@@ -104,7 +104,7 @@ class Cadastro(models.Model):
     last_name = models.CharField(u'SobreNome', max_length=200)
     empresa = models.CharField(
         u'Nome fantasia', max_length=100, blank=True, null=True)
-    cpf = models.CharField(u'CPF', max_length=20, blank=True, null=True, unique=True)
+    cpf = models.CharField(u'CPF', max_length=20, unique=True)
     cnpj = models.CharField(u'CNPJ', max_length=20, blank=True, null=True, unique=True)
     ie = models.CharField(
         u'Insc. Estadual', max_length=20, blank=True, null=True)
@@ -112,7 +112,7 @@ class Cadastro(models.Model):
         u'Telefone Fixo', max_length=20, blank=True, null=True)
     telefoneM = models.CharField(
         u'Telefone Movel', max_length=20, blank=True, null=True)
-    email = models.EmailField('Email', max_length=254, blank=True, null=True, unique=True)
+    email = models.EmailField('Email', max_length=254, unique=True)
     email_contato = models.EmailField(
         'Email contato', max_length=254, blank=True, null=True)
     nome = models.CharField(u'Nome', max_length=100, blank=True, null=True)

@@ -8,6 +8,3 @@ class EnvioForm(forms.ModelForm):
 		model = envio
 		fields = '__all__'
 		exclude = ['data','enviado']
-
-
-

@@ -17,7 +17,6 @@ def index_envio(request):
 def cadastro(request):
 
 	
-
 	if request.method == 'POST':
 		form = EnvioForm(request.POST)
 			
@@ -63,7 +62,7 @@ def enviar(request):
 			    context={'nome': nome},
 			)
 
-	envio.objects.filter(email=email).update(enviado=1)
+		envio.objects.filter(email=email).update(enviado=1)
 
 	return redirect('/envio/cadastro/')
 
