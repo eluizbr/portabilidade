@@ -175,3 +175,45 @@ class Retorno(models.Model):
 
     def __unicode__(self):
         return unicode(self.status)
+
+class SipBuddies(models.Model):
+    uniqueid = models.AutoField(primary_key=True)
+    name = models.CharField(unique=True, max_length=250)
+    accountcode = models.CharField(max_length=30, blank=True, null=True)
+    amaflags = models.CharField(max_length=1, blank=True, null=True)
+    callgroup = models.CharField(max_length=30, blank=True, null=True)
+    callerid = models.CharField(max_length=50, blank=True, null=True)
+    canreinvite = models.CharField(max_length=3, blank=True, null=True)
+    context = models.CharField(max_length=250, blank=True, null=True)
+    defaultip = models.CharField(max_length=15, blank=True, null=True)
+    dtmfmode = models.CharField(max_length=7, blank=True, null=True)
+    fromuser = models.CharField(max_length=50, blank=True, null=True)
+    fromdomain = models.CharField(max_length=31, blank=True, null=True)
+    host = models.CharField(max_length=31)
+    incominglimit = models.CharField(max_length=2, blank=True, null=True)
+    outgoinglimit = models.CharField(max_length=2, blank=True, null=True)
+    insecure = models.CharField(max_length=4, blank=True, null=True)
+    language = models.CharField(max_length=2, blank=True, null=True)
+    mailbox = models.CharField(max_length=50, blank=True, null=True)
+    md5secret = models.CharField(max_length=32, blank=True, null=True)
+    nat = models.CharField(max_length=5, blank=True, null=True)
+    permit = models.CharField(max_length=95, blank=True, null=True)
+    deny = models.CharField(max_length=95, blank=True, null=True)
+    pickupgroup = models.CharField(max_length=30, blank=True, null=True)
+    port = models.CharField(max_length=5)
+    qualify = models.CharField(max_length=4, blank=True, null=True)
+    restrictcid = models.CharField(max_length=3, blank=True, null=True)
+    rtptimeout = models.CharField(max_length=3, blank=True, null=True)
+    rtpholdtimeout = models.CharField(max_length=3, blank=True, null=True)
+    secret = models.CharField(max_length=30, blank=True, null=True)
+    type = models.CharField(max_length=6)
+    username = models.CharField(max_length=30)
+    allow = models.CharField(max_length=100, blank=True, null=True)
+    disallow = models.CharField(max_length=100, blank=True, null=True)
+    regseconds = models.IntegerField()
+    ipaddr = models.CharField(max_length=15)
+    cliente = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'sip_buddies'

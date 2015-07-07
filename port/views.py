@@ -7,7 +7,7 @@ from django.db.models import Count
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail, BadHeaderError
 from django.contrib.auth.decorators import login_required
-from models import Portados, NaoPortados, Cdr, Prefixo, PlanoCliente, Retorno
+from models import Portados, NaoPortados, Cdr, Prefixo, PlanoCliente, Retorno, SipBuddies
 from ratelimit.decorators import ratelimit
 from tasks import insert_cdr, atualiza_compra
 from django.conf import settings
@@ -60,6 +60,11 @@ def asterisk(request):
 	cad = Cadastro.objects.get(user=user)
 	chave = cad.chave
 	chave_cod = cad.cod_cliente
+	cod_cliente = cad.cod_cliente
+
+	asterisk = SipBuddies.objects.get(cliente=cod_cliente)
+	ast_user = asterisk.name
+	ast_pass = asterisk.secret
 
 	return render(request, 'asterisk.html', locals())
 
@@ -171,16 +176,24 @@ def criar_user(request):
 			obj.cod_cliente = int(random.randint(10000000, 99000000))
 			obj.save()
 
+
 			try:
 				### Se o plano não exite, então cria...
 				cad = Cadastro.objects.get(user=user)
 				user_id = cad.id
+				codigo_cliente = cad.cod_cliente
+				name = cad.first_name
 				z = PlanoCliente.objects.get(cliente=user_id)
 				cliente = z.cliente
 				plano = z.plano
 			except PlanoCliente.DoesNotExist:
 				z = PlanoCliente(consultas=500,consultas_gratis=0,cliente=user_id,plano=1,nome_plano='500 Grátis',criado_em=data,expira_em=mes,tipo=1)
 				z.save()
+
+				secret = int(random.randint(10000000, 99000000))
+				print name,secret,codigo_cliente
+				sip = SipBuddies(name=name,port=5060,secret=secret,regseconds=0,cliente=codigo_cliente)
+				sip.save()	
 				### Se o plano não exite, então cria...
 			return redirect('/portabilidade/meus-dados/')
 	else:
@@ -200,6 +213,8 @@ def meus_dados(request):
 		user_id = cad.id
 		codigo_cliente = cad.cod_cliente
 		cod_cliente = cad.chave
+		name = cad.first_name
+
 	except Cadastro.DoesNotExist:
 		return redirect('/portabilidade/criar-user/')
 	
@@ -223,6 +238,12 @@ def meus_dados(request):
 				obj.user = user
 				obj.cod_cliente = int(random.randint(10000000, 99000000))
 				obj.save()
+
+				# Gera cliente SIP
+				secret = int(random.randint(10000000, 99000000))
+				print name,secret,codigo_cliente
+				sip = SipBuddies(name=name,port=5060,secret=secret,cliente=cod_cliente)
+				sip.save()
 
 				try:
 					### Se o plano não exite, então cria...
@@ -287,7 +308,8 @@ def cdr(request):
 
 @login_required
 def operadoras(request):
-	
+
+
 
 	## Conexão ao banco MySQL
 	try:
