@@ -17,8 +17,9 @@ class Migration(migrations.Migration):
                 ('nome', models.CharField(max_length=255)),
                 ('telefone', models.CharField(default=b'(00)0000-0000', max_length=25)),
                 ('email', models.EmailField(max_length=254)),
+                ('empresa', models.CharField(max_length=255)),
                 ('data', models.DateTimeField(auto_now_add=True)),
-                ('enviado', models.IntegerField()),
+                ('enviado', models.IntegerField(default=0)),
             ],
         ),
     ]

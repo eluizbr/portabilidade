@@ -8,7 +8,8 @@ import choices
 
 data = datetime.datetime.now()
 mes = data + timedelta(days=30)
-
+hora = data + timedelta(hours=1)
+hora = hora.strftime("%H:%M:%S")
 
 
 class NaoPortados(models.Model):
@@ -85,6 +86,12 @@ class Cdr(models.Model):
     def __unicode__(self):
         return unicode(self.numero)
 
+class Cache(models.Model):
+    numero = models.CharField(max_length=30)
+    hora = models.TimeField(auto_now=True)
+    cache = models.TimeField()
+    cliente = models.IntegerField(default=0)
+
 class Cadastro(models.Model):
 
     PLANO = (
@@ -126,6 +133,7 @@ class Cadastro(models.Model):
     cod_cliente = models.IntegerField(u'Codigo do Cliente', unique=True)
     chave = models.UUIDField(default=uuid.uuid4, editable=False)
     plano = models.IntegerField(u'Plano', default=1)
+    cache = models.IntegerField(u'Cache', default=0)
 
     def __unicode__(self):
         return unicode(self.user)
@@ -133,6 +141,7 @@ class Cadastro(models.Model):
 class PlanoCliente(models.Model):
 
     TIPO = choices.TIPO_PLANO_CHOICES
+    CACHE = choices.CACHE_CHOICES
 
     cliente = models.IntegerField(u'Cliente', default=1, unique=True)
     plano = models.IntegerField(u'Plano', default=1)
@@ -142,6 +151,8 @@ class PlanoCliente(models.Model):
     criado_em = models.DateTimeField(default=data)
     expira_em = models.DateTimeField(default=mes)
     tipo = models.CharField(max_length=200,choices=TIPO,default=1)
+    cache = models.CharField(u'Cache habilitado',max_length=1,choices=CACHE,default=0)
+    tempo = models.IntegerField(u'Tempo do cache em minutos',default=60)
 
     def __unicode__(self):
         return unicode(self.plano)

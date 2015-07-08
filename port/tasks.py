@@ -6,46 +6,83 @@ from portabilidade.celery import app
 from django.shortcuts import render,get_object_or_404
 from django.db import IntegrityError
 from django.http import HttpResponse
-from port.models import Portados, NaoPortados, Cadastro, Cdr, Prefixo, PlanoCliente, Plano, Retorno
+from port.models import Portados, NaoPortados, Cadastro, Cdr, Prefixo, PlanoCliente, Plano, Retorno, Cache
 from post_office import mail
 from pagseguro.api import PagSeguroItem, PagSeguroApi
 from django.core.exceptions import ObjectDoesNotExist
-from datetime import datetime
+from datetime import timedelta,date
+import datetime
 import decimal
 
 @task
 def insert_cdr(request,numero):
 
+	data = datetime.datetime.now()
+	agora = data.strftime("%H:%M:%S")
+
 	chave = request
 	numero = numero
 	tamanho = len(numero)
 	portado = Portados.objects.values_list('numero').filter(numero=numero)
-	print portado
 
-	print chave
 	if len(chave) == 8:
 
 		z = Cadastro.objects.get(cod_cliente=chave)
 		id_user = z.id
+		cod_cliente = z.cod_cliente
 
 	else:
 
 		z = Cadastro.objects.get(chave=chave)
 		id_user = z.id
+		cod_cliente = z.cod_cliente
 
 	x = PlanoCliente.objects.get(cliente=id_user)
 	plano_id_cliente = x.plano
 	consultas = x.consultas
 	gratis = x.consultas_gratis
+	ativo = int(x.cache)
+	tempo = x.tempo
 	tipo = x.tipo
 	tipo = int(tipo)
 
+	hora = data + timedelta(minutes=tempo)
+	hora = hora.strftime("%H:%M:%S")
+
 	y = Plano.objects.get(id=plano_id_cliente)
 	valor_plano = y.valor_consulta
+	valor_plano_2 = y.valor_consulta
+
+	try:
+		cache = Cache.objects.get(numero=numero)
+		numero_cache = cache.numero
+		hora_cache = str(cache.cache)
+	except ObjectDoesNotExist:
+		hora_cache = agora
+
 
 	### INICIO Remover credito ###
+	a = agora.replace(":", "")
+	h = hora_cache.replace(":", "")
+	
 	if tipo == 1:
-		total_consultas = consultas - 1
+
+		if ativo == 1:
+			
+			if a > h:
+
+				Cache.objects.filter(numero=numero).delete()
+				valor_plano = valor_plano_2
+				total_consultas = consultas - 1
+			
+			elif a < h:
+				valor_plano = 0.00
+			else:
+				
+				total_consultas = consultas
+		else:
+			valor_plano = valor_plano
+			total_consultas = consultas - 1
 
 	else:
 		total_consultas = 0
@@ -83,18 +120,28 @@ def insert_cdr(request,numero):
 		for z in x:
 			rn1 = z['rn1']
 			operadora = z['operadora']
-			
-			print operadora,rn1
 
 			if len(chave) == 8:
 				key = get_object_or_404(Cadastro, cod_cliente=chave)
 			else:
-				key = get_object_or_404(Cadastro, chave=chave)		
+				key = get_object_or_404(Cadastro, chave=chave)					
 			
+			### INICIO rotina CACHE - Só entra aqui se o cache esta hábilitado para o cliente ###
+			if ativo == 1:
+				try:
+					Cache.objects.get(numero=numero)
+				except Cache.DoesNotExist:
+					Cache.objects.create(numero=numero,cache=hora,cliente=cod_cliente)
+					total_consultas = consultas - 1
+					PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
+			### INICIO rotina CACHE - Só entra aqui se o cache esta hábilitado para o cliente ###
+			elif ativo == 0:
+			
+				total_consultas = consultas - 1
+				PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
+
 			Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, operadora=operadora,\
 										 cidade=cidade, estado=estado, tipo=tipo,portado=1,valor=valor_plano)
-
-			PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
 
 	else:
 
@@ -107,8 +154,8 @@ def insert_cdr(request,numero):
 
 		dados = Prefixo.objects.values('ddd','prefixo','cidade','estado','operadora','tipo', 'rn1').filter(prefixo=prefix)
 		dados = Prefixo.objects.get(prefixo=prefix)
-
 		ddd = dados.ddd
+		
 		prefixo = dados.prefixo
 		cidade = dados.cidade
 		estado = dados.estado
@@ -121,10 +168,26 @@ def insert_cdr(request,numero):
 		else:
 			key = get_object_or_404(Cadastro, chave=chave)	
 		#print 'a chave e %s' %key		
+
+		### INICIO rotina CACHE - Só entra aqui se o cache esta hábilitado para o cliente ###
+		if ativo == 1:
+			try:
+				Cache.objects.get(numero=numero)
+			except Cache.DoesNotExist:
+				Cache.objects.create(numero=numero,cache=hora,cliente=cod_cliente)
+				total_consultas = consultas - 1
+				PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
+		### INICIO rotina CACHE - Só entra aqui se o cache esta hábilitado para o cliente ###
+
+		elif ativo == 0:
+		
+			total_consultas = consultas - 1
+			PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
+
 		Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, operadora=operadora,\
 									 cidade=cidade, estado=estado, tipo=tipo,portado=0,valor=valor_plano)
 		
-		PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
+
 		print key,estado,cidade,operadora,tipo
 
 
@@ -334,4 +397,12 @@ def procura():
 	for v in x:
 		code = v[0]
 		atualiza_compra(code)
-		
+
+@task
+def limpa_cache():
+
+	inicio = '00:00:00'
+	fim = '23:59:59'
+
+	Cache.objects.filter(cache__range=(inicio,fim)).delete()
+

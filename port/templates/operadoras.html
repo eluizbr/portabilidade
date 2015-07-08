@@ -112,10 +112,8 @@
                     {% if tipo == '0' %}
                         <strong class="text-reverse"><h5>ILIMITADO</h5> vence em {{expira|date:"d F Y"}}</strong>
                         {% else %}
-                            {% if consultas == 0 %}
+                            {% if consultas <= 0 %}
                                 <strong class="text-danger"><h5>ATENÇÃO </h5>Você esta sem creditos</strong>
-                            {% elif consultas == -1 %}
-                                <strong>Plano ILIMITADO</strong>
                             {% else %}
                                 <span class="circle bg-warning"><i class="fa fa-random"></i></span> 
                                 <strong>{{consultas|intcomma}}</strong>
@@ -272,6 +270,7 @@
 <script src="{% static "vendor/datatables/media/js/jquery.dataTables.js"%}"></script>
 <script src="{% static "vendor/bootstrap-select/dist/js/bootstrap-select.min.js"%}"></script>
 <script src="{% static "vendor/jasny-bootstrap/js/inputmask.js"%}"></script>
+<script src="{% static "js/cdrport.js"%}"></script>
 
 <script src="{% static "js/tables-dynamic.js"%}"></script>
 

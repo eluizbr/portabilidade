@@ -29,7 +29,7 @@ def cadastro(request):
 		form = EnvioForm()
 
 	empresas = envio.objects.all()
-	paginator = Paginator(empresas, 10)
+	paginator = Paginator(empresas, 30)
 	page = request.GET.get('page')
 
 	try:

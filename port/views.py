@@ -496,11 +496,9 @@ def consulta(request,numero):
 	else:
 
 		tamanho = len(numero)
-		print tamanho
 		
 		key = request.GET['key']
 		key = str(key)
-		print key
 
 
 		if len(segredo) == 8:
@@ -509,16 +507,13 @@ def consulta(request,numero):
 			chave = chave.cod_cliente
 			chave = str(chave)
 
-
 		else:
 
 			chave = Cadastro.objects.get(chave=key)
 			chave = str(chave.chave)
 			chave = chave.replace("-", "")
 
-		print type(key), type(chave)
 		if key == chave:
-			print '='
 
 			if tamanho <= 9:
 				rn1 = 'error - somente aceito 10 e 11 digitos'
@@ -528,22 +523,18 @@ def consulta(request,numero):
 			if tamanho == 10:
 
 				try:
-					print numero
 					x = Portados.objects.get(numero=numero)
 					p_numero = x.numero
 					rn1 = x.rn1
-					print p_numero, rn1
 				
 				except ObjectDoesNotExist:
 
 					try:
 
 						prefixo = numero[0:6]
-						print prefixo
 						x = NaoPortados.objects.get(prefixo=prefixo)
 						prefixo = x.prefixo
 						rn1 = x.rn1
-						print prefixo, rn1
 
 					except ObjectDoesNotExist:
 
@@ -554,21 +545,17 @@ def consulta(request,numero):
 			if tamanho == 11:
 
 				try:
-					print numero
 					x = Portados.objects.get(numero=numero)
 					p_numero = x.numero
 					rn1 = x.rn1
-					print p_numero, rn1
 				
 				except ObjectDoesNotExist:
 
 					try:
 						prefixo = numero[0:7]
-						print prefixo
 						x = NaoPortados.objects.get(prefixo=prefixo)
 						prefixo = x.prefixo
 						rn1 = x.rn1
-						print prefixo, rn1
 
 					except ObjectDoesNotExist:
 
@@ -576,7 +563,7 @@ def consulta(request,numero):
 						response = HttpResponse(rn1, content_type='text/plain')
 						return response	
 
-			insert_cdr.apply_async(kwargs={'request': chave, 'numero': numero},countdown=10)		
+			insert_cdr.apply_async(kwargs={'request': chave, 'numero': numero},countdown=1)		
 			response = HttpResponse(rn1, content_type='text/plain')
 			return response	
 
@@ -597,17 +584,16 @@ def retorno(request):
 		z = Cadastro.objects.get(cod_cliente=reference)
 		user_id = z.id
 		#compra.registra_compra(retorno,user_id)
-		atualiza_compra.apply_async(kwargs={'retorno': retorno},countdown=10)		
+		atualiza_compra.apply_async(kwargs={'retorno': retorno},countdown=1)		
 
 	
 	except ObjectDoesNotExist:
 
 		retorno = request.GET['id_pagseguro']
 		#compra.registra_compra(retorno)
-		atualiza_compra.apply_async(kwargs={'retorno': retorno},countdown=10)
+		atualiza_compra.apply_async(kwargs={'retorno': retorno},countdown=1)
 	
 	return redirect('/portabilidade/financeiro/')
-
 
 def procura(request):
 

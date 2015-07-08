@@ -1,9 +1,13 @@
 # -*- coding: UTF-8 -*-
+CACHE_CHOICES = (
+    ('0', 'Desativado'),
+    ('1', 'Ativado')
+)
+
 TIPO_PLANO_CHOICES = (
     ('0', 'Ilimitado'),
     ('1', 'normal')
 )
-
 
 
 STATUS_CHOICES = (

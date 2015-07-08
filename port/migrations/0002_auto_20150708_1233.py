@@ -8,18 +8,18 @@ import datetime
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('port', '0015_plano_taxas'),
+        ('port', '0001_initial'),
     ]
 
     operations = [
-        migrations.AddField(
+        migrations.AlterField(
             model_name='planocliente',
             name='criado_em',
-            field=models.DateTimeField(default=datetime.date(2015, 7, 1)),
+            field=models.DateTimeField(default=datetime.datetime(2015, 7, 8, 12, 33, 48, 447274)),
         ),
-        migrations.AddField(
+        migrations.AlterField(
             model_name='planocliente',
             name='expira_em',
-            field=models.DateTimeField(default=datetime.date(2015, 7, 31)),
+            field=models.DateTimeField(default=datetime.datetime(2015, 8, 7, 12, 33, 48, 447274)),
         ),
     ]
