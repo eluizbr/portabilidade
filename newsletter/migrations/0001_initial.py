@@ -20,6 +20,7 @@ class Migration(migrations.Migration):
                 ('empresa', models.CharField(max_length=255)),
                 ('data', models.DateTimeField(auto_now_add=True)),
                 ('enviado', models.IntegerField(default=0)),
+                ('tipo', models.CharField(default=b'Parceiro', max_length=25, choices=[('Parceiro', b'Parceiro'), ('Cliente', b'Cliente')])),
             ],
         ),
     ]

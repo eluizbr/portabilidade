@@ -1,3 +1,10 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import envio
+
+class envioAdmin(admin.ModelAdmin):
+
+	list_display = ['nome']
+
+
+admin.site.register(envio,envioAdmin)

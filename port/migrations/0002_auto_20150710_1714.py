@@ -15,11 +15,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='planocliente',
             name='criado_em',
-            field=models.DateTimeField(default=datetime.datetime(2015, 7, 8, 12, 33, 48, 447274)),
+            field=models.DateTimeField(default=datetime.datetime(2015, 7, 10, 17, 14, 44, 497623)),
         ),
         migrations.AlterField(
             model_name='planocliente',
             name='expira_em',
-            field=models.DateTimeField(default=datetime.datetime(2015, 8, 7, 12, 33, 48, 447274)),
+            field=models.DateTimeField(default=datetime.datetime(2015, 8, 9, 17, 14, 44, 497623)),
         ),
     ]

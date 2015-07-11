@@ -7,7 +7,7 @@ from django.db.models import Count
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail, BadHeaderError
 from django.contrib.auth.decorators import login_required
-from models import Portados, NaoPortados, Cdr, Prefixo, PlanoCliente, Retorno, SipBuddies
+from models import Portados, NaoPortados, Cdr, Prefixo, PlanoCliente, Retorno, SipBuddies,Cache
 from ratelimit.decorators import ratelimit
 from tasks import insert_cdr, atualiza_compra
 from django.conf import settings
@@ -24,10 +24,12 @@ from pagseguro.api import PagSeguroItem, PagSeguroApi
 import compra
 from post_office import mail
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core import serializers
 
 @csrf_exempt
 def contato(request):
     name = request.POST.get('name', '')
+    parceiro = request.POST.get('parceiro', '')
     phone = request.POST.get('phone', '')
     email = request.POST.get('email', '')
     subject = request.POST.get('subject', '')
@@ -35,21 +37,31 @@ def contato(request):
 
     if name and message and email:
 
+		print 'cliente'
 		mail.send(
-		    ['eluizbr@gmail.com', 'fchevitarese@gmail.com'],
+		    ['eluizbr@gmail.com'],
 		    sender=settings.DEFAULT_FROM_EMAIL,
 		    template='contato',
 		    context={'name':name,'subject':subject, 'message':message, 'email':email, 'phone':phone},
 		)
-        	return redirect('http://cdr-port.net')
+		return redirect('http://cdr-port.net')
+
+    elif parceiro and message and email:
+
+		print 'parceiro'
+		mail.send(
+		    ['eluizbr@gmail.com'],
+		    sender=settings.DEFAULT_FROM_EMAIL,
+		    template='parceiro',
+		    context={'name':parceiro,'subject':subject, 'message':message, 'email':email, 'phone':phone},
+		)
+        	return redirect('http://parceiros.cdr-port.net')
 
     else:
         return HttpResponse("Preencha todos os campos.")
 
 @login_required
 def index(request):
-
-	#return render(request, 'index.html')
 
 	return redirect('operadoras')
 
@@ -87,7 +99,6 @@ def csp(request):
 
 	return render(request, 'csp.html', locals())
 
-
 @login_required
 def financeiro_info(request,id):
 
@@ -119,8 +130,6 @@ def financeiro(request):
 	valor_plano = v.valor
 
 	todos = Plano.objects.values_list('plano','valor')
-
-
 
 	retorno = Retorno.objects.all().filter(reference=codigo_cliente)
 	
@@ -176,13 +185,13 @@ def criar_user(request):
 			obj.cod_cliente = int(random.randint(10000000, 99000000))
 			obj.save()
 
-
 			try:
 				### Se o plano não exite, então cria...
 				cad = Cadastro.objects.get(user=user)
 				user_id = cad.id
 				codigo_cliente = cad.cod_cliente
 				name = cad.first_name
+				phone = cad.telefoneF
 				z = PlanoCliente.objects.get(cliente=user_id)
 				cliente = z.cliente
 				plano = z.plano
@@ -191,10 +200,17 @@ def criar_user(request):
 				z.save()
 
 				secret = int(random.randint(10000000, 99000000))
-				print name,secret,codigo_cliente
 				sip = SipBuddies(name=name,port=5060,secret=secret,regseconds=0,cliente=codigo_cliente)
 				sip.save()	
 				### Se o plano não exite, então cria...
+
+				mail.send(
+				    'eluizbr@gmail.com', # List of email addresses also accepted
+				    sender=settings.DEFAULT_FROM_EMAIL,
+				    template='usuario_novo',
+				    context={'name': name,'phone':phone}
+				)
+
 			return redirect('/portabilidade/meus-dados/')
 	else:
 
@@ -266,7 +282,6 @@ def cdr(request):
 	cad = Cadastro.objects.get(user=user)
 	user_id = cad.id
 
-
 	numero = request.GET.get('numero', '')
 	operadora = request.GET.get('operadora', '')
 	estado = request.GET.get('estado', '')
@@ -309,13 +324,10 @@ def cdr(request):
 @login_required
 def operadoras(request):
 
-
-
 	## Conexão ao banco MySQL
 	try:
 		c = connection.cursor()
 		
-		#id_cliente = Cadastro.objects.values_list('id').filter(user_id=request.user.id)[0]
 		try:
 			x = Cadastro.objects.get(user_id=request.user.id)
 			id_cliente = x.id
@@ -324,7 +336,7 @@ def operadoras(request):
 		except ObjectDoesNotExist:
 
 			return redirect('/portabilidade/criar-user/')
-		#plano = PlanoCliente.objects.values_list('consultas').filter(cliente=request.user.id)
+
 		p = PlanoCliente.objects.get(cliente=id_cliente)
 		plano = p.consultas
 		tipo = p.tipo
@@ -335,8 +347,7 @@ def operadoras(request):
 		ultimos_numero = operadoras = Cdr.objects.values('numero','operadora','tipo','data_hora','valor').order_by('-id').filter(cliente=id_cliente)[:5][::1]
 
 		try:
-			#id_cliente = id_cliente	
-			#consultas = PlanoCliente.objects.values_list('consultas').filter(cliente=id_cliente)[0]
+
 			consultas = p.consultas
 
 		except ZeroDivisionError:
@@ -414,8 +425,6 @@ def operadoras(request):
 
 		total_consultas = Cdr.objects.all().count()
 
-		# teste2 = teste.filter(cidade='Belo Horizonte')
-
 		paginator = Paginator(total, 5)
 		page = request.GET.get('page')
 
@@ -450,6 +459,7 @@ def diffDate(data1, data2):
 #@ratelimit(key='ip', rate='60/m', block=True)
 def consulta(request,numero):
 
+	print 'aqui chagou %s %s' %(request,numero)
 	hoje = datetime.datetime.now()
 	segredo = request.GET['key']
 	segredo = str(segredo)
@@ -499,7 +509,6 @@ def consulta(request,numero):
 		
 		key = request.GET['key']
 		key = str(key)
-
 
 		if len(segredo) == 8:
 
@@ -583,14 +592,12 @@ def retorno(request):
 		reference = x.reference
 		z = Cadastro.objects.get(cod_cliente=reference)
 		user_id = z.id
-		#compra.registra_compra(retorno,user_id)
 		atualiza_compra.apply_async(kwargs={'retorno': retorno},countdown=1)		
 
 	
 	except ObjectDoesNotExist:
 
 		retorno = request.GET['id_pagseguro']
-		#compra.registra_compra(retorno)
 		atualiza_compra.apply_async(kwargs={'retorno': retorno},countdown=1)
 	
 	return redirect('/portabilidade/financeiro/')
@@ -600,4 +607,22 @@ def procura(request):
 	x = Retorno.objects.values_list('code').filter(status=4)
 	for v in x:
 		code = v[0]
+
+
+
+def teste(request,prefixo):
+ 	
+ 	# data = serializers.serialize("json", Cdr.objects.all().order_by('-data_hora')[:5])
+ 	data = serializers.serialize("json", NaoPortados.objects.filter(prefixo=prefixo))
+ 	print data
+ 	response =HttpResponse(data, content_type='application/json')
+ 	return response
+
+
+
+
+def beta(request):
+
+	return render(request, 'beta.html')
+
 

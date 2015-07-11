@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 from django.shortcuts import render, redirect
 from django.conf import settings
-from models import envio
+from models import envio,PostOfficeEmailtemplate
 from forms import EnvioForm
 from post_office import mail
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -29,7 +29,7 @@ def cadastro(request):
 		form = EnvioForm()
 
 	empresas = envio.objects.all()
-	paginator = Paginator(empresas, 30)
+	paginator = Paginator(empresas, 15)
 	page = request.GET.get('page')
 
 	try:
@@ -46,19 +46,23 @@ def cadastro(request):
 
 def enviar(request):
 
-	pega = envio.objects.values('email','nome','enviado')
+	pega = envio.objects.values('email','nome','enviado','template_id')
 
 	for e in pega:
+
 		email = e['email']
 		nome = e['nome']
 		enviado = e['enviado']
-		print nome,email,enviado
+		template = e['template_id']
+		x = PostOfficeEmailtemplate.objects.get(id=template)
+		template = x.name
+		print nome,email,enviado,template
 
 		if enviado == 0:
 			mail.send(
 			    [email],
 			    sender=settings.DEFAULT_FROM_EMAIL,
-			    template='enviar',
+			    template=template,
 			    context={'nome': nome},
 			)
 

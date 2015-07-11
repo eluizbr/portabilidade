@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load l10n %}
+{% load staticfiles %}
+
+{% block content %}
+
+<h1 class="page-title">Portabilidade <small><small>Dashboard</small></small></h1>
+    <div class="row">
+        <div class="col-md-4" >
+            <section class="widget">
+                <header>
+                    <h5>Últimos 5 numeros <span class="fw-semi-bold">consultados</span></h5>
+                </header>
+                <div class="widget-body">
+                    <table class="table table-striped mt-lg mb-0" id="tabela">
+                        <thead>
+                        <tr>
+                            <th class="text-align-center">Número</th>
+                            <th class="text-align-center">Operadora</th>
+                            <th class="text-align-center">Tipo</th>
+                            <th class="text-align-center">Hora</th>
+                            <th class="text-align-center">Custo</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+
+{% endblock content %}
+
+
+
+{% block scripts %}
+<script src="{% static "js/cdrport.js"%}"></script>
+<script id="test" src="{% static "vendor/underscore/underscore.js"%}"></script>
+<script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
+<script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
+<script src="{% static "vendor/d3/d3.min.js"%}"></script>
+<script src="{% static "vendor/rickshaw/rickshaw.min.js"%}"></script>
+<script src="{% static "vendor/raphael/raphael-min.js"%}"></script>
+<script src="{% static "vendor/jQuery-Mapael/js/jquery.mapael.js"%}"></script>
+<script src="{% static "js/brazil.js"%}"></script>
+<script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/popover.js"%}"></script>
+<script src="{% static "vendor/bootstrap_calendar/bootstrap_calendar/js/bootstrap_calendar.min.js"%}"></script>
+<script src="{% static "vendor/jquery-animateNumber/jquery.animateNumber.min.js"%}"></script>
+
+<script src="{% static "js/index.js"%}"></script>
+
+<!-- page specific libs -->
+<script src="{% static "vendor/backbone/backbone.js"%}"></script>
+<script src="{% static "vendor/backbone.paginator/lib/backbone.paginator.min.js"%}"></script>
+<script src="{% static "vendor/backgrid/lib/backgrid.js"%}"></script>
+<script src="{% static "vendor/backgrid-paginator/backgrid-paginator.js"%}"></script>
+<script src="{% static "vendor/datatables/media/js/jquery.dataTables.js"%}"></script>
+<script src="{% static "vendor/bootstrap-select/dist/js/bootstrap-select.min.js"%}"></script>
+<script src="{% static "vendor/jasny-bootstrap/js/inputmask.js"%}"></script>
+
+
+
+
+{% endblock %}

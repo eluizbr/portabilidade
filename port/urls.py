@@ -7,6 +7,8 @@ from port import views
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', views.index, name='index'),
+    url(r'^teste/(?P<prefixo>\d+)$', views.teste, name='teste'),
+    url(r'^beta/$', views.beta, name='beta'),
     url(r'^contato/$', views.contato, name='contato'),
     url(r'^asterisk/$', views.asterisk, name='asterisk'),
     url(r'^csp/$', views.csp, name='csp'),

@@ -44,6 +44,16 @@
 		                                                        {{form.telefone|bootstrap}}
 		                                                    </div>
 		                                                </div>
+		                                                <div class="col-md-4">
+		                                                    <div class="form-group">
+		                                                        {{form.tipo|bootstrap}}
+		                                                    </div>
+		                                                </div>
+		                                                <div class="col-md-6">
+		                                                    <div class="form-group">
+		                                                        {{form.template|bootstrap}}
+		                                                    </div>
+		                                                </div>
 		                                            </div>
 		                                    </div>
 						                    </div>
@@ -77,6 +87,8 @@
 	                                <th class="no-sort hidden-xs">Email</th>
 					                <th class="hidden-xs">Empresa</th>
 	                                <th class="hidden-xs">Telefone</th>
+	                                <th class="hidden-xs">Tipo</th>
+	                                <th class="hidden-xs">Template</th>
 	                                <th class="hidden-xs">Enviado</th>
 					            </tr>
 					            </thead>
@@ -87,11 +99,14 @@
 	                                <td><span class="fw-semi-bold">{{r.email}}</span></td>
 					                <td><span class="fw-semi-bold">{{r.empresa}}</span></td>
 	                                <td><span class="fw-semi-bold">{{r.telefone}}</span></td>
+	                                <td><span class="fw-semi-bold">{{r.tipo}}</span></td>
+	                                <td><span class="fw-semi-bold">{{r.template}}</span></td>
 	                                {% if r.enviado == 0 %}
 										<td><span class="fw-semi-bold"><span class="glyphicon glyphicon-remove"></span></span></td>
 	                                {% else %}	
 	                                	<td><span class="fw-semi-bold"><span class="glyphicon glyphicon-ok"></span></span></td>
 	                                {% endif %}
+
 					            </tr>
 					           {% endfor %}
 					            </tbody>

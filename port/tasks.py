@@ -13,6 +13,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from datetime import timedelta,date
 import datetime
 import decimal
+import os
 
 @task
 def insert_cdr(request,numero):
@@ -401,8 +402,18 @@ def procura():
 @task
 def limpa_cache():
 
-	inicio = '00:00:00'
-	fim = '23:59:59'
+	data = datetime.datetime.now()
+
+	hora_1 = data - timedelta(hours=2)
+	hora_2 = data - timedelta(hours=1)
+
+	inicio = hora_1.strftime("%H:%M:%S")
+	fim = hora_2.strftime("%H:%M:%S")
 
 	Cache.objects.filter(cache__range=(inicio,fim)).delete()
+	print inicio,fim
 
+@task
+def email():
+
+	os.system('/Volumes/DADOS/email.sh')

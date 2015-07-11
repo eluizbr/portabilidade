@@ -188,9 +188,11 @@ class Migration(migrations.Migration):
                 ('nome_plano', models.CharField(max_length=255, verbose_name='Nome do Plano')),
                 ('consultas', models.IntegerField(default=0, null=True, blank=True)),
                 ('consultas_gratis', models.IntegerField(default=0, null=True, blank=True)),
-                ('criado_em', models.DateTimeField(default=datetime.datetime(2015, 7, 8, 12, 33, 4, 812676))),
-                ('expira_em', models.DateTimeField(default=datetime.datetime(2015, 8, 7, 12, 33, 4, 812676))),
+                ('criado_em', models.DateTimeField(default=datetime.datetime(2015, 7, 10, 17, 14, 14, 331609))),
+                ('expira_em', models.DateTimeField(default=datetime.datetime(2015, 8, 9, 17, 14, 14, 331609))),
                 ('tipo', models.CharField(default=1, max_length=200, choices=[(b'0', b'Ilimitado'), (b'1', b'normal')])),
+                ('cache', models.CharField(default=0, max_length=1, verbose_name='Cache habilitado', choices=[(b'0', b'Desativado'), (b'1', b'Ativado')])),
+                ('tempo', models.IntegerField(default=60, verbose_name='Tempo do cache em minutos')),
             ],
         ),
         migrations.CreateModel(
