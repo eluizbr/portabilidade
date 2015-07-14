@@ -25,6 +25,7 @@ import compra
 from post_office import mail
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core import serializers
+import funcoes
 
 @csrf_exempt
 def contato(request):
@@ -200,7 +201,7 @@ def criar_user(request):
 				z.save()
 
 				secret = int(random.randint(10000000, 99000000))
-				sip = SipBuddies(name=name,port=5060,secret=secret,regseconds=0,cliente=codigo_cliente)
+				sip = SipBuddies(name=codigo_cliente,port=5060,secret=secret,regseconds=0,cliente=codigo_cliente)
 				sip.save()	
 				### Se o plano não exite, então cria...
 
@@ -449,52 +450,27 @@ def operadoras(request):
 	except IndexError:
 		return redirect('/portabilidade/meus-dados/')
 
-def diffDate(data1, data2):
-   d1 = data1
-   d2 = data2
-   delta = d2-d1
-   r = delta.days if (delta.days > 0) else "0"
-   return r
 
 #@ratelimit(key='ip', rate='60/m', block=True)
 def consulta(request,numero):
 
-	print 'aqui chagou %s %s' %(request,numero)
 	hoje = datetime.datetime.now()
 	segredo = request.GET['key']
 	segredo = str(segredo)
 
-	try:
-		if len(segredo) == 8:
-			s = Cadastro.objects.get(cod_cliente=segredo)
-			id_user = s.id
-
-		else:
-
-			s = Cadastro.objects.get(chave=segredo)
-			id_user = s.id
-
-
-	except ObjectDoesNotExist:
-
+	### Chama a função que checa o ID do usuário
+	id_user = funcoes.pega_id_user(segredo)
+	
+	if id_user == None:
 		rn1 = 'error - Chave não autoriada'
 		response = HttpResponse(rn1, content_type='text/plain')
 		return response
+	else:
+		id_user = id_user
 
-	c = PlanoCliente.objects.get(cliente=id_user)
-	saldo = c.consultas
-	saldo = int(saldo)
-	tipo = c.tipo
-	tipo = int(tipo)
+	### Chama a função que checa o saldo do cliente
+	saldo,tipo,diferenca = funcoes.checa_saldo(id_user)
 
-	expira = c.expira_em
-	expira_y = int(expira.strftime("%Y"))
-	expira_m = int(expira.strftime("%m"))
-	expira_d = int(expira.strftime("%d"))
-
-	diferenca = diffDate(date(expira_y,expira_m,expira_d),date(hoje.year,hoje.month,hoje.day))
-	diferenca = int(diferenca)
-	
 	if diferenca >= 30:
 		PlanoCliente.objects.filter(cliente=id_user).update(consultas=0,plano=1,nome_plano='Escolha um plano',tipo=1)
 
@@ -509,18 +485,7 @@ def consulta(request,numero):
 		
 		key = request.GET['key']
 		key = str(key)
-
-		if len(segredo) == 8:
-
-			chave = Cadastro.objects.get(cod_cliente=key)
-			chave = chave.cod_cliente
-			chave = str(chave)
-
-		else:
-
-			chave = Cadastro.objects.get(chave=key)
-			chave = str(chave.chave)
-			chave = chave.replace("-", "")
+		chave = funcoes.checa_chave(key)
 
 		if key == chave:
 
@@ -531,48 +496,30 @@ def consulta(request,numero):
 			
 			if tamanho == 10:
 
-				try:
-					x = Portados.objects.get(numero=numero)
-					p_numero = x.numero
-					rn1 = x.rn1
-				
-				except ObjectDoesNotExist:
-
-					try:
-
-						prefixo = numero[0:6]
-						x = NaoPortados.objects.get(prefixo=prefixo)
-						prefixo = x.prefixo
-						rn1 = x.rn1
-
-					except ObjectDoesNotExist:
-
-						rn1 = 'error - numero ou prefixo nao existe'
-						response = HttpResponse(rn1, content_type='text/plain')
-						return response	
+				### Chama a função que checa retorna o CSP para números de 10 dígitos
+				csp = funcoes.numero_10(numero)
+				if numero == None:
+					rn1 = 'error - numero ou prefixo nao existe'
+					response = HttpResponse(rn1, content_type='text/plain')
+					return response	
+				else:
+					rn1 = csp
 
 			if tamanho == 11:
 
-				try:
-					x = Portados.objects.get(numero=numero)
-					p_numero = x.numero
-					rn1 = x.rn1
-				
-				except ObjectDoesNotExist:
+				### Chama a função que checa retorna o CSP para números de 11 dígitos
+				csp = funcoes.numero_11(numero)
+				if csp == None:
+					rn1 = 'error - numero ou prefixo nao existe'
+					response = HttpResponse(rn1, content_type='text/plain')
+					return response	
 
-					try:
-						prefixo = numero[0:7]
-						x = NaoPortados.objects.get(prefixo=prefixo)
-						prefixo = x.prefixo
-						rn1 = x.rn1
+				else:
+					rn1 = csp
 
-					except ObjectDoesNotExist:
+			### Chama a função que insere no CELERY, e o CELERY debita e insere no CDR
+			insert_cdr.apply_async(kwargs={'request': chave, 'numero': numero},countdown=settings.TEMPO_ESPERA_CDR)	
 
-						rn1 = 'error - numero ou prefixo nao existe'
-						response = HttpResponse(rn1, content_type='text/plain')
-						return response	
-
-			insert_cdr.apply_async(kwargs={'request': chave, 'numero': numero},countdown=1)		
 			response = HttpResponse(rn1, content_type='text/plain')
 			return response	
 

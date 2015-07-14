@@ -112,7 +112,7 @@ class Cadastro(models.Model):
     empresa = models.CharField(
         u'Nome fantasia', max_length=100, blank=True, null=True)
     cpf = models.CharField(u'CPF', max_length=20, unique=True)
-    cnpj = models.CharField(u'CNPJ', max_length=20, blank=True, null=True, unique=True)
+    cnpj = models.CharField(u'CNPJ', max_length=20, blank=True, null=True)
     ie = models.CharField(
         u'Insc. Estadual', max_length=20, blank=True, null=True)
     telefoneF = models.CharField(
