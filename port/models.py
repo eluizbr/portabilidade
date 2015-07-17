@@ -1,9 +1,12 @@
 # -*- coding: UTF-8 -*-
 import uuid
+import datetime
+
 from django.db import models
 from django.contrib.auth.models import User
-import datetime
 from datetime import timedelta,date
+
+from panel.models import Revenda
 import choices
 
 data = datetime.datetime.now()
@@ -33,6 +36,7 @@ class Portados(models.Model):
         managed = False
         db_table = 'portados'
 
+
 class Prefixo(models.Model):
     ddd = models.IntegerField(blank=True, null=True)
     prefixo = models.IntegerField(unique=True, blank=True, null=True)
@@ -50,6 +54,7 @@ class Prefixo(models.Model):
     def __unicode__(self):
         return unicode(self.prefixo)
 
+
 class Plano(models.Model):
 
     TIPO = choices.TIPO_PLANO_CHOICES
@@ -61,7 +66,7 @@ class Plano(models.Model):
     consultas_gratis = models.IntegerField(blank=True, null=True,default=0)
     taxas = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2, default=00.00)
     tipo = models.CharField(max_length=200,choices=TIPO,default=1)
-    
+
     def __unicode__(self):
         return unicode(self.plano)
 
@@ -81,10 +86,12 @@ class Cdr(models.Model):
     data = models.DateField(auto_now=True)
     hora = models.TimeField(auto_now=True)
     data_hora = models.DateTimeField(auto_now=True)
-    valor = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2)
-    
+    valor = models.DecimalField(blank=True, null=True, max_digits=10,
+                                decimal_places=2)
+
     def __unicode__(self):
         return unicode(self.numero)
+
 
 class Cache(models.Model):
     numero = models.CharField(max_length=30)
@@ -92,13 +99,17 @@ class Cache(models.Model):
     cache = models.TimeField()
     cliente = models.IntegerField(default=0)
 
+
 class Cadastro(models.Model):
+    """
+        Cadastro do cliente
+        @TODO --> Necessário fazer vínculo de revendas ;)
+    """
 
     PLANO = (
             ('Free', 'Free'),
             ('Premium', 'Premium'),
     )
-
 
     TIPO = (
         ('Pessoa Fisica', 'Pessoa Fisica'),
@@ -135,8 +146,17 @@ class Cadastro(models.Model):
     plano = models.IntegerField(u'Plano', default=1)
     cache = models.IntegerField(u'Cache', default=0)
 
+    revenda = models.ForeignKey("panel.Revenda", blank=True, null=True, default=None)
+
     def __unicode__(self):
         return unicode(self.user)
+
+    def is_revenda(self):
+        if self.revenda:
+            return True
+        else:
+            return False
+
 
 class PlanoCliente(models.Model):
 
@@ -159,11 +179,14 @@ class PlanoCliente(models.Model):
 
 
 class Retorno(models.Model):
+    """
+    Referencia dos campos:
+    https://pagseguro.uol.com.br/v3/guia-de-integracao/consulta-de-transacoes-por-codigo.html
+    """
 
     TIPO = choices.TIPO_MEIO_PAGAMENTO_CHOICES
     CODIGO = choices.CODIGO_PAGAMENTO_CHOICES
     STATUS = choices.STATUS_CHOICES
-    # Referencia dos campos: https://pagseguro.uol.com.br/v3/guia-de-integracao/consulta-de-transacoes-por-codigo.html
     date = models.DateTimeField()
     lastEventDate = models.DateTimeField()
     code = models.CharField(max_length=200)
@@ -182,10 +205,11 @@ class Retorno(models.Model):
     email = models.EmailField(default='email@email.com')
     name = models.CharField(max_length=255,default=1)
     phone = models.CharField(max_length=20,default=1)
-    
+
 
     def __unicode__(self):
         return unicode(self.status)
+
 
 class SipBuddies(models.Model):
     uniqueid = models.AutoField(primary_key=True)

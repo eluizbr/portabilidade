@@ -23,7 +23,7 @@ from api import views
 
 
 urlpatterns = [
-    
+
     url(r'^cadastro/$', views.NaoPortadosList.as_view()),
     url(r'^api/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^admin/', include(admin.site.urls)),
@@ -32,8 +32,7 @@ urlpatterns = [
     url(r'^envio/', include('newsletter.urls')),
     url(r'^$', RedirectView.as_view(pattern_name='operadoras')),
     url(r'^retorno/pagseguro/', include('pagseguro.urls')),
-
-
+    url(r'^create-revenda/', include('panel.urls')),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <form id="revenda_form" method="post" action="." class="form">
+      {% csrf_token %}
+        {{ form.as_p }}
+
+        <fieldset>
+                <legend>Contato Revenda</legend>
+                {{ contato_form }}
+                {{ contato_form.management_form }}
+                {{ contato_form.non_form_errors }}
+                {% for form in contato_form %}
+                    {{ form.id }}
+                    <div class="inline {{ ingredient_form.prefix }}">
+                        {{ form.description.errors }}
+                        {{ form.description.label_tag }}
+                        {{ form.description }}
+                    </div>
+                {% endfor %}
+            </fieldset>
+        <button type="submit" class="btn btn-primary">Criar</button>
+    </form>
+{% endblock %}
