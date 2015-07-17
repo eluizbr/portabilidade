@@ -56,7 +56,7 @@ def enviar(request):
 		template = e['template_id']
 		x = PostOfficeEmailtemplate.objects.get(id=template)
 		template = x.name
-		print nome,email,enviado,template
+		#print nome,email,enviado,template
 
 		if enviado == 0:
 			mail.send(

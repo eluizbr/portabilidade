@@ -16,9 +16,16 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic.base import RedirectView
+from django.conf.urls import url, include
+from rest_framework.urlpatterns import format_suffix_patterns
+from api import views
+
 
 
 urlpatterns = [
+    
+    url(r'^cadastro/$', views.NaoPortadosList.as_view()),
+    url(r'^api/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^conta/', include('registration.backends.default.urls')),
     url(r'^portabilidade/', include('port.urls')),
@@ -28,3 +35,5 @@ urlpatterns = [
 
 
 ]
+
+urlpatterns = format_suffix_patterns(urlpatterns)

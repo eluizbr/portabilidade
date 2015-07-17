@@ -573,3 +573,6 @@ def beta(request):
 	return render(request, 'beta.html')
 
 
+
+
+
