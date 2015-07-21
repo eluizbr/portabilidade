@@ -12,27 +12,29 @@ class NaoPortadosList(APIView):
 		numero = request.GET['numero']
 		segredo = request.GET['key']
 
-		try:
-			rn1,prefixo,operadora = port.funcoes.consulta_api(numero,segredo)
+		valor = Portados.objects.filter(numero=numero)
+
+		if valor:
+
+			print 'portado'
+
+			rn1,p_numero = port.funcoes.consulta_rest(numero,segredo)
+			rn1 = str(rn1)
+			rn1 = rn1
+			p_numero = p_numero
+			print rn1,p_numero
+			portados = Portados.objects.filter(rn1=rn1,numero=p_numero)
+			serializer = PortadosSerializer(portados, many=True)	
+			return Response(serializer.data)
+		else:
+
+			print 'nao portado'
+			rn1,prefixo,operadora = port.funcoes.consulta_rest(numero,segredo)
 			rn1 = str(rn1)
 			rn1 = rn1
 			prefixo = prefixo
 			operadora = operadora
 			nao_portados = NaoPortados.objects.filter(rn1=rn1,prefixo=prefixo,operadora=operadora)
-			print rn1,prefixo,operadora
 			serializer = NaoPortadosSerializer(nao_portados, many=True)
 		
-		except ValueError:
-
-			rn1,p_numero = port.funcoes.consulta_api(numero,segredo)
-			rn1 = str(rn1)
-			rn1 = rn1
-			numero = p_numero
-			print rn1,numero
-			portados = Portados.objects.filter(rn1=rn1,numero=numero)
-			serializer = PortadosSerializer(portados, many=True)
-
-			
-
-		
-		return Response(serializer.data)
+			return Response(serializer.data)

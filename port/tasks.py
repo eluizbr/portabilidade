@@ -43,6 +43,7 @@ def insert_cdr(request,numero):
 	consultas = x.consultas
 	gratis = x.consultas_gratis
 	ativo = int(x.cache)
+	print 'o cache é %s' %ativo
 	tempo = x.tempo
 	tipo = x.tipo
 	tipo = int(tipo)
@@ -55,6 +56,7 @@ def insert_cdr(request,numero):
 	valor_plano_2 = y.valor_consulta
 
 	try:
+		print numero
 		cache = Cache.objects.get(numero=numero)
 		numero_cache = cache.numero
 		hora_cache = str(cache.cache)
@@ -119,6 +121,7 @@ def insert_cdr(request,numero):
 		x = Prefixo.objects.values('rn1','operadora').filter(rn1=portado).distinct()
 
 		for z in x:
+			print ativo
 			rn1 = z['rn1']
 			operadora = z['operadora']
 
@@ -129,6 +132,7 @@ def insert_cdr(request,numero):
 			
 			### INICIO rotina CACHE - Só entra aqui se o cache esta hábilitado para o cliente ###
 			if ativo == 1:
+				print 'cache ativo'
 				try:
 					Cache.objects.get(numero=numero)
 				except Cache.DoesNotExist:
@@ -137,6 +141,7 @@ def insert_cdr(request,numero):
 					PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
 			### INICIO rotina CACHE - Só entra aqui se o cache esta hábilitado para o cliente ###
 			elif ativo == 0:
+				print 'sem cache'
 			
 				total_consultas = consultas - 1
 				PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
@@ -181,7 +186,6 @@ def insert_cdr(request,numero):
 		### INICIO rotina CACHE - Só entra aqui se o cache esta hábilitado para o cliente ###
 
 		elif ativo == 0:
-		
 			total_consultas = consultas - 1
 			PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
 

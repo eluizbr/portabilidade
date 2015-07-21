@@ -80,7 +80,27 @@ def numero_10(numero):
         x = Portados.objects.get(numero=numero)
         p_numero = x.numero
         rn1 = x.rn1
-        print rn1,p_numero
+        return rn1
+    
+    except ObjectDoesNotExist:
+
+        try:
+            prefixo = numero[0:6]
+            x = NaoPortados.objects.get(prefixo=prefixo)
+            prefixo = x.prefixo
+            operadora = x.operadora
+            rn1 = x.rn1
+            return rn1
+
+        except ObjectDoesNotExist:
+            return None
+
+def numero_10_rest(numero):
+
+    try:
+        x = Portados.objects.get(numero=numero)
+        p_numero = x.numero
+        rn1 = x.rn1
         return rn1,p_numero
     
     except ObjectDoesNotExist:
@@ -91,7 +111,6 @@ def numero_10(numero):
             prefixo = x.prefixo
             operadora = x.operadora
             rn1 = x.rn1
-            print rn1,prefixo,operadora
             return rn1,prefixo,operadora
 
         except ObjectDoesNotExist:
@@ -107,7 +126,27 @@ def numero_11(numero):
         x = Portados.objects.get(numero=numero)
         p_numero = x.numero
         rn1 = x.rn1
-        print rn1,p_numero
+        return rn1
+    
+    except ObjectDoesNotExist:
+
+        try:
+            prefixo = numero[0:7]
+            x = NaoPortados.objects.get(prefixo=prefixo)
+            prefixo = x.prefixo
+            operadora = x.operadora
+            rn1 = x.rn1
+            return rn1
+
+        except ObjectDoesNotExist:
+            return None
+
+def numero_11_rest(numero):
+
+    try:
+        x = Portados.objects.get(numero=numero)
+        p_numero = x.numero
+        rn1 = x.rn1
         return rn1,p_numero
     
     except ObjectDoesNotExist:
@@ -118,12 +157,10 @@ def numero_11(numero):
             prefixo = x.prefixo
             operadora = x.operadora
             rn1 = x.rn1
-            print rn1,prefixo,operadora
             return rn1,prefixo,operadora
 
         except ObjectDoesNotExist:
             return None
-
 
 '''
     Função checa se o cliente tem saldo.
@@ -226,5 +263,80 @@ def consulta_api(numero,key):
             response = HttpResponse(rn1, content_type='text/plain')
             return rn1
 
+def consulta_rest(numero,key):
+    print numero,key
+    hoje = datetime.datetime.now()
+    segredo = key
+    segredo = str(segredo)
 
+    ### Chama a função que checa o ID do usuário
+    id_user = pega_id_user(segredo)
+    
+    if id_user == None:
+        rn1 = 'error - Chave não autoriada'
+        response = HttpResponse(rn1, content_type='text/plain')
+        return response
+    else:
+        id_user = id_user
+
+    ### Chama a função que checa o saldo do cliente
+    saldo,tipo,diferenca = checa_saldo(id_user)
+
+    if diferenca >= 30:
+        PlanoCliente.objects.filter(cliente=id_user).update(consultas=0,plano=1,nome_plano='Escolha um plano',tipo=1)
+
+    if (saldo <= 0) and (tipo == 1):
+
+        rn1 = 'error - Sem credito'
+        response = HttpResponse(rn1, content_type='text/plain')
+        return response
+    else:
+
+        tamanho = len(numero)
+        
+        key = key
+        key = str(key)
+        chave = checa_chave(key)
+
+        if key == chave:
+
+            if tamanho <= 9:
+                rn1 = 'error - somente aceito 10 e 11 digitos'
+                response = HttpResponse(rn1, content_type='text/plain')
+                return rn1           
+            
+            if tamanho == 10:
+
+                ### Chama a função que checa retorna o CSP para números de 10 dígitos
+                csp = numero_10_rest(numero)
+                if numero == None:
+                    rn1 = 'error - numero ou prefixo nao existe'
+                    response = HttpResponse(rn1, content_type='text/plain')
+                    return rn1 
+                else:
+                    rn1 = csp
+
+            if tamanho == 11:
+
+                ### Chama a função que checa retorna o CSP para números de 11 dígitos
+                csp = numero_11_rest(numero)
+                if csp == None:
+                    rn1 = 'error - numero ou prefixo nao existe'
+                    response = HttpResponse(rn1, content_type='text/plain')
+                    return rn1  
+
+                else:
+                    rn1 = csp
+
+            ### Chama a função que insere no CELERY, e o CELERY debita e insere no CDR
+            insert_cdr.apply_async(kwargs={'request': chave, 'numero': numero},countdown=settings.TEMPO_ESPERA_CDR) 
+
+            #response = HttpResponse(rn1, content_type='text/plain')
+            return rn1
+
+        else:
+
+            rn1 = 0
+            response = HttpResponse(rn1, content_type='text/plain')
+            return rn1
 
