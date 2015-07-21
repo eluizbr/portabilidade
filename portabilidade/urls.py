@@ -24,7 +24,7 @@ from api import views
 
 urlpatterns = [
     
-    url(r'^api/$', views.NaoPortadosList.as_view()),
+    url(r'^api/$', views.ConsultaApi.as_view()),
     url(r'^api/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^conta/', include('registration.backends.default.urls')),
