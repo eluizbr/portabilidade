@@ -10,8 +10,9 @@ from port.models import Portados, NaoPortados, Cadastro, Cdr, Prefixo, PlanoClie
 from post_office import mail
 from pagseguro.api import PagSeguroItem, PagSeguroApi
 from django.core.exceptions import ObjectDoesNotExist
-from datetime import timedelta,date
 import datetime
+from datetime import timedelta,datetime,date
+
 import decimal
 import os
 
