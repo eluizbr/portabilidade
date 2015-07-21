@@ -1,5 +1,5 @@
-from port.models import NaoPortados
-from serializers import NaoPortadosSerializer
+from port.models import NaoPortados, Portados
+from serializers import NaoPortadosSerializer,PortadosSerializer
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -12,12 +12,27 @@ class NaoPortadosList(APIView):
 		numero = request.GET['numero']
 		segredo = request.GET['key']
 
-		rn1 = port.funcoes.consulta_api(numero,segredo)
-		rn1 = str(rn1)
+		try:
+			rn1,prefixo,operadora = port.funcoes.consulta_api(numero,segredo)
+			rn1 = str(rn1)
+			rn1 = rn1
+			prefixo = prefixo
+			operadora = operadora
+			nao_portados = NaoPortados.objects.filter(rn1=rn1,prefixo=prefixo,operadora=operadora)
+			print rn1,prefixo,operadora
+			serializer = NaoPortadosSerializer(nao_portados, many=True)
+		
+		except ValueError:
 
-		print rn1
+			rn1,p_numero = port.funcoes.consulta_api(numero,segredo)
+			rn1 = str(rn1)
+			rn1 = rn1
+			numero = p_numero
+			print rn1,numero
+			portados = Portados.objects.filter(rn1=rn1,numero=numero)
+			serializer = PortadosSerializer(portados, many=True)
 
-		rn1 = rn1
-		cadastro = NaoPortados.objects.filter(rn1=rn1)
-		serializer = NaoPortadosSerializer(cadastro, many=True)
+			
+
+		
 		return Response(serializer.data)

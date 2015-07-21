@@ -5,6 +5,8 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpRequest
 from datetime import timedelta,datetime,date
 import datetime
 from views import Cadastro, Portados, NaoPortados, PlanoCliente
+from django.conf import settings
+from tasks import insert_cdr
 
 '''
     Função retorna a diferença entre 2 datas
@@ -78,8 +80,8 @@ def numero_10(numero):
         x = Portados.objects.get(numero=numero)
         p_numero = x.numero
         rn1 = x.rn1
-        print rn1
-        return rn1
+        print rn1,p_numero
+        return rn1,p_numero
     
     except ObjectDoesNotExist:
 
@@ -87,9 +89,10 @@ def numero_10(numero):
             prefixo = numero[0:6]
             x = NaoPortados.objects.get(prefixo=prefixo)
             prefixo = x.prefixo
+            operadora = x.operadora
             rn1 = x.rn1
-            print rn1
-            return rn1
+            print rn1,prefixo,operadora
+            return rn1,prefixo,operadora
 
         except ObjectDoesNotExist:
             return None
@@ -104,7 +107,8 @@ def numero_11(numero):
         x = Portados.objects.get(numero=numero)
         p_numero = x.numero
         rn1 = x.rn1
-        return rn1
+        print rn1,p_numero
+        return rn1,p_numero
     
     except ObjectDoesNotExist:
 
@@ -112,8 +116,10 @@ def numero_11(numero):
             prefixo = numero[0:7]
             x = NaoPortados.objects.get(prefixo=prefixo)
             prefixo = x.prefixo
+            operadora = x.operadora
             rn1 = x.rn1
-            return rn1
+            print rn1,prefixo,operadora
+            return rn1,prefixo,operadora
 
         except ObjectDoesNotExist:
             return None
@@ -209,7 +215,7 @@ def consulta_api(numero,key):
                     rn1 = csp
 
             ### Chama a função que insere no CELERY, e o CELERY debita e insere no CDR
-            #insert_cdr.apply_async(kwargs={'request': chave, 'numero': numero},countdown=settings.TEMPO_ESPERA_CDR) 
+            insert_cdr.apply_async(kwargs={'request': chave, 'numero': numero},countdown=settings.TEMPO_ESPERA_CDR) 
 
             #response = HttpResponse(rn1, content_type='text/plain')
             return rn1
