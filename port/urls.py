@@ -8,8 +8,6 @@ from port import views
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', views.index, name='index'),
-    url(r'^teste/(?P<prefixo>\d+)$', views.teste, name='teste'),
-    url(r'^beta/$', views.beta, name='beta'),
     url(r'^contato/$', views.contato, name='contato'),
     url(r'^asterisk/$', views.asterisk, name='asterisk'),
     url(r'^csp/$', views.csp, name='csp'),
@@ -21,6 +19,7 @@ urlpatterns = patterns('',
 	# url(r'^comprar/$', views.comprar, name='comprar'),
     url(r'^financeiro/$', views.financeiro, name='financeiro'),
     url(r'^(?P<numero>\d+)$', views.consulta, name='consulta'),
+    url(r'^consulta/(?P<key>\d+)$', views.gsm, name='gsm'),
     url(r'^retorno/$', views.retorno, name='retorno'),
     url(r'^retorno/pagseguro/', include('pagseguro.urls')),
     

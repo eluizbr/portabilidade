@@ -301,7 +301,7 @@ def cdr(request):
 	n_rn1 = results.values_list('rn1').distinct()
 
 	results_v = results.filter(numero__startswith=numero,operadora__contains=operadora,cidade__contains=cidade,
-								estado__contains=estado,portado__contains=portado,tipo__contains=tipo,rn1__contains=rn1)
+								estado__contains=estado,portado__contains=portado,tipo__contains=tipo,rn1__contains=rn1).order_by('-data_hora')
 
 	if request.method == 'GET':
 		results = results_v
@@ -555,22 +555,83 @@ def procura(request):
 	for v in x:
 		code = v[0]
 
+def gsm(request,key):
 
+	hoje = datetime.datetime.now()
+	numero = request.GET['numero']
+	segredo = key
+	segredo = str(segredo)
 
-def teste(request,prefixo):
- 	
- 	# data = serializers.serialize("json", Cdr.objects.all().order_by('-data_hora')[:5])
- 	data = serializers.serialize("json", NaoPortados.objects.filter(prefixo=prefixo))
- 	print data
- 	response =HttpResponse(data, content_type='application/json')
- 	return response
+	### Chama a função que checa o ID do usuário
+	id_user = funcoes.pega_id_user(segredo)
+	
+	if id_user == None:
+		rn1 = 'error - Chave não autoriada'
+		response = HttpResponse(rn1, content_type='text/plain')
+		return response
+	else:
+		id_user = id_user
 
+	### Chama a função que checa o saldo do cliente
+	saldo,tipo,diferenca = funcoes.checa_saldo(id_user)
 
+	if diferenca >= 30:
+		PlanoCliente.objects.filter(cliente=id_user).update(consultas=0,plano=1,nome_plano='Escolha um plano',tipo=1)
 
+	if (saldo <= 0) and (tipo == 1):
 
-def beta(request):
+		rn1 = 'error - Sem credito'
+		response = HttpResponse(rn1, content_type='text/plain')
+		return response
+	else:
 
-	return render(request, 'beta.html')
+		tamanho = len(numero)
+		
+		key = key
+		key = str(key)
+		chave = funcoes.checa_chave(key)
+
+		if key == chave:
+
+			if tamanho <= 9:
+				rn1 = 'error - somente aceito 10 e 11 digitos'
+				response = HttpResponse(rn1, content_type='text/plain')
+				return response				
+			
+			if tamanho == 10:
+
+				### Chama a função que checa retorna o CSP para números de 10 dígitos
+				csp = funcoes.numero_10(numero)
+				if numero == None:
+					rn1 = 'error - numero ou prefixo nao existe'
+					response = HttpResponse(rn1, content_type='text/plain')
+					return response	
+				else:
+					rn1 = csp
+
+			if tamanho == 11:
+
+				### Chama a função que checa retorna o CSP para números de 11 dígitos
+				csp = funcoes.numero_11(numero)
+				if csp == None:
+					rn1 = 'error - numero ou prefixo nao existe'
+					response = HttpResponse(rn1, content_type='text/plain')
+					return response	
+
+				else:
+					rn1 = csp
+
+			### Chama a função que insere no CELERY, e o CELERY debita e insere no CDR
+			insert_cdr.apply_async(kwargs={'request': chave, 'numero': numero},countdown=settings.TEMPO_ESPERA_CDR)	
+
+			response = HttpResponse(rn1, content_type='text/plain')
+			return response	
+
+		else:
+
+			rn1 = 0
+			response = HttpResponse(rn1, content_type='text/plain')
+			return response
 
 
 

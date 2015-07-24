@@ -11,7 +11,7 @@ CREATE TABLE `sip_buddies` (
   `dtmfmode` varchar(7) DEFAULT NULL,
   `fromuser` varchar(50) DEFAULT NULL,
   `fromdomain` varchar(31) DEFAULT NULL,
-  `host` varchar(31) NOT NULL DEFAULT '',
+  `host` varchar(31) NOT NULL DEFAULT 'dynamic',
   `incominglimit` char(2) DEFAULT NULL,
   `outgoinglimit` char(2) DEFAULT NULL,
   `insecure` varchar(4) DEFAULT NULL,
@@ -23,10 +23,13 @@ CREATE TABLE `sip_buddies` (
   `deny` varchar(95) DEFAULT NULL,
   `pickupgroup` varchar(30) DEFAULT NULL,
   `port` varchar(5) NOT NULL DEFAULT '',
-  `qualify` varchar(4) DEFAULT NULL,
+  `qualify` varchar(4) DEFAULT 'yes',
+  `useragent` varchar(255) DEFAULT NULL,
   `restrictcid` char(3) DEFAULT NULL,
+  `lastms` int(11) DEFAULT NULL,
   `rtptimeout` char(3) DEFAULT NULL,
   `rtpholdtimeout` char(3) DEFAULT NULL,
+  `fullcontact` varchar(255) DEFAULT NULL,
   `secret` varchar(30) DEFAULT NULL,
   `type` varchar(6) NOT NULL DEFAULT '',
   `username` varchar(30) NOT NULL DEFAULT '',
@@ -38,4 +41,4 @@ CREATE TABLE `sip_buddies` (
   PRIMARY KEY (`uniqueid`),
   UNIQUE KEY `name` (`name`),
   KEY `name_2` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;

@@ -19,7 +19,7 @@ import os
 @task
 def insert_cdr(request,numero):
 
-	data = datetime.datetime.now()
+	data = datetime.now()
 	agora = data.strftime("%H:%M:%S")
 
 	chave = request
@@ -407,7 +407,7 @@ def procura():
 @task
 def limpa_cache():
 
-	data = datetime.datetime.now()
+	data = datetime.now()
 
 	hora_1 = data - timedelta(hours=2)
 	hora_2 = data - timedelta(hours=1)

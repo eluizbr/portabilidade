@@ -123,7 +123,9 @@
                         <div class="widget-body">
                             <div class="alert alert-danger">
                                 <span class="fw-semi-bold">EXTEN:</span> É o número a ser consultado. Deverá ser enviado no formato: <strong>1140627333</strong>. Não pode ser enviado nenhum dígito a mais. Seram aceitos números com <strong>10</strong> ou <strong>11</strong> digitos. Número com tamanho diferente irá retornar <strong>0</strong>.<br><br>
+                                <!--
                                 <span class="fw-semi-bold">CHAVE:</span> As consultas só poderam ser realizadas com a sua CHAVE <strong>{{chave_cod}}</strong><br><br>
+                                -->
                                 <span class="fw-semi-bold">RETORNO:</span> Sempre será retornado apenas 5 dígitos na consulta. Para o <strong>CSP 55341 (TIM)</strong> por exemplo, o retorno será <strong>55341</strong>.<br><br>
                             </div>
                                 <header>
@@ -138,7 +140,7 @@
                                             [default]<br><br>
                         
 
-                                            exten => _X.,1,Dial(SIP/consulta/{{chave_cod}}${EXTEN})<br>
+                                            exten => _X.,1,Dial(SIP/consulta/${EXTEN})<br>
                                             exten => _X.,n,Hangup()<br><br>
                                             [redirect]<br><br>
 
