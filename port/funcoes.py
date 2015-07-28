@@ -90,6 +90,8 @@ def numero_10(numero):
             prefixo = x.prefixo
             operadora = x.operadora
             rn1 = x.rn1
+            # z = str(rn1)
+            # rn1 = z[3:]
             return rn1
 
         except ObjectDoesNotExist:

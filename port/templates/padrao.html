@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load l10n %}
+{% load staticfiles %}
+{% block nome %}
+    <strong>{{user}}</strong>&nbsp;
+{% endblock %}
+
+{% block menu_1 %}
+                    <li class="active"><a href="{% url 'operadoras' %}">Operadoras</a></li>
+                    <li><a href="{% url 'cdr' %}">CDR</a></li>
+{% endblock menu_1 %}
+
+{% block lista_server %}{% endblock lista_server %}
+
+{% block content %}
+
+
+<h1 class="page-title">Padrões - <span class="fw-semi-bold">do sistema</span></h1>
+    <form class="form-horizontal" role="form"  method="POST">{% csrf_token %}
+        <div class="row">
+            <div class="col-md-6">
+                <section class="widget">
+                    <div class="widget-body">
+                            <fieldset>
+                            <header>
+                                <legend>
+                                    <h5>
+                                        Configuração - <strong>sistema</strong>
+                                    </h5>
+                                </legend>
+                            </header>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" for="max-length">DDD Padrão</label>
+									{% if ddd %}
+	                                    <div class="col-sm-3">
+	                                        <input type="text" name="ddd" maxlength="2"
+	                                               class="form-control"
+	                                               pattern="[1-9][1-9]"
+	                                               value="{{ddd}}"
+	                                               data-placement="top" title="O DDD deve ter 2 digitos e não pode conter ZERO.">
+	                                    </div>
+									{% else%}
+	                                    <div class="col-sm-3">
+	                                        <input type="text" name="ddd" maxlength="2"
+	                                               class="form-control"
+	                                               pattern="[1-9][1-9]"
+	                                               placeholder="Insira seu ddd padrão."
+	                                               data-placement="top" title="O DDD deve ter 2 digitos e não pode conter ZERO.">
+	                                    </div>	
+									{% endif %}
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" for="simple-select">Selecione o tipo de retorno</label>
+                                    <div class="col-sm-8">
+                                        <select class="selectpicker" data-style="btn-default"
+                                                data-width="auto"
+                                                name="retorno"
+                                                value="1"
+                                                tabindex="-1" id="simple-select">
+                                            {% for n in z %}
+                                                <option value="{{retorno}}">{{n.get_retorno_display}}</option>
+                                            {% endfor %}
+                                            
+                                            <option value="1">CSP completo Ex. 55321</option>
+                                            <option value="2">Código de operadora apenas Ex. 021</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                <label class="col-sm-4 control-label" for="max-length">Avsios por email</label>
+                            	    {% if aviso == 1 %}
+	                            	    <div class="col-sm-8 checkbox-inline checkbox-ios">
+	                                        <label for="checkbox-ios1">
+	                                            <input type="checkbox" id="checkbox-ios1" checked name="aviso_email">
+	                                        </label>
+	                                    </div>
+	                                {% else %}
+	                            	    <div class="col-sm-8 checkbox-inline checkbox-ios">
+	                                        <label for="checkbox-ios1">
+	                                            <input type="checkbox" id="checkbox-ios1" name="aviso_email">
+	                                        </label>
+	                                    </div>                            	    	
+                            	    {% endif %}
+                                </div>
+                            </fieldset>
+                            <div class="form-actions">
+                                <div class="row">
+                                    <div class="col-sm-offset-4 col-sm-7">
+                                        <button type="submit" class="btn btn-primary">Salvar</button>
+                                        <button type="button" class="btn btn-inverse">Cancelar</button>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                </section>
+            </div>
+        {% if aviso == 1 %}
+            <div class="row">
+                <div class="col-md-3">
+                    <section class="widget">
+                        <header>
+                            <legend>
+                                <h5>
+                                    Avisos - <strong>EMAIL</strong>
+                                </h5>
+                            </legend>
+                        </header>
+                            <div class="widget-body">
+                                <fieldset>
+                                    <div>
+                                        <div class="form-group">
+                                            <label class="col-sm-6 control-label" for="simple-select">Sem saldo</label>
+                                            {% if sem_saldo == 1 %}
+                                                <div class="checkbox-inline checkbox-ios">
+                                                    <label for="checkbox-ios2">
+                                                        <input type="checkbox" id="checkbox-ios2" checked name="sem_saldo">
+                                                    </label>
+                                                </div>
+                                            {% else %}
+                                                <div class="checkbox-inline checkbox-ios">
+                                                    <label for="checkbox-ios2">
+                                                        <input type="checkbox" id="checkbox-ios2" name="sem_saldo">
+                                                    </label>
+                                                </div>  
+                                            {% endif %}
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-6 control-label" for="simple-select">Saldo baixo</label>
+                                            {% if saldo_baixo == 1 %}
+                                                <div class="checkbox-inline checkbox-ios col-sm-2">
+                                                    <label for="checkbox-ios3">
+                                                        <input type="checkbox" id="checkbox-ios3" checked name="saldo_baixo">
+                                                    </label>
+                                                </div>
+                                            {% else %}
+                                                <div class="checkbox-inline checkbox-ios">
+                                                    <label for="checkbox-ios3">
+                                                        <input type="checkbox" id="checkbox-ios3" name="saldo_baixo">
+                                                    </label>
+                                                </div>   
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                    </section>
+                </div>
+                {% if saldo_baixo == 1 %}
+                    <div class="col-md-3">
+                        <section class="widget">
+                            <header>
+                                <legend>
+                                    <h5>
+                                        Avisos - <strong>Saldo baixo</strong>
+                                    </h5>
+                                </legend>
+                            </header>
+                                <div class="widget-body">
+                                    <fieldset>
+                                        <div class="form-group">
+                                            <label class="col-sm-4 control-label" for="max-length">Valor para aviso</label>
+                                            <div class="col-sm-4">
+                                                <input type="number" name="aviso_saldo"
+                                                       class="form-control"
+                                                       value="{{aviso_saldo}}"
+                                                       data-placement="top" title="Insira o valor para aviso">
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                        </section>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+            <div class="row">
+
+            </div>
+        </div>
+    </form>
+{% endblock content %}
+{% block scripts %}
+
+<script id="test" src="{% static "vendor/underscore/underscore.js"%}"></script>
+<script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
+<script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
+<script src="{% static "vendor/d3/d3.min.js"%}"></script>
+<script src="{% static "vendor/rickshaw/rickshaw.min.js"%}"></script>
+<script src="{% static "vendor/raphael/raphael-min.js"%}"></script>
+<script src="{% static "vendor/jQuery-Mapael/js/jquery.mapael.js"%}"></script>
+<script src="{% static "js/brazil.js"%}"></script>
+<script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/popover.js"%}"></script>
+<script src="{% static "vendor/bootstrap_calendar/bootstrap_calendar/js/bootstrap_calendar.min.js"%}"></script>
+<script src="{% static "vendor/jquery-animateNumber/jquery.animateNumber.min.js"%}"></script>
+<!-- page specific libs -->
+<script src="{% static "vendor/underscore/underscore-min.js"%}"></script>
+<script src="{% static "vendor/backbone/backbone.js"%}"></script>
+<script src="{% static "vendor/backbone.paginator/lib/backbone.paginator.min.js"%}"></script>
+<script src="{% static "vendor/backgrid/lib/backgrid.js"%}"></script>
+<script src="{% static "vendor/backgrid-paginator/backgrid-paginator.js"%}"></script>
+<script src="{% static "vendor/datatables/media/js/jquery.dataTables.js"%}"></script>
+<script src="{% static "vendor/bootstrap-select/dist/js/bootstrap-select.min.js"%}"></script>
+<script src="{% static "vendor/bootstrap-select/dist/js/bootstrap-select.min.js"%}"></script>
+<script src="{% static "vendor/jquery-autosize/jquery.autosize.min.js"%}"></script>
+<script src="{% static "vendor/bootstrap3-wysihtml5/src/bootstrap3-wysihtml5.js"%}"></script>
+<script src="{% static "vendor/switchery/dist/switchery.min.js"%}"></script>
+<script src="{% static "js/form-elements.js"%}"></script>
+
+
+
+{% endblock %}

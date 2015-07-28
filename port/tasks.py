@@ -213,7 +213,7 @@ def atualiza_compra(retorno):
 	email_cad = u.email
 
 	#id_pagseguro = id_pagseguro.replace("-", "")
-	agora = datetime.now()
+	agora = datetime.datetime.now()
 
 	try:
 
@@ -311,7 +311,7 @@ def atualiza_pago(id_pagseguro,usuario,status):
 
 	u = Cadastro.objects.get(user_id=usuario)
 	user = u.id
-	agora = datetime.now()
+	agora = datetime.datetime.now()
 	pega_plano_cadastro = Cadastro.objects.values_list('plano').filter(id=user)[0]
 	pega_plano_cadastro = pega_plano_cadastro[0]
 

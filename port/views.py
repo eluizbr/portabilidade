@@ -17,7 +17,7 @@ import datetime
 import random
 import decimal
 from datetime import timedelta,date
-from forms import CadastroForm, CompraFrom
+from forms import CadastroForm, CompraFrom, PlanoClienteForm
 from models import Cadastro, Plano, Retorno
 from django.contrib.auth.models import User
 from pagseguro.api import PagSeguroItem, PagSeguroApi
@@ -65,6 +65,52 @@ def contato(request):
 def index(request):
 
 	return redirect('operadoras')
+
+@login_required
+def padrao(request):
+
+	user = User.objects.get(pk=request.user.id)
+	cad = Cadastro.objects.get(user=user)
+	cod_user = cad.user_id
+	z = PlanoCliente.objects.all()
+	plano = PlanoCliente.objects.get(cliente=cod_user)
+	ddd = plano.ddd
+	aviso = plano.aviso_email
+	retorno = plano.retorno
+	saldo_baixo = plano.saldo_baixo
+	sem_saldo = plano.sem_saldo
+	aviso_saldo = plano.aviso_saldo
+	#print retorno, aviso, sem_saldo, saldo_baixo
+
+	ddd_v = request.POST.get('ddd', '')
+	aviso_v = request.POST.get('aviso_email', '')
+	retorno_v = request.POST.get('retorno', '')
+	sem_saldo_v = request.POST.get('sem_saldo', '')
+	saldo_baixo_v = request.POST.get('saldo_baixo', '')
+	aviso_saldo_v = request.POST.get('aviso_saldo', '')
+
+	if aviso_saldo_v == '':
+		aviso_saldo_v = 250
+
+	if request.method == 'POST':
+		form = PlanoClienteForm(request.POST , instance=plano)
+			
+		if form.is_valid():
+			obj = form.save(commit=False)
+			obj.ddd = ddd_v
+			obj.aviso_email = aviso_v
+			obj.retorno = retorno_v
+			obj.saldo_baixo = saldo_baixo_v
+			obj.sem_saldo = sem_saldo_v
+			obj.aviso_saldo = aviso_saldo_v
+			obj.save()
+
+			return redirect('/portabilidade/padrao')
+	else:
+
+		form = PlanoClienteForm(instance=plano)
+
+	return render(request, 'padrao.html', locals())
 
 @login_required
 def asterisk(request):
@@ -426,7 +472,7 @@ def operadoras(request):
 
 		total_consultas = Cdr.objects.all().count()
 
-		paginator = Paginator(total, 5)
+		paginator = Paginator(total, 8)
 		page = request.GET.get('page')
 
 		try:
@@ -488,11 +534,29 @@ def consulta(request,numero):
 		chave = funcoes.checa_chave(key)
 
 		if key == chave:
+			z = PlanoCliente.objects.get(cliente=id_user)
+			retorno = z.retorno
+			ddd = z.ddd
+			y = str(ddd)
+			x = str(numero)
 
 			if tamanho <= 9:
-				rn1 = 'error - somente aceito 10 e 11 digitos'
-				response = HttpResponse(rn1, content_type='text/plain')
-				return response				
+
+				numero = y + x
+				csp = funcoes.numero_10(numero)
+	
+				if csp == None:
+					rn1 = 'error - numero ou prefixo nao existe'
+					response = HttpResponse(rn1, content_type='text/plain')
+					return response	
+
+				else:
+					if retorno == '1':
+						rn1 = csp
+					else:
+						rn1 = csp
+						z = str(rn1)[3:]
+						rn1 = '0' + z		
 			
 			if tamanho == 10:
 
@@ -503,7 +567,12 @@ def consulta(request,numero):
 					response = HttpResponse(rn1, content_type='text/plain')
 					return response	
 				else:
-					rn1 = csp
+					if retorno == '1':
+						rn1 = csp
+					else:
+						rn1 = csp
+						z = str(rn1)[3:]
+						rn1 = '0' + z
 
 			if tamanho == 11:
 
@@ -515,20 +584,25 @@ def consulta(request,numero):
 					return response	
 
 				else:
-					rn1 = csp
+					if retorno == 1:
+						rn1 = csp
+					else:
+						rn1 = csp
+						z = str(rn1)[3:]
+						rn1 = '0' + z
 
 			### Chama a função que insere no CELERY, e o CELERY debita e insere no CDR
 			insert_cdr.apply_async(kwargs={'request': chave, 'numero': numero},countdown=settings.TEMPO_ESPERA_CDR)	
 
+
 			response = HttpResponse(rn1, content_type='text/plain')
-			return response	
+			return response
 
 		else:
 
 			rn1 = 0
 			response = HttpResponse(rn1, content_type='text/plain')
 			return response
-
 
 def retorno(request):
 

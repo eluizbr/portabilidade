@@ -1,4 +1,11 @@
 # -*- coding: UTF-8 -*-
+
+RETORNO_CHOICES = (
+    ('1', 'CSP Completo'),
+    ('2', 'Código de operadora apenas')
+)
+
+
 CACHE_CHOICES = (
     ('0', 'Desativado'),
     ('1', 'Ativado')

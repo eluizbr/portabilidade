@@ -142,6 +142,7 @@ class PlanoCliente(models.Model):
 
     TIPO = choices.TIPO_PLANO_CHOICES
     CACHE = choices.CACHE_CHOICES
+    RETORNO = choices.RETORNO_CHOICES
 
     cliente = models.IntegerField(u'Cliente', default=1, unique=True)
     plano = models.IntegerField(u'Plano', default=1)
@@ -153,6 +154,12 @@ class PlanoCliente(models.Model):
     tipo = models.CharField(max_length=200,choices=TIPO,default=1)
     cache = models.CharField(u'Cache habilitado',max_length=1,choices=CACHE,default=0)
     tempo = models.IntegerField(u'Tempo do cache em minutos',default=60)
+    ddd = models.IntegerField(u'DDD', blank=True, null=True)
+    aviso_email = models.BooleanField(u'Aviso por email', default=0)
+    saldo_baixo = models.BooleanField(u'Saldo baixo', default=0)
+    aviso_saldo = models.IntegerField(blank=True, null=True,default=250)
+    sem_saldo = models.BooleanField(u'Sem saldo', default=0)
+    retorno = models.CharField(u'Retorno',max_length=5,choices=RETORNO,default=1)
 
     def __unicode__(self):
         return unicode(self.plano)
