@@ -44,7 +44,6 @@ def insert_cdr(request,numero):
 	consultas = x.consultas
 	gratis = x.consultas_gratis
 	ativo = int(x.cache)
-	print 'o cache é %s' %ativo
 	tempo = x.tempo
 	tipo = x.tipo
 	tipo = int(tipo)
@@ -57,7 +56,6 @@ def insert_cdr(request,numero):
 	valor_plano_2 = y.valor_consulta
 
 	try:
-		print numero
 		cache = Cache.objects.get(numero=numero)
 		numero_cache = cache.numero
 		hora_cache = str(cache.cache)
@@ -95,34 +93,23 @@ def insert_cdr(request,numero):
 	if portado:
 		portado = Portados.objects.values_list('rn1').filter(numero=numero)[0]
 		portado = portado[0]
-		print portado
 
 		if tamanho == 10:
 			prefix = numero[0:6]
-			print 'prifxo 1'
 		elif tamanho == 11:
 			prefix = numero[0:7]
-			print 'prifxo 2'
 
 		dados = Prefixo.objects.get(prefixo=prefix)
-		print 'dados é = %s' %dados
-
 		ddd = dados.ddd
 		prefixo = dados.prefixo
-		print prefixo
 		cidade = dados.cidade
-		print cidade
 		estado = dados.estado
 		operadora = dados.operadora
-		print operadora
 		tipo = dados.tipo
-		print tipo
 		rn1 = dados.rn1
-		print rn1
 		x = Prefixo.objects.values('rn1','operadora').filter(rn1=portado).distinct()
 
 		for z in x:
-			print ativo
 			rn1 = z['rn1']
 			operadora = z['operadora']
 
@@ -133,7 +120,6 @@ def insert_cdr(request,numero):
 			
 			### INICIO rotina CACHE - Só entra aqui se o cache esta hábilitado para o cliente ###
 			if ativo == 1:
-				print 'cache ativo'
 				try:
 					Cache.objects.get(numero=numero)
 				except Cache.DoesNotExist:
@@ -141,9 +127,7 @@ def insert_cdr(request,numero):
 					total_consultas = consultas - 1
 					PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
 			### INICIO rotina CACHE - Só entra aqui se o cache esta hábilitado para o cliente ###
-			elif ativo == 0:
-				print 'sem cache'
-			
+			elif ativo == 0:		
 				total_consultas = consultas - 1
 				PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
 
@@ -154,10 +138,8 @@ def insert_cdr(request,numero):
 
 		if tamanho == 10:
 			prefix = numero[0:6]
-			print 'prifxo 3'
 		elif tamanho == 11:
 			prefix = numero[0:7]
-			print 'prifxo 4'
 
 		dados = Prefixo.objects.values('ddd','prefixo','cidade','estado','operadora','tipo', 'rn1').filter(prefixo=prefix)
 		dados = Prefixo.objects.get(prefixo=prefix)
@@ -192,10 +174,6 @@ def insert_cdr(request,numero):
 
 		Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, operadora=operadora,\
 									 cidade=cidade, estado=estado, tipo=tipo,portado=0,valor=valor_plano)
-		
-
-		print key,estado,cidade,operadora,tipo
-
 
 @task
 def atualiza_compra(retorno):

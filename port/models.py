@@ -154,7 +154,7 @@ class PlanoCliente(models.Model):
     tipo = models.CharField(max_length=200,choices=TIPO,default=1)
     cache = models.CharField(u'Cache habilitado',max_length=1,choices=CACHE,default=0)
     tempo = models.IntegerField(u'Tempo do cache em minutos',default=60)
-    ddd = models.IntegerField(u'DDD', blank=True, null=True)
+    ddd = models.IntegerField(u'DDD', blank=True, null=True, default=31)
     aviso_email = models.BooleanField(u'Aviso por email', default=0)
     saldo_baixo = models.BooleanField(u'Saldo baixo', default=0)
     aviso_saldo = models.IntegerField(blank=True, null=True,default=250)

@@ -38,7 +38,6 @@ def contato(request):
 
     if name and message and email:
 
-		print 'cliente'
 		mail.send(
 		    ['eluizbr@gmail.com'],
 		    sender=settings.DEFAULT_FROM_EMAIL,
@@ -49,7 +48,6 @@ def contato(request):
 
     elif parceiro and message and email:
 
-		print 'parceiro'
 		mail.send(
 		    ['eluizbr@gmail.com'],
 		    sender=settings.DEFAULT_FROM_EMAIL,
@@ -71,8 +69,8 @@ def padrao(request):
 
 	user = User.objects.get(pk=request.user.id)
 	cad = Cadastro.objects.get(user=user)
-	cod_user = cad.user_id
-	z = PlanoCliente.objects.all()
+	cod_user = cad.id
+	z = PlanoCliente.objects.all().filter(cliente=cod_user)
 	plano = PlanoCliente.objects.get(cliente=cod_user)
 	ddd = plano.ddd
 	aviso = plano.aviso_email
@@ -449,7 +447,7 @@ def operadoras(request):
 						  COUNT( IF( tipo='RADIO', 1, NULL ) ) AS radio,
 						  SUM(valor) AS valor
 						FROM port_cdr WHERE cliente_id = %d
-						GROUP BY operadora""" % id_cliente
+						GROUP BY operadora ORDER BY movel DESC""" % id_cliente
 		total = c.execute(total)
 		total = c.fetchall()
 
@@ -472,7 +470,7 @@ def operadoras(request):
 
 		total_consultas = Cdr.objects.all().count()
 
-		paginator = Paginator(total, 8)
+		paginator = Paginator(total, 6)
 		page = request.GET.get('page')
 
 		try:
@@ -536,6 +534,7 @@ def consulta(request,numero):
 		if key == chave:
 			z = PlanoCliente.objects.get(cliente=id_user)
 			retorno = z.retorno
+			user_id = z.cliente
 			ddd = z.ddd
 			y = str(ddd)
 			x = str(numero)
@@ -584,7 +583,7 @@ def consulta(request,numero):
 					return response	
 
 				else:
-					if retorno == 1:
+					if retorno == '1':
 						rn1 = csp
 					else:
 						rn1 = csp
