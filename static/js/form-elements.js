@@ -61,6 +61,7 @@ $(function(){
         new Switchery(document.getElementById('checkbox-ios1'));
         new Switchery(document.getElementById('checkbox-ios2'),{color: Sing.colors['brand-primary']});
         new Switchery(document.getElementById('checkbox-ios3'),{color: Sing.colors['brand-primary']});
+        new Switchery(document.getElementById('checkbox-ios4'));
     
         $('#datetimepicker1').datetimepicker({
             format: 'YYYY-MM-DDT00:00:00'

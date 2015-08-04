@@ -194,6 +194,19 @@ class Retorno(models.Model):
     def __unicode__(self):
         return unicode(self.status)
 
+class Csp(models.Model):
+    operadora = models.CharField(max_length=255, blank=True, null=True)
+    rn1 = models.IntegerField(blank=True, null=True)
+    tipo = models.CharField(max_length=100, blank=True, null=True)
+
+    def __unicode__(self):
+        return unicode(self.rn1)
+
+    class Meta:
+        managed = False
+        db_table = 'csp'
+
+
 class SipBuddies(models.Model):
     uniqueid = models.AutoField(primary_key=True)
     name = models.CharField(unique=True, max_length=250)

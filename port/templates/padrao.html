@@ -83,6 +83,22 @@
 	                                    </div>                            	    	
                             	    {% endif %}
                                 </div>
+                                <div class="form-group">
+                                <label class="col-sm-4 control-label" for="max-length">Retorno personalizado</label>
+                                    {% if aviso == 1 %}
+                                        <div class="col-sm-8 checkbox-inline checkbox-ios">
+                                            <label for="checkbox-ios4">
+                                                <input type="checkbox" id="checkbox-ios4" checked name="rtr_personalizado">
+                                            </label>
+                                        </div>
+                                    {% else %}
+                                        <div class="col-sm-8 checkbox-inline checkbox-ios">
+                                            <label for="checkbox-ios4">
+                                                <input type="checkbox" id="checkbox-ios4" name="rtr_personalizado">
+                                            </label>
+                                        </div>                                      
+                                    {% endif %}
+                                </div>
                             </fieldset>
                             <div class="form-actions">
                                 <div class="row">

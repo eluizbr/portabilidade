@@ -108,6 +108,7 @@ def insert_cdr(request,numero):
 		tipo = dados.tipo
 		rn1 = dados.rn1
 		x = Prefixo.objects.values('rn1','operadora').filter(rn1=portado).distinct()
+		print ddd,prefixo,cidade,estado,operadora,tipo,rn1
 
 		for z in x:
 			rn1 = z['rn1']
