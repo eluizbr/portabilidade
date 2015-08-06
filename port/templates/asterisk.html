@@ -18,10 +18,39 @@
 
 
 
-<h1 class="page-title">Configurações - <span class="fw-semi-bold">IPBX</span></h1>
+<h1 class="page-title"><span class="fw-semi-bold">Configurações</span></h1>
 <section class="widget">
-	<h3>As configurações devem ser feitas no seu<span class="fw-semi-bold"> IPBX</span></h3><br>
+	<h3>Consulta via<span class="fw-semi-bold"> HTTP</span></h3><br>
 
+    <div class="panel panel-default">
+        <div class="panel-heading collapsed">
+            <h5 class="panel-title">
+                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse1">
+                    <strong>Consulta via HTTP</strong>
+                    <i class="fa fa-angle-down pull-right"></i>
+                </a>
+            </h5>
+        </div>
+        <div id="collapse1" class="panel-collapse collapse">
+            <div class="panel-body">
+                <div class="col-md-14">
+                <section class="widget">
+                <div class="widget-body">
+                    <div class="alert alert-info">
+                        <span class="fw-semi-bold">No NAVEGADOR WEB:</span> <strong>http://consulta.cdr-port.net/portabilidade/NUMERO?key={{ast_pass}}</strong><br>
+                    </div>
+                </div>
+                <div class="widget-body">
+                    <div class="alert alert-info">
+                        <span class="fw-semi-bold">Via console (Prompt DOS):</span> <strong> curl http://consulta.cdr-port.net/portabilidade/NUMERO?key={{ast_pass}}</strong><br>
+                    </div>
+                </div>
+                </section>
+                </div>
+            </div>
+        </div>
+    </div>
+<h3>IPBX<span class="fw-semi-bold"> Asterisk</span></h3><br>
     <div class="panel panel-default">
         <div class="panel-heading collapsed">
             <h5 class="panel-title">
@@ -106,7 +135,6 @@
             </div>
         </div>
     </div>
-
     <div class="panel panel-default">
         <div class="panel-heading collapsed">
             <h5 class="panel-title">
@@ -194,10 +222,9 @@
                 </div>
             </div>
         </div>
-
-
     </div>
 
+<h3>Gateway GSM<span class="fw-semi-bold"> Homologado</span></h3><br>
     <div class="panel panel-default">
         <div class="panel-heading collapsed">
             <h5 class="panel-title">
@@ -220,9 +247,34 @@
                 </div>
             </div>
         </div>
-
-
     </div>
+
+<h3>PABX <span class="fw-semi-bold"> Homologado</span></h3><br>
+
+    <div class="panel panel-default">
+        <div class="panel-heading collapsed">
+            <h5 class="panel-title">
+                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseFour">
+                    <strong>Centrais DIGISTAR</strong>
+                    <i class="fa fa-angle-down pull-right"></i>
+                </a>
+            </h5>
+        </div>
+        <div id="collapseFour" class="panel-collapse collapse">
+            <div class="panel-body">
+                <div class="col-md-14">
+                    <section class="widget">
+                        <div class="widget-body">
+                            <div class="alert alert-danger">
+                                <span class="fw-semi-bold">AGIUARDE...:</span> <br><br>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </section>
 <!--
 <div class="modal fade" id="chave" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18" aria-hidden="true">
