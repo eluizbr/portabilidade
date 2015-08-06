@@ -217,7 +217,7 @@ def checa_saldo(id_user):
 
 
 def consulta_api(numero,key):
-    print numero,key
+
     hoje = datetime.datetime.now()
     segredo = key
     segredo = str(segredo)
@@ -294,7 +294,7 @@ def consulta_api(numero,key):
             return rn1
 
 def consulta_rest(numero,key):
-    print numero,key
+
     hoje = datetime.datetime.now()
     segredo = key
     segredo = str(segredo)

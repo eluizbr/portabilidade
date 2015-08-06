@@ -601,7 +601,6 @@ def consulta(request,numero):
 			z = PlanoCliente.objects.get(cliente=id_user)
 			retorno = z.retorno
 			user_id = z.cliente
-			print user_id
 			ddd = z.ddd
 			y = str(ddd)
 			x = str(numero)

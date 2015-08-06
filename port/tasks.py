@@ -411,7 +411,6 @@ def limpa_cache():
 	fim = hora_2.strftime("%H:%M:%S")
 
 	Cache.objects.filter(cache__range=(inicio,fim)).delete()
-	print inicio,fim
 
 @task
 def email():
