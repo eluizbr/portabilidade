@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpRequest
 
 from datetime import timedelta,datetime,date
 import datetime
-from views import Cadastro, Portados, NaoPortados, PlanoCliente
+from views import Cadastro, Portados, NaoPortados, PlanoCliente, CspRetorno
 from django.conf import settings
 from tasks import insert_cdr
 
@@ -74,12 +74,19 @@ def checa_chave(key):
 '''
     Função retorna o CSP para número de 10 digitos
 '''
-def numero_10(numero):
+def numero_10(numero,user_id):
 
     try:
         x = Portados.objects.get(numero=numero)
         p_numero = x.numero
         rn1 = x.rn1
+        z = CspRetorno.objects.values_list('retorno').filter(csp=rn1)
+        try:
+            z = z[0]
+        except IndexError:
+            z = z
+        if z:
+            rn1 = z[0]
         return rn1
     
     except ObjectDoesNotExist:
@@ -92,6 +99,13 @@ def numero_10(numero):
             rn1 = x.rn1
             # z = str(rn1)
             # rn1 = z[3:]
+            z = CspRetorno.objects.values_list('retorno').filter(csp=rn1)
+            try:
+                z = z[0]
+            except IndexError:
+                z = z
+            if z:
+                rn1 = z[0]
             return rn1
 
         except ObjectDoesNotExist:
@@ -122,12 +136,19 @@ def numero_10_rest(numero):
 '''
     Função retorna o CSP para número de 11 digitos
 '''
-def numero_11(numero):
+def numero_11(numero,user_id):
 
     try:
         x = Portados.objects.get(numero=numero)
         p_numero = x.numero
         rn1 = x.rn1
+        z = CspRetorno.objects.values_list('retorno').filter(csp=rn1)
+        try:
+            z = z[0]
+        except IndexError:
+            z = z
+        if z:
+            rn1 = z[0]
         return rn1
     
     except ObjectDoesNotExist:
@@ -138,6 +159,13 @@ def numero_11(numero):
             prefixo = x.prefixo
             operadora = x.operadora
             rn1 = x.rn1
+            z = CspRetorno.objects.values_list('retorno').filter(csp=rn1)
+            try:
+                z = z[0]
+            except IndexError:
+                z = z
+            if z:
+                rn1 = z[0]
             return rn1
 
         except ObjectDoesNotExist:

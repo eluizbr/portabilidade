@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load l10n %}
+{% load staticfiles %}
+{% load bootstrap %}
+
+{% block nome %}
+    <strong>{{user}}</strong>&nbsp;
+{% endblock %}
+
+{% block menu_1 %}
+                    <li class="active"><a href="{% url 'operadoras' %}">Operadoras</a></li>
+                    <li><a href="{% url 'cdr' %}">CDR</a></li>
+{% endblock menu_1 %}
+
+{% block content %}
+        <form method="POST" action="{% url 'csp-retorno' %}" role="form"> {% csrf_token %}
+            <div class="row mb-lg">
+                <div class="col-md-8">
+                    <div id="tabs1c" class="tab-content mb-lg">
+                        <div class="tab-pane active clearfix" id="meusdados">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <legend>Selecione o CSP de retorno</legend>
+                            <fieldset>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" for="country-select">CSP de origem</label>
+                                    <div class="col-sm-8">
+                                        <select id="country-select"
+                                                data-placeholder="Selecione o CSP de origem"
+                                                class="select2 form-control"
+                                                tabindex="-1"
+                                                name="csp">
+                                            <option value="{{r.rn1}}"></option>
+                                            {% for r in todos_csp %}
+                                                <option value="{{r.rn1}}">{{r.rn1}} - {{r.operadora}} - {{r.tipo}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <br><br>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" for="country-select-1">CSP de retorno</label>
+                                    <div class="col-sm-8">
+                                        <select id="country-select-1"
+                                                data-placeholder="Selecione o CSP de retorno"
+                                                class="select2 form-control"
+                                                tabindex="-1"
+                                                name="retorno">
+                                            <option value="{{r.rn1}}"></option>
+                                            {% for r in todos_csp %}
+                                                <option value="{{r.rn1}}">{{r.rn1}} - {{r.operadora}} - {{r.tipo}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </fieldset>
+                                            <div class="form-actions">
+                                                <div class="row">
+                                                    <div class="col-sm-offset-5 col-sm-7">
+                                                        <button type="submit" class="btn btn-inverse">Inserir CSP</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+<h1 class="page-title">Retornos <small>CSP</small></h1>
+
+<div class="row">
+    <div class="col-md-8">
+        <section class="widget">
+				<div class="widget-body">
+				    <div class="mt">
+				        <table class="table table-striped table-hover">
+				            <thead>
+				            <tr>
+				                <th class="hidden-xs">Código CSP</th>
+                                <th class="hidden-xs">Retorno</th>
+                                <th class="hidden-xs">Apagar</th>
+				            </tr>
+				            </thead>
+				            <tbody>
+				            {% for r in x %}
+				            <tr>
+                                <td><span class="fw-semi-bold">{{r.csp}}</span></td>
+				                <td><span class="fw-semi-bold">{{r.retorno}}</span></td>
+                                <td><a href="/portabilidade/csp-retorno-del/{{r.id}}" id="apagar" name="apagar"><span class="glyphicon glyphicon-remove" style="color: #DE2121"></span></a></td>
+				            </tr>
+				           {% endfor %}
+				            </tbody>
+				        </table>
+				    </div>
+				</div>
+        </section>
+    </div>
+</div>
+
+
+{% endblock content %}
+
+
+
+{% block scripts %}
+
+<script id="test" src="{% static "vendor/underscore/underscore.js"%}"></script>
+<script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
+<script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
+<script src="{% static "vendor/d3/d3.min.js"%}"></script>
+<script src="{% static "vendor/rickshaw/rickshaw.min.js"%}"></script>
+<script src="{% static "vendor/raphael/raphael-min.js"%}"></script>
+<script src="{% static "vendor/jQuery-Mapael/js/jquery.mapael.js"%}"></script>
+<script src="{% static "js/brazil.js"%}"></script>
+<script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/popover.js"%}"></script>
+<script src="{% static "vendor/bootstrap_calendar/bootstrap_calendar/js/bootstrap_calendar.min.js"%}"></script>
+<script src="{% static "vendor/jquery-animateNumber/jquery.animateNumber.min.js"%}"></script>
+
+<script src="{% static "js/index.js"%}"></script>
+
+<!-- page specific libs -->
+<script src="{% static "vendor/backbone/backbone.js"%}"></script>
+<script src="{% static "vendor/backbone.paginator/lib/backbone.paginator.min.js"%}"></script>
+<script src="{% static "vendor/backgrid/lib/backgrid.js"%}"></script>
+<script src="{% static "vendor/backgrid-paginator/backgrid-paginator.js"%}"></script>
+<script src="{% static "vendor/datatables/media/js/jquery.dataTables.js"%}"></script>
+<script src="{% static "vendor/bootstrap-select/dist/js/bootstrap-select.min.js"%}"></script>
+<script src="{% static "vendor/jquery-autosize/jquery.autosize.min.js"%}"></script>
+<script src="{% static "vendor/bootstrap3-wysihtml5/lib/js/wysihtml5-0.3.0.min.js"%}"></script>
+<script src="{% static "vendor/bootstrap3-wysihtml5/src/bootstrap3-wysihtml5.js"%}"></script>
+<script src="{% static "vendor/select2/select2.min.js"%}"></script>
+<script src="{% static "vendor/switchery/dist/switchery.min.js"%}"></script>
+<script src="{% static "vendor/moment/min/moment.min.js"%}"></script>
+<script src="{% static "vendor/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"%}"></script>
+<script src="{% static "vendor/mjolnic-bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js"%}"></script>
+<script src="{% static "js/form-elements.js"%}"></script>
+
+
+
+{% endblock %}

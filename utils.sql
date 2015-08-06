@@ -1,3 +1,8 @@
+# Atualiza tabela CSP
+INSERT INTO csp (operadora,rn1,tipo)
+SELECT DISTINCT operadora,rn1,tipo FROM nao_portados
+
+
 # SELECT/INSERT from nao_portados
 
 INSERT INTO prefixo_novo (operadora,tipo,prefixo,rn1,ddd)

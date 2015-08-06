@@ -206,6 +206,15 @@ class Csp(models.Model):
         managed = False
         db_table = 'csp'
 
+class CspRetorno(models.Model):
+    user = models.IntegerField(blank=True, null=True)
+    csp = models.IntegerField(u'CSP de origem',blank=True, null=True)
+    retorno = models.IntegerField(u'CSP de retorno',blank=True, null=True)
+    # operadora = models.CharField(max_length=255,default=0)
+    # tipo = models.CharField(max_length=30,default=0)
+
+    def __unicode__(self):
+        return unicode(self.retorno)
 
 class SipBuddies(models.Model):
     uniqueid = models.AutoField(primary_key=True)

@@ -74,6 +74,7 @@
             </li>
         </ul>
         <!-- every .sidebar-nav may have a title -->
+        {% if chave_cod %}
         <h5 class="sidebar-nav-title">Perfil <a class="action-link" href="#"><i class="glyphicon glyphicon-refresh"></i></a></h5>
         <ul class="sidebar-nav">
             <li>
@@ -102,10 +103,12 @@
                 </a>
                 <ul id="sidebar-ui" class="collapse">
                     <li><a href="{% url 'asterisk' %}" data-no-pjax>Asterisk</a></li>
-                    <li><a href="{% url 'csp' %}" data-no-pjax>Retornos CSP</a></li>
+                    <li><a href="{% url 'csp-retorno' %}" data-no-pjax>Retornos Personalizado</a></li>
+                    <li><a href="{% url 'csp' %}" data-no-pjax>Tabela CSP</a></li>
                 </ul>
             </li>
         </ul>
+        {% endif %}
     </div>
 </nav>
 <!-- This is the white navigation bar seen on the top. A bit enhanced BS navbar. See .page-controls in _base.scss. -->

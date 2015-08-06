@@ -7,7 +7,7 @@ from django.db.models import Count
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail, BadHeaderError
 from django.contrib.auth.decorators import login_required
-from models import Portados, NaoPortados, Cdr, Prefixo, PlanoCliente, Retorno, SipBuddies,Cache
+from models import Portados, NaoPortados, Cdr, Prefixo, PlanoCliente, Retorno, SipBuddies, Cache, Csp, CspRetorno
 from ratelimit.decorators import ratelimit
 from tasks import insert_cdr, atualiza_compra
 from django.conf import settings
@@ -17,7 +17,7 @@ import datetime
 import random
 import decimal
 from datetime import timedelta,date
-from forms import CadastroForm, CompraFrom, PlanoClienteForm
+from forms import CadastroForm, CompraFrom, PlanoClienteForm, CspRetornoFrom
 from models import Cadastro, Plano, Retorno
 from django.contrib.auth.models import User
 from pagseguro.api import PagSeguroItem, PagSeguroApi
@@ -70,6 +70,7 @@ def padrao(request):
 	user = User.objects.get(pk=request.user.id)
 	cad = Cadastro.objects.get(user=user)
 	cod_user = cad.id
+	chave_cod = cad.cod_cliente
 	z = PlanoCliente.objects.all().filter(cliente=cod_user)
 	plano = PlanoCliente.objects.get(cliente=cod_user)
 	ddd = plano.ddd
@@ -126,8 +127,69 @@ def asterisk(request):
 	return render(request, 'asterisk.html', locals())
 
 @login_required
+def csp_retorno(request):
+
+	user = User.objects.get(pk=request.user.id)
+	cad = Cadastro.objects.get(user=user)
+	chave = cad.chave
+	chave_cod = cad.cod_cliente
+	cod_cliente = cad.cod_cliente
+	user_id = cad.id
+	print user_id
+
+	todos_csp = Csp.objects.all()
+
+	x = CspRetorno.objects.all().filter(user=user_id)
+
+	csp_v = request.POST.get('csp', '')
+	retorno_v = request.POST.get('retorno', '')
+	# apaga_v = request.POST.get('apaga', '0')
+
+	#apagar = CspRetorno.objects.filter(id=apaga_v).delete()
+
+	if request.method == 'POST':
+		form = CspRetornoFrom(request.POST)
+			
+		if form.is_valid():
+			obj = form.save(commit=False)
+			obj.user = user_id
+			obj.csp = csp_v
+			obj.retorno = retorno_v
+			obj.save()
+
+			return redirect('/portabilidade/csp-retorno')
+	else:
+
+		form = CspRetornoFrom()
+
+	return render(request, 'csp_retorno.html', locals())
+
+@login_required
+def csp_retorno_del(request,deletar):
+
+	user = User.objects.get(pk=request.user.id)
+	cad = Cadastro.objects.get(user=user)
+	chave = cad.chave
+	chave_cod = cad.cod_cliente
+	cod_cliente = cad.cod_cliente
+	user_id = cad.id
+	print user_id
+
+	todos_csp = Csp.objects.all()
+	x = CspRetorno.objects.all().filter(user=user_id)
+	
+	apagar = CspRetorno.objects.filter(id=deletar).delete()
+
+	return redirect('/portabilidade/csp-retorno')
+
+@login_required
 def csp(request):
 
+	user = User.objects.get(pk=request.user.id)
+	cad = Cadastro.objects.get(user=user)
+	cod_user = cad.id
+	chave_cod = cad.cod_cliente
+	
 	operadora = Prefixo.objects.values('rn1','operadora','tipo').distinct()
 
 	paginator = Paginator(operadora, 15)
@@ -164,6 +226,7 @@ def financeiro(request):
 	cod_cliente = cad.chave
 	cod_plano = cad.plano
 	id_cliente = cad.id
+	chave_cod = cad.cod_cliente
 
 	x = PlanoCliente.objects.get(cliente=user_id)
 	plano_nome = x.nome_plano
@@ -275,6 +338,7 @@ def meus_dados(request):
 		codigo_cliente = cad.cod_cliente
 		cod_cliente = cad.chave
 		name = cad.first_name
+		chave_cod = cad.cod_cliente
 
 	except Cadastro.DoesNotExist:
 		return redirect('/portabilidade/criar-user/')
@@ -535,6 +599,7 @@ def consulta(request,numero):
 			z = PlanoCliente.objects.get(cliente=id_user)
 			retorno = z.retorno
 			user_id = z.cliente
+			print user_id
 			ddd = z.ddd
 			y = str(ddd)
 			x = str(numero)
@@ -542,7 +607,7 @@ def consulta(request,numero):
 			if tamanho <= 9:
 
 				numero = y + x
-				csp = funcoes.numero_10(numero)
+				csp = funcoes.numero_10(numero,user_id)
 	
 				if csp == None:
 					rn1 = 'error - numero ou prefixo nao existe'
@@ -560,7 +625,7 @@ def consulta(request,numero):
 			if tamanho == 10:
 
 				### Chama a função que checa retorna o CSP para números de 10 dígitos
-				csp = funcoes.numero_10(numero)
+				csp = funcoes.numero_10(numero,user_id)
 				if numero == None:
 					rn1 = 'error - numero ou prefixo nao existe'
 					response = HttpResponse(rn1, content_type='text/plain')
@@ -576,7 +641,7 @@ def consulta(request,numero):
 			if tamanho == 11:
 
 				### Chama a função que checa retorna o CSP para números de 11 dígitos
-				csp = funcoes.numero_11(numero)
+				csp = funcoes.numero_11(numero,user_id)
 				if csp == None:
 					rn1 = 'error - numero ou prefixo nao existe'
 					response = HttpResponse(rn1, content_type='text/plain')
