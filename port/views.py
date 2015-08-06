@@ -140,6 +140,7 @@ def csp_retorno(request):
 	todos_csp = Csp.objects.all()
 
 	x = CspRetorno.objects.all().filter(user=user_id)
+	print x
 
 	csp_v = request.POST.get('csp', '')
 	retorno_v = request.POST.get('retorno', '')
