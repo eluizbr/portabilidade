@@ -73,6 +73,7 @@ class Cdr(models.Model):
     prefixo = models.IntegerField()
     ddd = models.IntegerField()
     rn1 = models.IntegerField()
+    retorno = models.IntegerField(default=0)
     operadora = models.CharField(max_length=30)
     cidade = models.CharField(max_length=150)
     estado = models.CharField(max_length=10)

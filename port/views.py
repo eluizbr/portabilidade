@@ -391,6 +391,7 @@ def cdr(request):
 	user = User.objects.get(pk=request.user.id)
 	cad = Cadastro.objects.get(user=user)
 	user_id = cad.id
+	chave_cod = cad.cod_cliente
 
 	numero = request.GET.get('numero', '')
 	operadora = request.GET.get('operadora', '')

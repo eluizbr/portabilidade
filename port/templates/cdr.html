@@ -220,6 +220,7 @@
     				                <th class="no-sort hidden-xs">Numero</th>
                                     <th class="no-sort hidden-xs">Tipo</th>
     				                <th class="hidden-xs">Código CSP</th>
+                                    <th class="hidden-xs">Retorno CSP</th>
                                     <th class="hidden-xs">Portado</th>
                                     <th class="hidden-xs">Operadora</th>
                                     <th class="hidden-xs">Cidade</th>
@@ -239,6 +240,7 @@
                                     {% endif %}
                                     <td><span>{{r.tipo}}</span></td>
     				                <td><span>{{r.rn1}}</span></td>
+                                    <td><span>{{r.retorno}}</span></td>
                                     <td>
                                         {% if r.portado == 1   %}
                                             <span class="glyphicon glyphicon-retweet" style="color: #44AD41"></span>

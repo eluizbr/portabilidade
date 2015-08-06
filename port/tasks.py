@@ -6,7 +6,7 @@ from portabilidade.celery import app
 from django.shortcuts import render,get_object_or_404
 from django.db import IntegrityError
 from django.http import HttpResponse
-from port.models import Portados, NaoPortados, Cadastro, Cdr, Prefixo, PlanoCliente, Plano, Retorno, Cache
+from port.models import Portados, NaoPortados, Cadastro, Cdr, Prefixo, PlanoCliente, Plano, Retorno, Cache, CspRetorno
 from post_office import mail
 from pagseguro.api import PagSeguroItem, PagSeguroApi
 from django.core.exceptions import ObjectDoesNotExist
@@ -107,12 +107,20 @@ def insert_cdr(request,numero):
 		operadora = dados.operadora
 		tipo = dados.tipo
 		rn1 = dados.rn1
+
 		x = Prefixo.objects.values('rn1','operadora').filter(rn1=portado).distinct()
-		print ddd,prefixo,cidade,estado,operadora,tipo,rn1
+		#print ddd,prefixo,cidade,estado,operadora,tipo,rn1
 
 		for z in x:
 			rn1 = z['rn1']
 			operadora = z['operadora']
+			retorno = CspRetorno.objects.values_list('retorno').filter(csp=rn1)
+
+			try:
+				retorno = retorno[0]
+				retorno = retorno[0]
+			except:
+				retorno = rn1
 
 			if len(chave) == 8:
 				key = get_object_or_404(Cadastro, cod_cliente=chave)
@@ -132,7 +140,7 @@ def insert_cdr(request,numero):
 				total_consultas = consultas - 1
 				PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
 
-			Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, operadora=operadora,\
+			Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, retorno=retorno, operadora=operadora,\
 										 cidade=cidade, estado=estado, tipo=tipo,portado=1,valor=valor_plano)
 
 	else:
@@ -152,6 +160,14 @@ def insert_cdr(request,numero):
 		operadora = dados.operadora
 		tipo = dados.tipo
 		rn1 = dados.rn1
+
+		retorno = CspRetorno.objects.values_list('retorno').filter(csp=rn1)
+
+		try:
+			retorno = retorno[0]
+			retorno = retorno[0]
+		except:
+			retorno = rn1
 
 		if len(chave) == 8:
 			key = get_object_or_404(Cadastro, cod_cliente=chave)
@@ -173,7 +189,7 @@ def insert_cdr(request,numero):
 			total_consultas = consultas - 1
 			PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
 
-		Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, operadora=operadora,\
+		Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, retorno=retorno, operadora=operadora,\
 									 cidade=cidade, estado=estado, tipo=tipo,portado=0,valor=valor_plano)
 
 @task
