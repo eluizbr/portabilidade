@@ -135,12 +135,10 @@ def csp_retorno(request):
 	chave_cod = cad.cod_cliente
 	cod_cliente = cad.cod_cliente
 	user_id = cad.id
-	print user_id
 
 	todos_csp = Csp.objects.all()
 
 	x = CspRetorno.objects.all().filter(user=user_id)
-	print x
 
 	csp_v = request.POST.get('csp', '')
 	retorno_v = request.POST.get('retorno', '')
