@@ -112,11 +112,17 @@
 	                            data-width="auto" name="plano"
 	                            tabindex="-1" id="simple-select">
 	                        <option>{{planos}}</option>
-	                        {% for plano,valor in todos %}
-	                        	{% if valor != 0.00 %}
-	                        		<option  value="{{plano}}">{{plano}}</option>
-	                        	{% endif %}
-	                        {% endfor %}
+	                                                	
+		                        {% for plano,valor,especial in todos %}
+		                        	{% if valor != 0.00 and especial == '0' %}
+		                        		<option  value="{{plano}}">{{plano}}</option>
+		                        	{% endif %}
+		                        {% endfor %}
+
+		                        {% for plano in planos_cliente %}
+		                        		<option  value="{{plano}}">{{plano}}</option>
+		                        {% endfor %}
+		                    
 	                    </select>
 	                </div>
 	            </div>

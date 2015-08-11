@@ -11,6 +11,51 @@ mes = data + timedelta(days=30)
 hora = data + timedelta(hours=1)
 hora = hora.strftime("%H:%M:%S")
 
+class Cadastro(models.Model):
+
+    PLANO = (
+            ('Free', 'Free'),
+            ('Premium', 'Premium'),
+    )
+
+
+    TIPO = (
+        ('Pessoa Fisica', 'Pessoa Fisica'),
+        ('Pessoa Juridica', 'Pessoa Juridica'),
+    )
+
+    user = models.OneToOneField(User, unique=True)
+    tipo = models.CharField(u'Tipo', max_length=20, choices=TIPO)
+    first_name = models.CharField(u'Nome', max_length=100)
+    last_name = models.CharField(u'SobreNome', max_length=200)
+    empresa = models.CharField(
+        u'Nome fantasia', max_length=100, blank=True, null=True)
+    cpf = models.CharField(u'CPF', max_length=20, unique=True)
+    cnpj = models.CharField(u'CNPJ', max_length=20, blank=True, null=True)
+    ie = models.CharField(
+        u'Insc. Estadual', max_length=20, blank=True, null=True)
+    telefoneF = models.CharField(
+        u'Telefone Fixo', max_length=20, blank=True, null=True)
+    telefoneM = models.CharField(
+        u'Telefone Movel', max_length=20, blank=True, null=True)
+    email = models.EmailField('Email', max_length=254, unique=True)
+    email_contato = models.EmailField(
+        'Email contato', max_length=254, blank=True, null=True)
+    nome = models.CharField(u'Nome', max_length=100, blank=True, null=True)
+    endereco = models.CharField(u'Endereço', max_length=100, blank=True, null=True)
+    numero = models.CharField(u'Número', max_length=100, blank=True, null=True)
+    bairro = models.CharField(u'Bairro', max_length=100, blank=True, null=True)
+    complemento = models.CharField(u'Complemento', max_length=100, blank=True, null=True)
+    cidade = models.CharField(u'Cidade', max_length=100, blank=True, null=True)
+    estado = models.CharField(u'Estado', max_length=100, blank=True, null=True)
+    cep = models.CharField(u'CEP', max_length=10, default='00000-000')
+    cod_cliente = models.IntegerField(u'Codigo do Cliente', unique=True)
+    chave = models.UUIDField(default=uuid.uuid4, editable=False)
+    plano = models.IntegerField(u'Plano', default=1)
+    cache = models.IntegerField(u'Cache', default=0)
+
+    def __unicode__(self):
+        return unicode(self.user)
 
 class NaoPortados(models.Model):
     operadora = models.CharField(max_length=64)
@@ -61,7 +106,20 @@ class Plano(models.Model):
     consultas_gratis = models.IntegerField(blank=True, null=True,default=0)
     taxas = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2, default=00.00)
     tipo = models.CharField(max_length=200,choices=TIPO,default=1)
+    especial = models.CharField(max_length=200,choices=TIPO,default=0)
+    cod_cliente = models.ManyToManyField(Cadastro, related_name="cliente")
     
+    def __unicode__(self):
+        return unicode(self.plano)
+
+class PortPlanoCodCliente(models.Model):
+    plano = models.ForeignKey(Plano)
+    cadastro = models.ForeignKey(Cadastro)
+
+    class Meta:
+        managed = False
+        db_table = 'port_plano_cod_cliente'
+        #unique_together = (('plano_id', 'cadastro_id'),)
     def __unicode__(self):
         return unicode(self.plano)
 
@@ -93,51 +151,6 @@ class Cache(models.Model):
     cache = models.TimeField()
     cliente = models.IntegerField(default=0)
 
-class Cadastro(models.Model):
-
-    PLANO = (
-            ('Free', 'Free'),
-            ('Premium', 'Premium'),
-    )
-
-
-    TIPO = (
-        ('Pessoa Fisica', 'Pessoa Fisica'),
-        ('Pessoa Juridica', 'Pessoa Juridica'),
-    )
-
-    user = models.OneToOneField(User, unique=True)
-    tipo = models.CharField(u'Tipo', max_length=20, choices=TIPO)
-    first_name = models.CharField(u'Nome', max_length=100)
-    last_name = models.CharField(u'SobreNome', max_length=200)
-    empresa = models.CharField(
-        u'Nome fantasia', max_length=100, blank=True, null=True)
-    cpf = models.CharField(u'CPF', max_length=20, unique=True)
-    cnpj = models.CharField(u'CNPJ', max_length=20, blank=True, null=True)
-    ie = models.CharField(
-        u'Insc. Estadual', max_length=20, blank=True, null=True)
-    telefoneF = models.CharField(
-        u'Telefone Fixo', max_length=20, blank=True, null=True)
-    telefoneM = models.CharField(
-        u'Telefone Movel', max_length=20, blank=True, null=True)
-    email = models.EmailField('Email', max_length=254, unique=True)
-    email_contato = models.EmailField(
-        'Email contato', max_length=254, blank=True, null=True)
-    nome = models.CharField(u'Nome', max_length=100, blank=True, null=True)
-    endereco = models.CharField(u'Endereço', max_length=100, blank=True, null=True)
-    numero = models.CharField(u'Número', max_length=100, blank=True, null=True)
-    bairro = models.CharField(u'Bairro', max_length=100, blank=True, null=True)
-    complemento = models.CharField(u'Complemento', max_length=100, blank=True, null=True)
-    cidade = models.CharField(u'Cidade', max_length=100, blank=True, null=True)
-    estado = models.CharField(u'Estado', max_length=100, blank=True, null=True)
-    cep = models.CharField(u'CEP', max_length=10, default='00000-000')
-    cod_cliente = models.IntegerField(u'Codigo do Cliente', unique=True)
-    chave = models.UUIDField(default=uuid.uuid4, editable=False)
-    plano = models.IntegerField(u'Plano', default=1)
-    cache = models.IntegerField(u'Cache', default=0)
-
-    def __unicode__(self):
-        return unicode(self.user)
 
 class PlanoCliente(models.Model):
 

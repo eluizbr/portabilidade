@@ -7,7 +7,7 @@ from django.db.models import Count
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail, BadHeaderError
 from django.contrib.auth.decorators import login_required
-from models import Portados, NaoPortados, Cdr, Prefixo, PlanoCliente, Retorno, SipBuddies, Cache, Csp, CspRetorno
+from models import Portados, NaoPortados, Cdr, Prefixo, PlanoCliente, Retorno, SipBuddies, Cache, Csp, CspRetorno, PortPlanoCodCliente
 from ratelimit.decorators import ratelimit
 from tasks import insert_cdr, atualiza_compra
 from django.conf import settings
@@ -236,7 +236,8 @@ def financeiro(request):
 	v = Plano.objects.get(id=id_plano)
 	valor_plano = v.valor
 
-	todos = Plano.objects.values_list('plano','valor')
+	todos = Plano.objects.values_list('plano','valor','especial')
+	planos_cliente = PortPlanoCodCliente.objects.all().filter(cadastro_id=id_cliente)
 
 	retorno = Retorno.objects.all().filter(reference=codigo_cliente)
 	
@@ -251,7 +252,7 @@ def financeiro(request):
 			descricao = qs.descricao
 			valor = qs.valor
 			taxa = qs.taxas
-			valorD = int(valor)
+			valorD = float(valor)
 			valor_consulta = qs.valor_consulta
 			try:
 				total = int(valorD / valor_consulta)

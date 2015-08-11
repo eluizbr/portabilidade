@@ -8,7 +8,6 @@ from validar_cpf import CPF
 
 class CadastroForm(forms.ModelForm):
 
-
 	class Meta:
 		model = Cadastro
 		fields = '__all__'
@@ -27,7 +26,7 @@ class CompraFrom(forms.ModelForm):
 	class Meta:
 		model = Plano
 		fields = '__all__'
-		exclude = ['consultas_gratis','taxas','tipo']
+		exclude = ['consultas_gratis','taxas','tipo','cod_cliente','especial']
 
 class PlanoClienteForm(forms.ModelForm):
 
