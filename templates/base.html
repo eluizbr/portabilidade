@@ -509,5 +509,39 @@
 <script src="{% static "js/index.js"%}"></script>
 {% block scripts %}{% endblock %}
 
+<script type="text/javascript">
+
+
+$( '#consulta' ).keyup( function()
+    {
+    
+    var numero = $("#consulta").val();
+
+    if($('#consulta').delay(5000).val().length >= 10){
+    
+        setTimeout(function(){
+
+        $.ajax({
+
+            type:"GET",
+            contentType:"application/json; charset=utf-8",
+            dateType:"json",
+            url:"/api/?format=json&key={{chave_cod}}&numero=" + numero,
+            success:function(data){
+
+                $.each(data, function(i,fields){
+
+                    alert("Operadora " + fields.operadora +  "\nCSP " + fields.rn1);
+                });
+            }
+        })
+
+        },3000);
+
+}
+});
+
+</script>
+
 </body>
 </html>

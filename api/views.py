@@ -1,5 +1,5 @@
-from port.models import NaoPortados, Portados
-from serializers import NaoPortadosSerializer,PortadosSerializer
+from port.models import NaoPortados, Portados, Csp
+from serializers import NaoPortadosSerializer,PortadosSerializer,CspSerializer
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -19,8 +19,8 @@ class ConsultaApi(APIView):
 			rn1 = str(rn1)
 			rn1 = rn1
 			p_numero = p_numero
-			portados = Portados.objects.filter(rn1=rn1,numero=p_numero)
-			serializer = PortadosSerializer(portados, many=True)	
+			portados = Csp.objects.all().filter(rn1=rn1)
+			serializer = CspSerializer(portados, many=True)	
 			return Response(serializer.data)
 
 		else:
@@ -29,6 +29,26 @@ class ConsultaApi(APIView):
 			rn1 = rn1
 			prefixo = prefixo
 			operadora = operadora
-			nao_portados = NaoPortados.objects.filter(rn1=rn1,prefixo=prefixo,operadora=operadora)
-			serializer = NaoPortadosSerializer(nao_portados, many=True)	
+			nao_portados = Csp.objects.all().filter(rn1=rn1)
+			serializer = CspSerializer(nao_portados, many=True)	
 			return Response(serializer.data)
+
+
+		# if valor:
+		# 	rn1,p_numero = port.funcoes.consulta_rest(numero,segredo)
+		# 	rn1 = str(rn1)
+		# 	rn1 = rn1
+		# 	p_numero = p_numero
+		# 	portados = Portados.objects.filter(rn1=rn1,numero=p_numero)
+		# 	serializer = PortadosSerializer(portados, many=True)	
+		# 	return Response(serializer.data)
+
+		# else:
+		# 	rn1,prefixo,operadora = port.funcoes.consulta_rest(numero,segredo)
+		# 	rn1 = str(rn1)
+		# 	rn1 = rn1
+		# 	prefixo = prefixo
+		# 	operadora = operadora
+		# 	nao_portados = NaoPortados.objects.filter(rn1=rn1,prefixo=prefixo,operadora=operadora)
+		# 	serializer = NaoPortadosSerializer(nao_portados, many=True)	
+		# 	return Response(serializer.data)

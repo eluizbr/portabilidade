@@ -211,7 +211,6 @@ def financeiro_info(request,id):
     financeiro_info = Retorno.objects.all().filter(id=id)
     return render(request,'financeiro_info.html', locals())
 
-
 @login_required
 def financeiro(request):
 
@@ -326,7 +325,6 @@ def criar_user(request):
 
 	return render(request, 'criar_user.html', locals())	
 
-
 @login_required
 def meus_dados(request):
 
@@ -382,7 +380,6 @@ def meus_dados(request):
 		form = CadastroForm(instance=cad)
 
 	return render(request, 'meus_dados.html', locals())
-
 
 @login_required
 def cdr(request):
@@ -559,8 +556,7 @@ def operadoras(request):
 	except IndexError:
 		return redirect('/portabilidade/meus-dados/')
 
-
-#@ratelimit(key='ip', rate='60/m', block=True)
+@ratelimit(key='ip', rate='40/m', block=True)
 def consulta(request,numero):
 
 	hoje = datetime.datetime.now()
@@ -760,7 +756,7 @@ def gsm(request,key):
 					rn1 = csp
 
 			### Chama a função que insere no CELERY, e o CELERY debita e insere no CDR
-			insert_cdr.apply_async(kwargs={'request': chave, 'numero': numero},countdown=settings.TEMPO_ESPERA_CDR)	
+			#insert_cdr.apply_async(kwargs={'request': chave, 'numero': numero},countdown=settings.TEMPO_ESPERA_CDR)	
 
 			response = HttpResponse(rn1, content_type='text/plain')
 			return response	
@@ -770,8 +766,4 @@ def gsm(request,key):
 			rn1 = 0
 			response = HttpResponse(rn1, content_type='text/plain')
 			return response
-
-
-
-
 
