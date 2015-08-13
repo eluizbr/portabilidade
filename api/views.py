@@ -19,6 +19,8 @@ class ConsultaApi(APIView):
 			rn1 = str(rn1)
 			rn1 = rn1
 			p_numero = p_numero
+			z = Portados.objects.get(rn1=rn1)
+			rn1 = z.rn1
 			portados = Csp.objects.all().filter(rn1=rn1)
 			serializer = CspSerializer(portados, many=True)	
 			return Response(serializer.data)

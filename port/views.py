@@ -756,7 +756,7 @@ def gsm(request,key):
 					rn1 = csp
 
 			### Chama a função que insere no CELERY, e o CELERY debita e insere no CDR
-			#insert_cdr.apply_async(kwargs={'request': chave, 'numero': numero},countdown=settings.TEMPO_ESPERA_CDR)	
+			insert_cdr.apply_async(kwargs={'request': chave, 'numero': numero},countdown=settings.TEMPO_ESPERA_CDR)	
 
 			response = HttpResponse(rn1, content_type='text/plain')
 			return response	
