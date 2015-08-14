@@ -38,8 +38,9 @@
 				                        <th class="text-align-center">Codigo</th>
 				                        <th class="text-align-center">Plano</th>
 				                        <th class="text-align-center">Consultas</th>
-				                        <th class="text-align-center">Financeiro</th>
-				                        <th class="text-align-center">Editar</th>
+				                        <th class="text-align-center">Editar usuário</th>
+				                        <th class="text-align-center">Historico de compras</th>
+				                        <th class="text-align-center">Nova compra</th>
 				                    </tr>
 				                    </thead>
 				                    <tbody>
@@ -53,8 +54,9 @@
 									            <td class="text-align-center">{{p.nome_plano}}</td>
 									            <td class="text-align-center">{{p.consultas}}</td>
 									        {% endfor %}
-				                            <td class="text-align-center"> <button href="/revenda/info/{{n.id}}" data-toggle="modal" data-target="#myModal18"  class="btn btn-inverse"><i class="fa fa-dollar"></i></button></td>
-				                            <td class="text-align-center"> <button href="/revenda/edit-cliente/{{n.id}}" data-toggle="modal" data-target="#myModal19"  class="btn btn-inverse"><i class="fa fa-edit"></i></button></td>  
+				                            <td class="text-align-center"> <button href="/revenda/edit-cliente/{{n.id}}" data-toggle="modal" data-target="#myModal19"  class="btn btn-inverse"><i class="fa fa-edit"></i></button></td>
+				                            <td class="text-align-center"> <button href="/revenda/info/{{n.id}}" data-toggle="modal" data-target="#myModal18"  class="btn btn-inverse"><i class="fa fa-list"></i></button></td>
+				                            <td class="text-align-center"> <button href="/revenda/edit-cliente/{{n.id}}" data-toggle="modal" data-target="#myModal19"  class="btn btn-inverse"><i class="fa fa-usd"></i></button></td>   
 				                        </tr>
 				                    {% endfor %}
 				                    </tbody>
