@@ -9,5 +9,6 @@ urlpatterns = patterns('',
     url(r'^revenda-dados/$', views.revenda_dados, name='revenda-dados'),
     url(r'^criar-revenda/$', views.criar_revenda, name='criar-revenda'),
     url(r'^meus-clientes/$', views.meus_clientes, name='meus-clientes'),
-    url(r'^info/(?P<id>\d+)$', views.pg_info, name='info'),     
+    url(r'^info/(?P<id>\d+)$', views.pg_info, name='info'),
+    url(r'^edit-cliente/(?P<id>\d+)$', views.editar_cliente, name='edit-cliente'),       
 )

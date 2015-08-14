@@ -7,7 +7,7 @@ Cadastro Parceiro
 Cadastro Cliente
 - Visualizar clientes - OK
 - Criar Clientes - OK
-- Alterar dados Clientes
+- Alterar dados Clientes - OK
 
 Financeiro
 - Gerar corbrança e enviar por email

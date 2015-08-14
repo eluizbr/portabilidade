@@ -135,6 +135,40 @@ def pg_info(request,id):
     return render(request,'pg_info.html', locals())
 
 @login_required
+def editar_cliente(request,id):
+
+	user = User.objects.get(pk=request.user.id)
+
+
+	cad = Cadastro.objects.get(id=id)
+	user_id = cad.id
+	codigo_cliente = cad.cod_cliente
+	name = cad.first_name
+	chave_cod = cad.cod_cliente
+	print chave_cod
+
+	if request.method == 'POST':
+		form = RevendaForm(request.POST or None, instance=cad)
+
+		p = Cadastro.objects.get(user_id=request.user.id)
+		if form.is_valid():
+
+			obj = form.save(commit=False)
+			obj.save()
+		else:
+
+			form = RevendaForm(instance=cad)
+			obj = form.save(commit=False)
+			obj.save()
+			return redirect('/revenda/meus-clientes/')
+
+	else:
+
+		form = RevendaForm(instance=cad)
+    
+    	return render(request,'edit_cliente.html', locals())
+
+@login_required
 def meus_clientes(request):
 	user = User.objects.get(pk=request.user.id)
 	cad = Cadastro.objects.get(user_id=user)

@@ -39,6 +39,7 @@
 				                        <th class="text-align-center">Plano</th>
 				                        <th class="text-align-center">Consultas</th>
 				                        <th class="text-align-center">Financeiro</th>
+				                        <th class="text-align-center">Editar</th>
 				                    </tr>
 				                    </thead>
 				                    <tbody>
@@ -52,7 +53,8 @@
 									            <td class="text-align-center">{{p.nome_plano}}</td>
 									            <td class="text-align-center">{{p.consultas}}</td>
 									        {% endfor %}
-				                            <td class="text-align-center"> <button href="/revenda/info/{{n.id}}" data-toggle="modal" data-target="#myModal18"  class="btn btn-inverse"><i class="fa fa-dollar"></i></button></td> 
+				                            <td class="text-align-center"> <button href="/revenda/info/{{n.id}}" data-toggle="modal" data-target="#myModal18"  class="btn btn-inverse"><i class="fa fa-dollar"></i></button></td>
+				                            <td class="text-align-center"> <button href="/revenda/edit-cliente/{{n.id}}" data-toggle="modal" data-target="#myModal19"  class="btn btn-inverse"><i class="fa fa-edit"></i></button></td>  
 				                        </tr>
 				                    {% endfor %}
 				                    </tbody>
@@ -78,6 +80,18 @@
 	    </div>
 	</div>
 
+	<div class="modal fade" id="myModal19" tabindex="-1" role="dialog" aria-labelledby="myModalLabel19" aria-hidden="true">
+	    <div class="modal-dialog modal-lg">
+	        <div class="modal-content">
+		        <div class="row">
+		            <div class="col-md-12">
+
+		            </div>
+		        </div>
+
+	        </div>
+	    </div>
+	</div>
 
 {% endblock content %}
 
@@ -109,6 +123,15 @@
 <script src="{% static "js/tables-dynamic.js"%}"></script>
 <script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/tab.js"%}"></script>
 <script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/modal.js"%}"></script>
+<style type="text/css">
+	    .modal-content {
+        position: absolute;
+       /* padding: -20px;*/
+        width: 1100px; /* SET THE WIDTH OF THE MODAL */
+    }
+
+
+</style>
 
 <script type="text/javascript">
 $(document).on('hidden.bs.modal', function (e) {

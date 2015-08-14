@@ -1,29 +1,16 @@
-{% extends "base.html" %}
 {% load humanize %}
 {% load l10n %}
 {% load staticfiles %}
 {% load bootstrap %}
-{% block nome %}
 
-
-    <strong>{{user}}</strong>&nbsp;
-{% endblock %}
-{% block menu_1 %}
-                    <li class="active"><a href="{% url 'operadoras' %}">Operadoras</a></li>
-                    <li><a href="{% url 'cdr' %}">CDR</a></li>
-{% endblock menu_1 %}
-{% block lista_server %}{% endblock lista_server %}
-
-{% block content %}
-
-<form method="POST" action="{% url 'edit-clente' %}" role="form"> {% csrf_token %}
+<form method="POST" action="/revenda/edit-cliente/{{id}}" role="form"> {% csrf_token %}
     <div class="row mb-lg">
-        <div class="col-md-10">
+        <div class="col-md-12">
             <div id="tabs1c" class="tab-content mb-lg">
                 <div class="tab-pane active clearfix" id="meusdados">
 				        <div class="row">
 				            <div class="col-md-12">
-{# 				            	<legend>CHAVE:  <strong> {{cod_cliente}}</strong> </legend> #}
+				            	{# <legend>CHAVE:  <strong> {{cod_cliente|cut:"-"}}</strong> </legend> #}
 				                <section class="widget">
 				                    <div class="widget-body  bg-gray-lighter">
                                     <div class="modal-body bg-gray-lighter">
@@ -44,18 +31,14 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="form-group">
+                                                    	{{ form.cpf_errors }}
                                                         {{form.cpf|bootstrap}}
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="form-group">
+                                                    	{{ form.email_errors }}
                                                         {{form.email|bootstrap}}
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <div class="form-group">
-                                                    {{ form.login.errors }}
-                                                        {{form.login|bootstrap}}
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4">
@@ -159,7 +142,7 @@
 		                            <div class="form-actions">
 		                                <div class="row">
 		                                    <div class="col-sm-offset-5 col-sm-7">
-		                                        <button type="submit" class="btn btn-inverse">Criar Revenda</button>
+		                                        <button type="submit" class="btn btn-inverse">Atualizar dados</button>
 		                                    </div>
 		                                </div>
 		                            </div>
@@ -170,38 +153,3 @@
         </div>
     </div>
 </form>
-
-
-{% endblock content %}
-
-{% block scripts %}
-
-<script id="test" src="{% static "vendor/underscore/underscore.js"%}"></script>
-<script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
-<script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
-<script src="{% static "vendor/d3/d3.min.js"%}"></script>
-<script src="{% static "vendor/rickshaw/rickshaw.min.js"%}"></script>
-<script src="{% static "vendor/raphael/raphael-min.js"%}"></script>
-<script src="{% static "vendor/jQuery-Mapael/js/jquery.mapael.js"%}"></script>
-<script src="{% static "js/brazil.js"%}"></script>
-<script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/popover.js"%}"></script>
-<script src="{% static "vendor/bootstrap_calendar/bootstrap_calendar/js/bootstrap_calendar.min.js"%}"></script>
-<script src="{% static "vendor/jquery-animateNumber/jquery.animateNumber.min.js"%}"></script>
-
-<script src="{% static "js/index.js"%}"></script>
-
-<!-- page specific libs -->
-<script src="{% static "vendor/underscore/underscore-min.js"%}"></script>
-<script src="{% static "vendor/backbone/backbone.js"%}"></script>
-<script src="{% static "vendor/backbone.paginator/lib/backbone.paginator.min.js"%}"></script>
-<script src="{% static "vendor/backgrid/lib/backgrid.js"%}"></script>
-<script src="{% static "vendor/backgrid-paginator/backgrid-paginator.js"%}"></script>
-<script src="{% static "vendor/datatables/media/js/jquery.dataTables.js"%}"></script>
-<script src="{% static "vendor/bootstrap-select/dist/js/bootstrap-select.min.js"%}"></script>
-
-<script src="{% static "js/tables-dynamic.js"%}"></script>
-<script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/tab.js"%}"></script>
-<script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/modal.js"%}"></script>
-
-
-{% endblock %}
