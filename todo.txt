@@ -1,0 +1,22 @@
+Modulo PARCEIROS
+
+Cadastro Parceiro
+- Criar parceiro - OK
+- Altarara dados - OK
+
+Cadastro Cliente
+- Visualizar clientes
+- Criar Clientes - OK
+- Alterar dados Clientes
+
+Financeiro
+- Gerar corbrança e enviar por email
+- Comissionamento
+- Data de saque do comissionamento
+	- configuracoes de conta bancaria
+- Recorrencia mensal
+	- Gerar boleto automatico para cleinte todo dia X
+	- Enviar boleto por email
+
+Planos
+- Criar planos personalizados

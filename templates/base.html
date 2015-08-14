@@ -107,6 +107,24 @@
                     <li><a href="{% url 'csp' %}" data-no-pjax>Tabela CSP</a></li>
                 </ul>
             </li>
+            {% if revenda == 1 %}
+            <li>
+                <a class="collapsed" href="#revenda" data-toggle="collapse" data-parent="#sidebar">
+                    <span class="icon">
+                        <i class="fa fa-group"></i>
+                    </span>
+                    Revenda
+                    <i class="toggle fa fa-angle-down"></i>
+                </a>
+                <ul id="revenda" class="collapse">
+{#                     <li><a href="{% url 'revenda-dados' %}" data-no-pjax>Meus dados</a></li> #}
+                    <li><a href="{% url 'meus-clientes' %}" data-no-pjax>Meus Clientes</a></li>
+                    <li><a href="{% url 'criar-revenda' %}" data-no-pjax>Criar cliente</a></li>
+                    <li><a href="#" data-no-pjax>Faturas</a></li>
+                    <li><a href="#" data-no-pjax>Comissionamento</a></li>
+                </ul>
+            </li>
+            {% endif %}
         </ul>
         {% endif %}
     </div>
@@ -531,7 +549,7 @@ $( '#consulta' ).keyup( function()
 
                 $.each(data, function(i,fields){
 
-                    alert("Operadora " + fields.operadora +  "\nCSP " + fields.rn1);
+                    alert("Operadora: " + fields.operadora +  "\nCSP: " + fields.rn1 + "\nTipo: " + fields.tipo);
                 });
             }
         })

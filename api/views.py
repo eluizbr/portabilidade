@@ -19,9 +19,10 @@ class ConsultaApi(APIView):
 			rn1 = str(rn1)
 			rn1 = rn1
 			p_numero = p_numero
-			z = Portados.objects.get(rn1=rn1)
+			z = Portados.objects.get(rn1=rn1,numero=p_numero)
 			rn1 = z.rn1
 			portados = Csp.objects.all().filter(rn1=rn1)
+			print portados
 			serializer = CspSerializer(portados, many=True)	
 			return Response(serializer.data)
 
@@ -31,8 +32,8 @@ class ConsultaApi(APIView):
 			rn1 = rn1
 			prefixo = prefixo
 			operadora = operadora
-			nao_portados = Csp.objects.all().filter(rn1=rn1)
-			serializer = CspSerializer(nao_portados, many=True)	
+			nao_portados = NaoPortados.objects.filter(rn1=rn1,prefixo=prefixo,operadora=operadora)
+			serializer = NaoPortadosSerializer(nao_portados, many=True)	
 			return Response(serializer.data)
 
 

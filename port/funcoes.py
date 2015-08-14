@@ -198,7 +198,7 @@ def numero_11_rest(numero):
 def checa_saldo(id_user):
 
     hoje = datetime.datetime.now()
-    c = PlanoCliente.objects.get(cliente=id_user)
+    c = PlanoCliente.objects.get(cliente_id=id_user)
     saldo = c.consultas
     saldo = int(saldo)
     tipo = c.tipo
@@ -236,7 +236,7 @@ def consulta_api(numero,key):
     saldo,tipo,diferenca = checa_saldo(id_user)
 
     if diferenca >= 30:
-        PlanoCliente.objects.filter(cliente=id_user).update(consultas=0,plano=1,nome_plano='Escolha um plano',tipo=1)
+        PlanoCliente.objects.filter(cliente_id=id_user).update(consultas=0,plano=1,nome_plano='Escolha um plano',tipo=1)
 
     if (saldo <= 0) and (tipo == 1):
 
@@ -313,7 +313,7 @@ def consulta_rest(numero,key):
     saldo,tipo,diferenca = checa_saldo(id_user)
 
     if diferenca >= 30:
-        PlanoCliente.objects.filter(cliente=id_user).update(consultas=0,plano=1,nome_plano='Escolha um plano',tipo=1)
+        PlanoCliente.objects.filter(cliente_id=id_user).update(consultas=0,plano=1,nome_plano='Escolha um plano',tipo=1)
 
     if (saldo <= 0) and (tipo == 1):
 

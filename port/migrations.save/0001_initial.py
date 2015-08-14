@@ -15,19 +15,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Csp',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('operadora', models.CharField(max_length=255, null=True, blank=True)),
-                ('rn1', models.IntegerField(null=True, blank=True)),
-                ('tipo', models.CharField(max_length=100, null=True, blank=True)),
-            ],
-            options={
-                'db_table': 'csp',
-                'managed': False,
-            },
-        ),
-        migrations.CreateModel(
             name='NaoPortados',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
@@ -52,16 +39,6 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'portados',
-                'managed': False,
-            },
-        ),
-        migrations.CreateModel(
-            name='PortPlanoCodCliente',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-            ],
-            options={
-                'db_table': 'port_plano_cod_cliente',
                 'managed': False,
             },
         ),
@@ -99,7 +76,7 @@ class Migration(migrations.Migration):
                 ('dtmfmode', models.CharField(max_length=7, null=True, blank=True)),
                 ('fromuser', models.CharField(max_length=50, null=True, blank=True)),
                 ('fromdomain', models.CharField(max_length=31, null=True, blank=True)),
-                ('host', models.CharField(default=b'dynamic', max_length=31)),
+                ('host', models.CharField(max_length=31)),
                 ('incominglimit', models.CharField(max_length=2, null=True, blank=True)),
                 ('outgoinglimit', models.CharField(max_length=2, null=True, blank=True)),
                 ('insecure', models.CharField(max_length=4, null=True, blank=True)),
@@ -111,13 +88,10 @@ class Migration(migrations.Migration):
                 ('deny', models.CharField(max_length=95, null=True, blank=True)),
                 ('pickupgroup', models.CharField(max_length=30, null=True, blank=True)),
                 ('port', models.CharField(max_length=5)),
-                ('qualify', models.CharField(default=b'yes', max_length=4, null=True, blank=True)),
-                ('useragent', models.CharField(max_length=255, null=True, blank=True)),
+                ('qualify', models.CharField(max_length=4, null=True, blank=True)),
                 ('restrictcid', models.CharField(max_length=3, null=True, blank=True)),
-                ('lastms', models.IntegerField(null=True, blank=True)),
                 ('rtptimeout', models.CharField(max_length=3, null=True, blank=True)),
                 ('rtpholdtimeout', models.CharField(max_length=3, null=True, blank=True)),
-                ('fullcontact', models.CharField(max_length=255, null=True, blank=True)),
                 ('secret', models.CharField(max_length=30, null=True, blank=True)),
                 ('type', models.CharField(max_length=6)),
                 ('username', models.CharField(max_length=30)),
@@ -146,14 +120,12 @@ class Migration(migrations.Migration):
             name='Cadastro',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('login', models.CharField(max_length=30, verbose_name='Login de acesso')),
-                ('senha', models.CharField(max_length=100, verbose_name='Senha')),
                 ('tipo', models.CharField(max_length=20, verbose_name='Tipo', choices=[(b'Pessoa Fisica', b'Pessoa Fisica'), (b'Pessoa Juridica', b'Pessoa Juridica')])),
                 ('first_name', models.CharField(max_length=100, verbose_name='Nome')),
                 ('last_name', models.CharField(max_length=200, verbose_name='SobreNome')),
                 ('empresa', models.CharField(max_length=100, null=True, verbose_name='Nome fantasia', blank=True)),
                 ('cpf', models.CharField(unique=True, max_length=20, verbose_name='CPF')),
-                ('cnpj', models.CharField(max_length=20, null=True, verbose_name='CNPJ', blank=True)),
+                ('cnpj', models.CharField(max_length=20, unique=True, null=True, verbose_name='CNPJ', blank=True)),
                 ('ie', models.CharField(max_length=20, null=True, verbose_name='Insc. Estadual', blank=True)),
                 ('telefoneF', models.CharField(max_length=20, null=True, verbose_name='Telefone Fixo', blank=True)),
                 ('telefoneM', models.CharField(max_length=20, null=True, verbose_name='Telefone Movel', blank=True)),
@@ -167,7 +139,7 @@ class Migration(migrations.Migration):
                 ('cidade', models.CharField(max_length=100, null=True, verbose_name='Cidade', blank=True)),
                 ('estado', models.CharField(max_length=100, null=True, verbose_name='Estado', blank=True)),
                 ('cep', models.CharField(default=b'00000-000', max_length=10, verbose_name='CEP')),
-                ('cod_cliente', models.CharField(unique=True, max_length=100, verbose_name='Codigo da Revenda')),
+                ('cod_cliente', models.IntegerField(unique=True, verbose_name='Codigo do Cliente')),
                 ('chave', models.UUIDField(default=uuid.uuid4, editable=False)),
                 ('plano', models.IntegerField(default=1, verbose_name='Plano')),
                 ('cache', models.IntegerField(default=0, verbose_name='Cache')),
@@ -182,7 +154,6 @@ class Migration(migrations.Migration):
                 ('prefixo', models.IntegerField()),
                 ('ddd', models.IntegerField()),
                 ('rn1', models.IntegerField()),
-                ('retorno', models.IntegerField(default=0)),
                 ('operadora', models.CharField(max_length=30)),
                 ('cidade', models.CharField(max_length=150)),
                 ('estado', models.CharField(max_length=10)),
@@ -196,15 +167,6 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='CspRetorno',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('user', models.IntegerField(null=True, blank=True)),
-                ('csp', models.IntegerField(unique=True, null=True, verbose_name='CSP de origem', blank=True)),
-                ('retorno', models.IntegerField(null=True, verbose_name='CSP de retorno', blank=True)),
-            ],
-        ),
-        migrations.CreateModel(
             name='Plano',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
@@ -215,8 +177,6 @@ class Migration(migrations.Migration):
                 ('consultas_gratis', models.IntegerField(default=0, null=True, blank=True)),
                 ('taxas', models.DecimalField(default=0.0, null=True, max_digits=10, decimal_places=2, blank=True)),
                 ('tipo', models.CharField(default=1, max_length=200, choices=[(b'0', b'Ilimitado'), (b'1', b'normal')])),
-                ('especial', models.CharField(default=0, max_length=200, choices=[(b'0', b'Ilimitado'), (b'1', b'normal')])),
-                ('cod_cliente', models.ManyToManyField(related_name='cliente', to='port.Cadastro')),
             ],
         ),
         migrations.CreateModel(
@@ -228,17 +188,11 @@ class Migration(migrations.Migration):
                 ('nome_plano', models.CharField(max_length=255, verbose_name='Nome do Plano')),
                 ('consultas', models.IntegerField(default=0, null=True, blank=True)),
                 ('consultas_gratis', models.IntegerField(default=0, null=True, blank=True)),
-                ('criado_em', models.DateTimeField(default=datetime.datetime(2015, 8, 14, 11, 14, 3, 183750))),
-                ('expira_em', models.DateTimeField(default=datetime.datetime(2015, 9, 13, 11, 14, 3, 183750))),
+                ('criado_em', models.DateTimeField(default=datetime.datetime(2015, 7, 10, 17, 14, 14, 331609))),
+                ('expira_em', models.DateTimeField(default=datetime.datetime(2015, 8, 9, 17, 14, 14, 331609))),
                 ('tipo', models.CharField(default=1, max_length=200, choices=[(b'0', b'Ilimitado'), (b'1', b'normal')])),
                 ('cache', models.CharField(default=0, max_length=1, verbose_name='Cache habilitado', choices=[(b'0', b'Desativado'), (b'1', b'Ativado')])),
                 ('tempo', models.IntegerField(default=60, verbose_name='Tempo do cache em minutos')),
-                ('ddd', models.IntegerField(default=31, null=True, verbose_name='DDD', blank=True)),
-                ('aviso_email', models.BooleanField(default=0, verbose_name='Aviso por email')),
-                ('saldo_baixo', models.BooleanField(default=0, verbose_name='Saldo baixo')),
-                ('aviso_saldo', models.IntegerField(default=250, null=True, blank=True)),
-                ('sem_saldo', models.BooleanField(default=0, verbose_name='Sem saldo')),
-                ('retorno', models.CharField(default=1, max_length=5, verbose_name='Retorno', choices=[(b'1', b'CSP Completo'), (b'2', b'C\xc3\xb3digo de operadora apenas')])),
             ],
         ),
         migrations.CreateModel(

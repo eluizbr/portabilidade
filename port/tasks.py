@@ -39,7 +39,7 @@ def insert_cdr(request,numero):
 		id_user = z.id
 		cod_cliente = z.cod_cliente
 
-	x = PlanoCliente.objects.get(cliente=id_user)
+	x = PlanoCliente.objects.get(cliente_id=id_user)
 	plano_id_cliente = x.plano
 	consultas = x.consultas
 	gratis = x.consultas_gratis
@@ -134,11 +134,11 @@ def insert_cdr(request,numero):
 				except Cache.DoesNotExist:
 					Cache.objects.create(numero=numero,cache=hora,cliente=cod_cliente)
 					total_consultas = consultas - 1
-					PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
+					PlanoCliente.objects.filter(cliente_id=id_user).update(consultas=total_consultas)
 			### INICIO rotina CACHE - Só entra aqui se o cache esta hábilitado para o cliente ###
 			elif ativo == 0:		
 				total_consultas = consultas - 1
-				PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
+				PlanoCliente.objects.filter(cliente_id=id_user).update(consultas=total_consultas)
 
 			Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, retorno=retorno, operadora=operadora,\
 										 cidade=cidade, estado=estado, tipo=tipo,portado=1,valor=valor_plano)
@@ -182,12 +182,12 @@ def insert_cdr(request,numero):
 			except Cache.DoesNotExist:
 				Cache.objects.create(numero=numero,cache=hora,cliente=cod_cliente)
 				total_consultas = consultas - 1
-				PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
+				PlanoCliente.objects.filter(cliente_id=id_user).update(consultas=total_consultas)
 		### INICIO rotina CACHE - Só entra aqui se o cache esta hábilitado para o cliente ###
 
 		elif ativo == 0:
 			total_consultas = consultas - 1
-			PlanoCliente.objects.filter(cliente=id_user).update(consultas=total_consultas)
+			PlanoCliente.objects.filter(cliente_id=id_user).update(consultas=total_consultas)
 
 		Cdr.objects.create(cliente=key, numero=numero, prefixo=prefixo, ddd=ddd, rn1=rn1, retorno=retorno, operadora=operadora,\
 									 cidade=cidade, estado=estado, tipo=tipo,portado=0,valor=valor_plano)
@@ -208,7 +208,7 @@ def atualiza_compra(retorno):
 	email_cad = u.email
 
 	#id_pagseguro = id_pagseguro.replace("-", "")
-	agora = datetime.datetime.now()
+	agora = datetime.now()
 
 	try:
 
@@ -278,7 +278,7 @@ def atualiza_compra(retorno):
 		Retorno.objects.create(date=date,lastEventDate=lastEventDate,code=code,reference=reference,status=status,
 								paymentMethod=paymentMethod,paymentMethodCode=paymentMethodCode,grossAmount=grossAmount,
 								discountAmount=discountAmount,netAmount=netAmount,extraAmount=extraAmount,item=item,id_plano=id_plano,
-								name=name,email=email,phone=areaCode+phone)
+								name=name,email=email,phone=areaCode+phone,cliente_id=user)
 		mail.send(
 		    [email_cad],
 		    sender=settings.DEFAULT_FROM_EMAIL,
@@ -306,13 +306,13 @@ def atualiza_pago(id_pagseguro,usuario,status):
 
 	u = Cadastro.objects.get(user_id=usuario)
 	user = u.id
-	agora = datetime.datetime.now()
+	agora = datetime.now()
 	pega_plano_cadastro = Cadastro.objects.values_list('plano').filter(id=user)[0]
 	pega_plano_cadastro = pega_plano_cadastro[0]
 
 
 	#print compra['redirect_url']
-	### INIICIO Pega o valor do plano e o valor por consulta de obtem a quantidade de consultas
+	### INICIO Pega o valor do plano e o valor por consulta de obtem a quantidade de consultas
 	x = Plano.objects.get(id=pega_plano_cadastro)
 	id_plano = x.id
 	descricao = x.plano
@@ -325,12 +325,16 @@ def atualiza_pago(id_pagseguro,usuario,status):
 	except ZeroDivisionError:
 		result = 00.00
 	## FIM Pega o valor do plano e o valor por consulta de obtem a quantidade de consultas
-	p = PlanoCliente.objects.get(cliente=user)
+	p = PlanoCliente.objects.get(cliente_id=user)
 	pega_plano_cliente = p.plano
 
 	try:
 		### INICIO cria o plano baseado no retorno do PagSeguro ###
-		PlanoCliente.objects.create(cliente=user,plano=pega_plano_cliente,consultas=result,consultas_gratis=0)
+		print user,pega_plano_cadastro,result
+		x = PlanoCliente.objects.get(id=user)
+		user = x.id
+		print user
+		PlanoCliente.objects.update(id=user,plano=pega_plano_cliente,consultas=result,consultas_gratis=0)
 		### FIM cria o plano baseado no retorno do PagSeguro ###
 
 	except IntegrityError:
@@ -353,16 +357,16 @@ def atualiza_pago(id_pagseguro,usuario,status):
 		valor_R = d.grossAmount + d.extraAmount
 
 
-		b = PlanoCliente.objects.get(cliente=user)
+		b = PlanoCliente.objects.get(cliente_id=user)
 		b = b.plano
 
 		if b != p:
 			PlanoCliente.objects.filter(plano=b).update(plano=plano)
-			b = PlanoCliente.objects.get(cliente=user)
+			b = PlanoCliente.objects.get(cliente_id=user)
 			b = b.plano
 
 
-		x = PlanoCliente.objects.get(cliente=user)
+		x = PlanoCliente.objects.get(cliente_id=user)
 		id_plano = x.id
 		consultas = int(x.consultas)
 
@@ -379,7 +383,7 @@ def atualiza_pago(id_pagseguro,usuario,status):
 		if controle == 0:
 
 			novo_saldo = consultas + results + gratis
-			PlanoCliente.objects.filter(cliente=user).update(consultas=novo_saldo,plano=plano_id,nome_plano=descricao)
+			PlanoCliente.objects.filter(cliente_id=user).update(consultas=novo_saldo,plano=plano_id,nome_plano=descricao)
 			Retorno.objects.filter(code=id_pagseguro).update(controle=1,consultas=results,lastEventDate=agora,status=status)
 			Cadastro.objects.filter(id=user).update(plano=plano_id)
 

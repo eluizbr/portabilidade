@@ -91,7 +91,7 @@ def registra_compra(id_pagseguro):
 		Retorno.objects.create(date=date,lastEventDate=lastEventDate,code=code,reference=reference,status=status,
 								paymentMethod=paymentMethod,paymentMethodCode=paymentMethodCode,grossAmount=grossAmount,
 								discountAmount=discountAmount,netAmount=netAmount,extraAmount=extraAmount,item=item,id_plano=id_plano,
-								name=name,email=email,phone=areaCode+phone)
+								name=name,email=email,phone=areaCode+phone,cliente_id=user)
 		mail.send(
 		    [email_cad],
 		    sender=settings.DEFAULT_FROM_EMAIL,
@@ -145,12 +145,12 @@ def atualiza_pago(id_pagseguro,usuario,status):
 	except ZeroDivisionError:
 		result = 00.00
 	## FIM Pega o valor do plano e o valor por consulta de obtem a quantidade de consultas
-	p = PlanoCliente.objects.get(cliente=user)
+	p = PlanoCliente.objects.get(cliente_id=user)
 	pega_plano_cliente = p.plano
 
 	try:
 		### INICIO cria o plano baseado no retorno do PagSeguro ###
-		PlanoCliente.objects.create(cliente=user,plano=pega_plano_cliente,consultas=result,consultas_gratis=0)
+		PlanoCliente.objects.create(cliente_id=user,plano=pega_plano_cliente,consultas=result,consultas_gratis=0)
 		### FIM cria o plano baseado no retorno do PagSeguro ###
 
 	except IntegrityError:
@@ -173,16 +173,16 @@ def atualiza_pago(id_pagseguro,usuario,status):
 		phone = d.phone
 		valor_R = d.grossAmount + d.extraAmount
 
-		b = PlanoCliente.objects.get(cliente=user)
+		b = PlanoCliente.objects.get(cliente_id=user)
 		b = b.plano
 
 		if b != p:
 			PlanoCliente.objects.filter(plano=b).update(plano=plano)
-			b = PlanoCliente.objects.get(cliente=user)
+			b = PlanoCliente.objects.get(cliente_id=user)
 			b = b.plano
 
 
-		x = PlanoCliente.objects.get(cliente=user)
+		x = PlanoCliente.objects.get(cliente_id=user)
 		id_plano = x.id
 		consultas = int(x.consultas)
 
@@ -199,7 +199,7 @@ def atualiza_pago(id_pagseguro,usuario,status):
 		if controle == 0:
 
 			novo_saldo = consultas + results + gratis
-			PlanoCliente.objects.filter(cliente=user).update(consultas=novo_saldo,plano=plano_id,nome_plano=descricao)
+			PlanoCliente.objects.filter(cliente_id=user).update(consultas=novo_saldo,plano=plano_id,nome_plano=descricao)
 			Retorno.objects.filter(code=id_pagseguro).update(controle=1,consultas=results,lastEventDate=agora,status=status)
 			Cadastro.objects.filter(id=user).update(plano=plano_id)
 

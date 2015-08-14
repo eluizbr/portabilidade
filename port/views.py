@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail, BadHeaderError
 from django.contrib.auth.decorators import login_required
 from models import Portados, NaoPortados, Cdr, Prefixo, PlanoCliente, Retorno, SipBuddies, Cache, Csp, CspRetorno, PortPlanoCodCliente
+from revenda.models import Codigo_revenda
 from ratelimit.decorators import ratelimit
 from tasks import insert_cdr, atualiza_compra
 from django.conf import settings
@@ -15,6 +16,7 @@ import MySQLdb
 from django.db import connection
 import datetime
 import random
+import uuid
 import decimal
 from datetime import timedelta,date
 from forms import CadastroForm, CompraFrom, PlanoClienteForm, CspRetornoFrom
@@ -71,8 +73,9 @@ def padrao(request):
 	cad = Cadastro.objects.get(user=user)
 	cod_user = cad.id
 	chave_cod = cad.cod_cliente
-	z = PlanoCliente.objects.all().filter(cliente=cod_user)
-	plano = PlanoCliente.objects.get(cliente=cod_user)
+	revenda = cad.revenda
+	z = PlanoCliente.objects.all().filter(cliente_id=cod_user)
+	plano = PlanoCliente.objects.get(cliente_id=cod_user)
 	ddd = plano.ddd
 	aviso = plano.aviso_email
 	retorno = plano.retorno
@@ -119,6 +122,7 @@ def asterisk(request):
 	chave = cad.chave
 	chave_cod = cad.cod_cliente
 	cod_cliente = cad.cod_cliente
+	revenda = cad.revenda
 
 	asterisk = SipBuddies.objects.get(cliente=cod_cliente)
 	ast_user = asterisk.name
@@ -135,6 +139,7 @@ def csp_retorno(request):
 	chave_cod = cad.cod_cliente
 	cod_cliente = cad.cod_cliente
 	user_id = cad.id
+	revenda = cad.revenda
 
 	todos_csp = Csp.objects.all()
 
@@ -172,7 +177,7 @@ def csp_retorno_del(request,deletar):
 	chave_cod = cad.cod_cliente
 	cod_cliente = cad.cod_cliente
 	user_id = cad.id
-	print user_id
+	revenda = cad.revenda
 
 	todos_csp = Csp.objects.all()
 	x = CspRetorno.objects.all().filter(user=user_id)
@@ -188,6 +193,7 @@ def csp(request):
 	cad = Cadastro.objects.get(user=user)
 	cod_user = cad.id
 	chave_cod = cad.cod_cliente
+	revenda = cad.revenda
 	
 	operadora = Prefixo.objects.values('rn1','operadora','tipo').distinct()
 
@@ -225,8 +231,9 @@ def financeiro(request):
 	cod_plano = cad.plano
 	id_cliente = cad.id
 	chave_cod = cad.cod_cliente
+	revenda = cad.revenda
 
-	x = PlanoCliente.objects.get(cliente=user_id)
+	x = PlanoCliente.objects.get(cliente_id=user_id)
 	plano_nome = x.nome_plano
 	tipo = x.tipo
 	consultas = x.consultas
@@ -284,13 +291,16 @@ def criar_user(request):
 
 	if request.method == 'POST':
 		form = CadastroForm(request.POST)
+		print form.errors
 			
 		if form.is_valid():
+			print form.errors
 			obj = form.save(commit=False)
 			#obj.email = user.email
 			obj.user = user
 			obj.cod_cliente = int(random.randint(10000000, 99000000))
 			obj.save()
+
 
 			try:
 				### Se o plano não exite, então cria...
@@ -299,11 +309,11 @@ def criar_user(request):
 				codigo_cliente = cad.cod_cliente
 				name = cad.first_name
 				phone = cad.telefoneF
-				z = PlanoCliente.objects.get(cliente=user_id)
-				cliente = z.cliente
+				z = PlanoCliente.objects.get(cliente_id=user_id)
+				cliente = z.cliente_id
 				plano = z.plano
 			except PlanoCliente.DoesNotExist:
-				z = PlanoCliente(consultas=500,consultas_gratis=0,cliente=user_id,plano=1,nome_plano='500 Grátis',criado_em=data,expira_em=mes,tipo=1)
+				z = PlanoCliente(consultas=500,consultas_gratis=0,cliente_id=user_id,plano=1,nome_plano='500 Grátis',criado_em=data,expira_em=mes,tipo=1)
 				z.save()
 
 				secret = int(random.randint(10000000, 99000000))
@@ -311,17 +321,22 @@ def criar_user(request):
 				sip.save()	
 				### Se o plano não exite, então cria...
 
-				mail.send(
-				    'eluizbr@gmail.com', # List of email addresses also accepted
-				    sender=settings.DEFAULT_FROM_EMAIL,
-				    template='usuario_novo',
-				    context={'name': name,'phone':phone}
-				)
+				# Associando cliente a revenda
+				revenda = str(uuid.uuid4().get_hex()[0:10])
+				z = Codigo_revenda.objects.create(revenda=revenda,cliente_id=user_id)
+
+				# mail.send(
+				#     'eluizbr@gmail.com', # List of email addresses also accepted
+				#     sender=settings.DEFAULT_FROM_EMAIL,
+				#     template='usuario_novo',
+				#     context={'name': name,'phone':phone}
+				# )
 
 			return redirect('/portabilidade/meus-dados/')
 	else:
 
 		form = CadastroForm()
+		print form.errors
 
 	return render(request, 'criar_user.html', locals())	
 
@@ -337,6 +352,7 @@ def meus_dados(request):
 		cod_cliente = cad.chave
 		name = cad.first_name
 		chave_cod = cad.cod_cliente
+		revenda = cad.revenda
 
 	except Cadastro.DoesNotExist:
 		return redirect('/portabilidade/criar-user/')
@@ -370,9 +386,9 @@ def meus_dados(request):
 
 				try:
 					### Se o plano não exite, então cria...
-					z = PlanoCliente.objects.get(cliente=request.user.id)
+					z = PlanoCliente.objects.get(cliente_id=request.user.id)
 				except PlanoCliente.DoesNotExist:
-					z = PlanoCliente(consultas=0,consultas_gratis=0,cliente=user_id,plano=1,nome_plano='Sem Plano')
+					z = PlanoCliente(consultas=0,consultas_gratis=0,cliente_id=user_id,plano=1,nome_plano='Sem Plano')
 					z.save()
 					### Se o plano não exite, então cria...
 	else:
@@ -388,6 +404,7 @@ def cdr(request):
 	cad = Cadastro.objects.get(user=user)
 	user_id = cad.id
 	chave_cod = cad.cod_cliente
+	revenda = cad.revenda
 
 	numero = request.GET.get('numero', '')
 	operadora = request.GET.get('operadora', '')
@@ -439,12 +456,13 @@ def operadoras(request):
 			x = Cadastro.objects.get(user_id=request.user.id)
 			id_cliente = x.id
 			chave_cod = x.cod_cliente
+			revenda = x.revenda
 		
 		except ObjectDoesNotExist:
 
 			return redirect('/portabilidade/criar-user/')
 
-		p = PlanoCliente.objects.get(cliente=id_cliente)
+		p = PlanoCliente.objects.get(cliente_id=id_cliente)
 		plano = p.consultas
 		tipo = p.tipo
 		id_plano = p.plano
@@ -577,7 +595,7 @@ def consulta(request,numero):
 	saldo,tipo,diferenca = funcoes.checa_saldo(id_user)
 
 	if diferenca >= 30:
-		PlanoCliente.objects.filter(cliente=id_user).update(consultas=0,plano=1,nome_plano='Escolha um plano',tipo=1)
+		PlanoCliente.objects.filter(cliente_id=id_user).update(consultas=0,plano=1,nome_plano='Escolha um plano',tipo=1)
 
 	if (saldo <= 0) and (tipo == 1):
 
@@ -593,7 +611,7 @@ def consulta(request,numero):
 		chave = funcoes.checa_chave(key)
 
 		if key == chave:
-			z = PlanoCliente.objects.get(cliente=id_user)
+			z = PlanoCliente.objects.get(cliente_id=id_user)
 			retorno = z.retorno
 			user_id = z.cliente
 			ddd = z.ddd
@@ -710,7 +728,7 @@ def gsm(request,key):
 	saldo,tipo,diferenca = funcoes.checa_saldo(id_user)
 
 	if diferenca >= 30:
-		PlanoCliente.objects.filter(cliente=id_user).update(consultas=0,plano=1,nome_plano='Escolha um plano',tipo=1)
+		PlanoCliente.objects.filter(cliente_id=id_user).update(consultas=0,plano=1,nome_plano='Escolha um plano',tipo=1)
 
 	if (saldo <= 0) and (tipo == 1):
 

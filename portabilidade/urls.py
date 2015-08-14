@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^conta/', include('registration.backends.default.urls')),
     url(r'^portabilidade/', include('port.urls')),
+    url(r'^revenda/', include('revenda.urls')),
     url(r'^envio/', include('newsletter.urls')),
     url(r'^$', RedirectView.as_view(pattern_name='operadoras')),
     url(r'^retorno/pagseguro/', include('pagseguro.urls')),

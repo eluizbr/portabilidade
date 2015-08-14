@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load l10n %}
+{% load staticfiles %}
+{% load bootstrap %}
+{% block nome %}
+    <strong>{{user}}</strong>&nbsp;
+{% endblock %}
+
+{% block menu_1 %}
+                    <li class="active"><a href="{% url 'operadoras' %}">Operadoras</a></li>
+                    <li><a href="{% url 'cdr' %}">CDR</a></li>
+{% endblock menu_1 %}
+
+{% block lista_server %}{% endblock lista_server %}
+
+{% block content %}
+
+
+
+	<div class="row">
+		<div class="col-md-12">
+            <div class="tab-pane" id="financeiro">
+				<br>
+                <div class="clearfix">
+				    <div class="col-md-12">
+				        <section class="widget">
+				            <header>
+				                <h5>Meus <span class="fw-semi-bold">Clientes</span></h5>
+				            </header>
+				            <div class="widget-body">
+				                <table class="table table-striped mt-lg mb-0">
+				                    <thead>
+				                    <tr>
+				                        <th class="text-align-center">Login</th>
+				                        <th class="text-align-center">Senha</th>
+				                        <th class="text-align-center">Nome</th>
+				                        <th class="text-align-center">Codigo</th>
+				                        <th class="text-align-center">Plano</th>
+				                        <th class="text-align-center">Consultas</th>
+				                        <th class="text-align-center">Financeiro</th>
+				                    </tr>
+				                    </thead>
+				                    <tbody>
+				                    {% for n in clientes %}
+				                        <tr>
+				                            <td class="text-align-center">{{n.login}}</td>
+				                            <td class="text-align-center">{{n.senha}}</td>
+				                            <td class="text-align-center">{{n.nome}}</td>
+				                            <td class="text-align-center">{{n.cod_cliente}}</td>
+									        {% for p in n.planocliente_set.all %}
+									            <td class="text-align-center">{{p.nome_plano}}</td>
+									            <td class="text-align-center">{{p.consultas}}</td>
+									        {% endfor %}
+				                            <td class="text-align-center"> <button href="/revenda/info/{{n.id}}" data-toggle="modal" data-target="#myModal18"  class="btn btn-inverse"><i class="fa fa-dollar"></i></button></td> 
+				                        </tr>
+				                    {% endfor %}
+				                    </tbody>
+				                </table>
+				            </div>
+				        </section>
+				    </div>
+                </div>
+            </div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="myModal18" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18" aria-hidden="true">
+	    <div class="modal-dialog modal-lg">
+	        <div class="modal-content">
+		        <div class="row">
+		            <div class="col-md-12">
+
+		            </div>
+		        </div>
+	        </div>
+	    </div>
+	</div>
+
+
+{% endblock content %}
+
+{% block scripts %}
+
+
+<script id="test" src="{% static "vendor/underscore/underscore.js"%}"></script>
+<script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
+<script src="{% static "vendor/jquery.sparkline/index.js"%}"></script>
+<script src="{% static "vendor/d3/d3.min.js"%}"></script>
+<script src="{% static "vendor/rickshaw/rickshaw.min.js"%}"></script>
+<script src="{% static "vendor/raphael/raphael-min.js"%}"></script>
+<script src="{% static "vendor/jQuery-Mapael/js/jquery.mapael.js"%}"></script>
+<script src="{% static "js/brazil.js"%}"></script>
+<script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/popover.js"%}"></script>
+<script src="{% static "vendor/bootstrap_calendar/bootstrap_calendar/js/bootstrap_calendar.min.js"%}"></script>
+<script src="{% static "vendor/jquery-animateNumber/jquery.animateNumber.min.js"%}"></script>
+
+
+<!-- page specific libs -->
+<script src="{% static "vendor/underscore/underscore-min.js"%}"></script>
+<script src="{% static "vendor/backbone/backbone.js"%}"></script>
+<script src="{% static "vendor/backbone.paginator/lib/backbone.paginator.min.js"%}"></script>
+<script src="{% static "vendor/backgrid/lib/backgrid.js"%}"></script>
+<script src="{% static "vendor/backgrid-paginator/backgrid-paginator.js"%}"></script>
+<script src="{% static "vendor/datatables/media/js/jquery.dataTables.js"%}"></script>
+<script src="{% static "vendor/bootstrap-select/dist/js/bootstrap-select.min.js"%}"></script>
+
+<script src="{% static "js/tables-dynamic.js"%}"></script>
+<script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/tab.js"%}"></script>
+<script src="{% static "vendor/bootstrap-sass/assets/javascripts/bootstrap/modal.js"%}"></script>
+
+<script type="text/javascript">
+$(document).on('hidden.bs.modal', function (e) {
+    $(e.target).removeData('bs.modal');
+});
+</script>
+{% endblock %}

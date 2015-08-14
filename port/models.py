@@ -23,7 +23,8 @@ class Cadastro(models.Model):
         ('Pessoa Fisica', 'Pessoa Fisica'),
         ('Pessoa Juridica', 'Pessoa Juridica'),
     )
-
+    login = models.CharField(u'Login de acesso', max_length=30)
+    senha = models.CharField(u'Senha', max_length=100)
     user = models.OneToOneField(User, unique=True)
     tipo = models.CharField(u'Tipo', max_length=20, choices=TIPO)
     first_name = models.CharField(u'Nome', max_length=100)
@@ -49,9 +50,11 @@ class Cadastro(models.Model):
     cidade = models.CharField(u'Cidade', max_length=100, blank=True, null=True)
     estado = models.CharField(u'Estado', max_length=100, blank=True, null=True)
     cep = models.CharField(u'CEP', max_length=10, default='00000-000')
-    cod_cliente = models.IntegerField(u'Codigo do Cliente', unique=True)
+    cod_cliente = models.CharField(u'Codigo do Cliente',max_length=100, unique=True)
     chave = models.UUIDField(default=uuid.uuid4, editable=False)
     plano = models.IntegerField(u'Plano', default=1)
+    revenda = models.IntegerField(u'Revenda', default=0)
+    cod_revenda = models.CharField(u'Codigo da Revenda',max_length=100,default='0')
     cache = models.IntegerField(u'Cache', default=0)
 
     def __unicode__(self):
@@ -98,6 +101,8 @@ class Prefixo(models.Model):
 class Plano(models.Model):
 
     TIPO = choices.TIPO_PLANO_CHOICES
+    ESPECIAL = choices.PLANO_ESPECIAL_CHOICES
+
 
     plano = models.CharField(null=True,blank=True,max_length=255)
     descricao = models.CharField(null=True,blank=True,max_length=255)
@@ -106,8 +111,8 @@ class Plano(models.Model):
     consultas_gratis = models.IntegerField(blank=True, null=True,default=0)
     taxas = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2, default=00.00)
     tipo = models.CharField(max_length=200,choices=TIPO,default=1)
-    especial = models.CharField(max_length=200,choices=TIPO,default=0)
-    cod_cliente = models.ManyToManyField(Cadastro, related_name="cliente")
+    especial = models.CharField(u'Plano',max_length=200,choices=ESPECIAL,default=0)
+    cod_cliente = models.ManyToManyField(Cadastro, related_name="cliente",blank=True)
     
     def __unicode__(self):
         return unicode(self.plano)
@@ -158,7 +163,8 @@ class PlanoCliente(models.Model):
     CACHE = choices.CACHE_CHOICES
     RETORNO = choices.RETORNO_CHOICES
 
-    cliente = models.IntegerField(u'Cliente', default=1, unique=True)
+    #cliente = models.IntegerField(u'Cliente', default=1, unique=True)
+    cliente = models.ForeignKey(Cadastro)
     plano = models.IntegerField(u'Plano', default=1)
     nome_plano = models.CharField(u'Nome do Plano',max_length=255)
     consultas = models.IntegerField(blank=True, null=True,default=0)
@@ -185,6 +191,7 @@ class Retorno(models.Model):
     CODIGO = choices.CODIGO_PAGAMENTO_CHOICES
     STATUS = choices.STATUS_CHOICES
     # Referencia dos campos: https://pagseguro.uol.com.br/v3/guia-de-integracao/consulta-de-transacoes-por-codigo.html
+    cliente = models.ForeignKey(Cadastro,blank=True)
     date = models.DateTimeField()
     lastEventDate = models.DateTimeField()
     code = models.CharField(max_length=200)
@@ -203,6 +210,7 @@ class Retorno(models.Model):
     email = models.EmailField(default='email@email.com')
     name = models.CharField(max_length=255,default=1)
     phone = models.CharField(max_length=20,default=1)
+
     
 
     def __unicode__(self):

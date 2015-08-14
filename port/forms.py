@@ -11,7 +11,7 @@ class CadastroForm(forms.ModelForm):
 	class Meta:
 		model = Cadastro
 		fields = '__all__'
-		exclude = ['user','cod_cliente','consultas','plano','cache']
+		exclude = ['user','cod_cliente','consultas','plano','cache','senha','login','revenda','cod_revenda']
 
 	def clean_cpf(self):
 		print "CLEAN CPF"

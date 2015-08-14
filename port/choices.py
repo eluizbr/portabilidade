@@ -16,6 +16,10 @@ TIPO_PLANO_CHOICES = (
     ('1', 'normal')
 )
 
+PLANO_ESPECIAL_CHOICES = (
+    ('0', 'Liberado'),
+    ('1', 'Restrito')
+)
 
 STATUS_CHOICES = (
     ('1', 'Aguardando pagamento'),
