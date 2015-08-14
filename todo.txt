@@ -5,7 +5,7 @@ Cadastro Parceiro
 - Altarara dados - OK
 
 Cadastro Cliente
-- Visualizar clientes
+- Visualizar clientes - OK
 - Criar Clientes - OK
 - Alterar dados Clientes
 
