@@ -12,7 +12,7 @@ import uuid
 import datetime
 import random
 import decimal
-from datetime import timedelta,date
+from datetime import timedelta,date,datetime
 
 @login_required
 def criar_revenda(request):
@@ -186,6 +186,11 @@ def meus_clientes(request):
 
 @login_required
 def comissao(request):
+
+	today = datetime.today()
+	mes = today.month
+	ano = today.year
+
 	user = User.objects.get(pk=request.user.id)
 	cad = Cadastro.objects.get(user_id=user)
 	cliente_id = cad.id
@@ -193,7 +198,7 @@ def comissao(request):
 	x = Codigo_revenda.objects.get(cliente_id=cliente_id)
 	cod_revenda = x.revenda
 	# Pega todos os clientes da revenda
-	comissao = Comissao_revenda.objects.all().filter(revenda=cod_revenda)
-	soma = Comissao_revenda.objects.filter(revenda=cod_revenda).aggregate(Sum('comissao'))['comissao__sum']
+	comissao = Comissao_revenda.objects.all().filter(revenda=cod_revenda,mes=mes,ano=ano)
+	soma = Comissao_revenda.objects.filter(revenda=cod_revenda,mes=mes,ano=ano).aggregate(Sum('comissao'))['comissao__sum']
 	print soma
 	return render(request, 'comissao.html', locals())
