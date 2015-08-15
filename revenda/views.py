@@ -67,11 +67,8 @@ def criar_revenda(request):
 				z.save()
 
 				secret = int(random.randint(10000000, 99000000))
-				sip = SipBuddies(name=codigo_cliente,port=5060,secret=secret,regseconds=0,cliente=codigo_cliente)
+				sip = SipBuddies(name=codigo_cliente,username=codigo_cliente,port=5060,secret=secret,regseconds=0,cliente=codigo_cliente)
 				sip.save()	
-
-				# Associando cliente a revenda
-				#z = Codigo_revenda.objects.create(revenda=cod_revenda,cliente_id=cad.id)
 
 				# mail.send(
 				#     'eluizbr@gmail.com', # List of email addresses also accepted
@@ -80,7 +77,7 @@ def criar_revenda(request):
 				#     context={'name': name,'phone':phone}
 				# )
 
-			return redirect('/revenda/revenda-dados/')
+			return redirect('/revenda/meus-clientes/')
 	else:
 		print 'error'
 		form = RevendaForm()
