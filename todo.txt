@@ -11,7 +11,7 @@ Cadastro Cliente
 
 Financeiro
 - Gerar corbrança e enviar por email
-- Comissionamento
+- Comissionamento - OK
 - Data de saque do comissionamento
 	- configuracoes de conta bancaria
 - Recorrencia mensal
