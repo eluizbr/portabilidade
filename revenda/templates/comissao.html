@@ -26,7 +26,7 @@
 				    <div class="col-md-12">
 				        <section class="widget">
 				            <header>
-				                <h3>Comissão acomulada no mês {{mes}}/{{ano}} é de: <span class="fw-semi-bold">R$ {{soma}}</span></h3>
+				                <h3>Comissão acomulada em <strong>{{today|date:"F Y" }}</strong> é de: <span class="fw-semi-bold">R$ {{soma}}</span></h3>
 				            </header>
 				            <div class="widget-body">
 				                <table class="table table-striped mt-lg mb-0">
@@ -61,30 +61,62 @@
 		</div>
 	</div>
 
-	<div class="modal fade" id="myModal18" tabindex="-1" role="dialog" aria-labelledby="myModalLabel18" aria-hidden="true">
-	    <div class="modal-dialog modal-lg">
-	        <div class="modal-content">
-		        <div class="row">
-		            <div class="col-md-12">
+	<div class="row">
+		<div class="col-md-12">
+		    <div class="panel-group mb-lg" id="accordion" data-toggle="collapse">
+		        <div class="panel panel-default">
+		            <div class="panel-heading">
+		                <h5 class="panel-title">
+		                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+		                    	Fatura <strong>{{today|date:"F Y" }}</strong></span>
 
+		                        <i class="fa fa-angle-down pull-right"></i>
+		                    </a>
+		                </h5>
 		            </div>
+		                <div id="collapseTwo" class="panel-collapse collapse out">
+				            <div class="tab-pane" id="financeiro">
+								<br>
+				                <div class="clearfix">
+								    <div class="col-md-12">
+				        <section class="widget">
+				            <header>
+				                <h3>Comissão em <strong>{{today|date:"F Y" }}</strong> é de: <span class="fw-semi-bold">R$ {{soma}}</span></h3>
+				            </header>
+				            <div class="widget-body">
+				                <table class="table table-striped mt-lg mb-0">
+				                    <thead>
+				                    <tr>
+				                        <th class="text-align-center">Login</th>
+				                        <th class="text-align-center">Clinte</th>
+				                        <th class="text-align-center">Data da compra</th>
+				                        <th class="text-align-center">Comissão</th>
+				                        <th class="text-align-center">Mês</th>
+				                        <th class="text-align-center">Ano</th>
+				                    </tr>
+				                    </thead>
+				                    <tbody>
+				                    {% for n in comissao %}
+					                        <tr>
+					                        	<td class="text-align-center">{{n.login}}</td>
+					                        	<td class="text-align-center">{{n.nome}}</td>
+					                        	<td class="text-align-center">{{n.data_compra}}</td>
+					                        	<td class="text-align-center">R$ {{n.comissao|intcomma}}</td>
+					                        	<td class="text-align-center">{{n.mes}}</td>
+					                        	<td class="text-align-center">{{n.ano}}</td>
+					                        </tr>			                        
+				                    {% endfor %}
+				                    </tbody>
+				                </table>
+				            </div>
+				        </section>
+								    </div>
+				                </div>
+				            </div>
+		    			</div>
 		        </div>
-
-	        </div>
-	    </div>
-	</div>
-
-	<div class="modal fade" id="myModal19" tabindex="-1" role="dialog" aria-labelledby="myModalLabel19" aria-hidden="true">
-	    <div class="modal-dialog modal-lg">
-	        <div class="modal-content">
-		        <div class="row">
-		            <div class="col-md-12">
-
-		            </div>
-		        </div>
-
-	        </div>
-	    </div>
+			</div>
+		</div>
 	</div>
 
 {% endblock content %}

@@ -32,17 +32,13 @@ def criar_revenda(request):
 
 	if request.method == 'POST':
 		form = RevendaForm(request.POST)
-		print '2'
-		print form.errors
-		#print request.POST
+
 		if form.is_valid():
-			print 'aqui'
+			
 			senha = str(uuid.uuid4().get_hex()[0:10])
 			login = request.POST.get('login', '')
 			email = request.POST.get('email', '')
-			print login,email,senha
 			new_user = User.objects.create_user(username=login,email=email, password=senha)
-			print new_user.username, new_user.id
 			obj = form.save(commit=False)
 			#obj.email = user.email
 			obj.user = user
@@ -70,18 +66,16 @@ def criar_revenda(request):
 				sip = SipBuddies(name=codigo_cliente,username=codigo_cliente,port=5060,secret=secret,regseconds=0,cliente=codigo_cliente)
 				sip.save()	
 
-				# mail.send(
-				#     'eluizbr@gmail.com', # List of email addresses also accepted
-				#     sender=settings.DEFAULT_FROM_EMAIL,
-				#     template='usuario_novo',
-				#     context={'name': name,'phone':phone}
-				# )
+				mail.send(
+				    'eluizbr@gmail.com', # List of email addresses also accepted
+				    sender=settings.DEFAULT_FROM_EMAIL,
+				    template='usuario_novo',
+				    context={'name': name,'phone':phone}
+				)
 
 			return redirect('/revenda/meus-clientes/')
 	else:
-		print 'error'
 		form = RevendaForm()
-		print form.errors
 
 	return render(request, 'criar_revenda.html', locals())	
 
@@ -96,7 +90,6 @@ def revenda_dados(request):
 		codigo_cliente = cad.cod_cliente
 		name = cad.first_name
 		chave_cod = cad.cod_cliente
-		print chave_cod
 
 	except Cadastro.DoesNotExist:
 		return redirect('/revenda/meus-clientes/')
@@ -129,7 +122,6 @@ def revenda_dados(request):
 def pg_info(request,id):
 
     pg_info = Retorno.objects.all().filter(cliente_id=id)
-    print pg_info
     return render(request,'pg_info.html', locals())
 
 @login_required
@@ -137,13 +129,11 @@ def editar_cliente(request,id):
 
 	user = User.objects.get(pk=request.user.id)
 
-
 	cad = Cadastro.objects.get(id=id)
 	user_id = cad.id
 	codigo_cliente = cad.cod_cliente
 	name = cad.first_name
 	chave_cod = cad.cod_cliente
-	print chave_cod
 
 	if request.method == 'POST':
 		form = RevendaForm(request.POST or None, instance=cad)
@@ -198,5 +188,7 @@ def comissao(request):
 	# Pega todos os clientes da revenda
 	comissao = Comissao_revenda.objects.all().filter(revenda=cod_revenda,mes=mes,ano=ano)
 	soma = Comissao_revenda.objects.filter(revenda=cod_revenda,mes=mes,ano=ano).aggregate(Sum('comissao'))['comissao__sum']
-	print soma
+	
 	return render(request, 'comissao.html', locals())
+
+

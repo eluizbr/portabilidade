@@ -221,14 +221,11 @@ def atualiza_compra(retorno):
 			status_atual = int(status_atual[0])
 			status = data['transaction']['status']
 			status = int(status)
-			print status_atual, status
 
 			if status_atual !=  status:
-				print 'estou aqui'
 				Retorno.objects.filter(code=retorno).update(lastEventDate=agora,status=status)
 
 				if status == 3:
-					print '== a 3'
 					atualiza_pago(id_pagseguro,usuario,status)
 
 			else:
@@ -255,7 +252,6 @@ def atualiza_compra(retorno):
 					)
 
 	except ObjectDoesNotExist:
-		print 'nao exsite'
 
 		date = data['transaction']['date']
 		lastEventDate = data['transaction']['lastEventDate']
@@ -299,7 +295,6 @@ def atualiza_compra(retorno):
 			)
 
 		if status == 3:
-			print 'atuazliando...'
 			atualiza_pago(id_pagseguro,usuario,status)
 
 
@@ -311,8 +306,6 @@ def atualiza_pago(id_pagseguro,usuario,status):
 	agora = datetime.now()
 	pega_plano_cadastro = Cadastro.objects.values_list('plano').filter(id=cad_user)[0]
 	pega_plano_cadastro = pega_plano_cadastro[0]
-	print 'o pega_plano_cadastro é %s' %pega_plano_cadastro
-
 
 	#print compra['redirect_url']
 	### INICIO Pega o valor do plano e o valor por consulta de obtem a quantidade de consultas
@@ -341,7 +334,6 @@ def atualiza_pago(id_pagseguro,usuario,status):
 	# 	### FIM cria o plano baseado no retorno do PagSeguro ###
 
 	# except IntegrityError:
-	print 'aqui agora'
 	# Pega o plano no cadastro do cliente
 	p = Cadastro.objects.get(user_id=cad_user)
 	plano = p.plano
@@ -369,12 +361,10 @@ def atualiza_pago(id_pagseguro,usuario,status):
 	phone = d.phone
 	valor_R = d.grossAmount + d.extraAmount
 	comissao = d.grossAmount / 10
-	print 'comissa e %s' %comissao
-
 
 	b = PlanoCliente.objects.get(cliente_id=cad_user)
 	b = b.plano
-	print b, plano
+
 	if b != plano:
 		PlanoCliente.objects.filter(plano=b).update(plano=plano)
 		b = PlanoCliente.objects.get(cliente_id=cad_user)
