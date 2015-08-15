@@ -17,7 +17,7 @@ from datetime import timedelta,date,datetime
 @login_required
 def criar_revenda(request):
 
-	data = datetime.datetime.now()
+	data = datetime.now()
 	mes = data + timedelta(days=30)
 	user = User.objects.get(pk=request.user.id)
 	revenda = Cadastro.objects.get(user_id=request.user.id)
@@ -193,6 +193,7 @@ def comissao(request):
 
 	user = User.objects.get(pk=request.user.id)
 	cad = Cadastro.objects.get(user_id=user)
+	revenda = cad.revenda
 	cliente_id = cad.id
 	chave_cod = cad.cod_cliente
 	x = Codigo_revenda.objects.get(cliente_id=cliente_id)
