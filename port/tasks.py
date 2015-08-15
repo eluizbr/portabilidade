@@ -200,14 +200,12 @@ def atualiza_compra(retorno):
 	data = pagseguro_api.get_transaction(id_pagseguro)
 	reference = data['transaction']['reference']
 
-	#print 'usuario de retorno é %s' %usuario
-	u = Cadastro.objects.get(cod_cliente=reference)
-	user = u.id
-	nome = u.nome
-	usuario = u.user_id
-	email_cad = u.email
+	cad = Cadastro.objects.get(cod_cliente=reference)
+	user = cad.id
+	nome = cad.nome
+	usuario = cad.user_id
+	email_cad = cad.email
 
-	#id_pagseguro = id_pagseguro.replace("-", "")
 	agora = datetime.now()
 
 	try:
@@ -222,12 +220,14 @@ def atualiza_compra(retorno):
 			status_atual = int(status_atual[0])
 			status = data['transaction']['status']
 			status = int(status)
+			print status_atual, status
 
 			if status_atual !=  status:
-
+				print 'estou aqui'
 				Retorno.objects.filter(code=retorno).update(lastEventDate=agora,status=status)
 
 				if status == 3:
+					print '== a 3'
 					atualiza_pago(id_pagseguro,usuario,status)
 
 			else:
@@ -254,7 +254,7 @@ def atualiza_compra(retorno):
 					)
 
 	except ObjectDoesNotExist:
-
+		print 'nao exsite'
 
 		date = data['transaction']['date']
 		lastEventDate = data['transaction']['lastEventDate']
@@ -275,7 +275,7 @@ def atualiza_compra(retorno):
 		areaCode = data['transaction']['sender']['phone']['areaCode']
 		phone = data['transaction']['sender']['phone']['number']
 
-		Retorno.objects.create(date=date,lastEventDate=lastEventDate,code=code,reference=reference,status=status,
+		Retorno.objects.update_or_create(date=date,lastEventDate=lastEventDate,code=code,reference=reference,status=status,
 								paymentMethod=paymentMethod,paymentMethodCode=paymentMethodCode,grossAmount=grossAmount,
 								discountAmount=discountAmount,netAmount=netAmount,extraAmount=extraAmount,item=item,id_plano=id_plano,
 								name=name,email=email,phone=areaCode+phone,cliente_id=user)
@@ -298,6 +298,7 @@ def atualiza_compra(retorno):
 			)
 
 		if status == 3:
+			print 'atuazliando...'
 			atualiza_pago(id_pagseguro,usuario,status)
 
 
@@ -305,10 +306,11 @@ def atualiza_pago(id_pagseguro,usuario,status):
 
 
 	u = Cadastro.objects.get(user_id=usuario)
-	user = u.id
+	cad_user = u.id
 	agora = datetime.now()
-	pega_plano_cadastro = Cadastro.objects.values_list('plano').filter(id=user)[0]
+	pega_plano_cadastro = Cadastro.objects.values_list('plano').filter(id=cad_user)[0]
 	pega_plano_cadastro = pega_plano_cadastro[0]
+	print 'o pega_plano_cadastro é %s' %pega_plano_cadastro
 
 
 	#print compra['redirect_url']
@@ -319,81 +321,83 @@ def atualiza_pago(id_pagseguro,usuario,status):
 	valorD = x.valor
 	valor = int(x.valor)
 	v_consulta = x.valor_consulta
+
 	try:
 		result = valor / v_consulta
 		result = decimal.Decimal(result)
 	except ZeroDivisionError:
 		result = 00.00
 	## FIM Pega o valor do plano e o valor por consulta de obtem a quantidade de consultas
-	p = PlanoCliente.objects.get(cliente_id=user)
+	p = PlanoCliente.objects.get(cliente_id=cad_user)
 	pega_plano_cliente = p.plano
 
-	try:
-		### INICIO cria o plano baseado no retorno do PagSeguro ###
-		print user,pega_plano_cadastro,result
-		x = PlanoCliente.objects.get(id=user)
-		user = x.id
-		print user
-		PlanoCliente.objects.update(id=user,plano=pega_plano_cliente,consultas=result,consultas_gratis=0)
-		### FIM cria o plano baseado no retorno do PagSeguro ###
+	# try:
+	# 	### INICIO cria o plano baseado no retorno do PagSeguro ###
+	# 	x = PlanoCliente.objects.get(cliente_id=cad_user)
+	# 	user = x.id
+	# 	print 'o user e %s' %user
+	# 	PlanoCliente.objects.update(id=user,cliente_id=user,plano=pega_plano_cliente,consultas=result,consultas_gratis=0)
+	# 	### FIM cria o plano baseado no retorno do PagSeguro ###
 
-	except IntegrityError:
-		
-		# Pega o plano no cadastro do cliente
-		p = Cadastro.objects.get(id=user)
-		plano = p.plano
-		nome = p.first_name
-		email = p.email
-		
-		# Pega o plano comprado
-		d = Retorno.objects.get(code=id_pagseguro)
-		plano_id = d.id_plano
-		code = d.code
-		reference = d.reference
-		data = d.date
-		nome = d.name
-		email_C = d.email
-		phone = d.phone
-		valor_R = d.grossAmount + d.extraAmount
+	# except IntegrityError:
+	print 'aqui agora'
+	# Pega o plano no cadastro do cliente
+	p = Cadastro.objects.get(user_id=cad_user)
+	plano = p.plano
+	nome = p.first_name
+	email = p.email
+	print plano, nome, email
+	
+	# Pega o plano comprado
+	d = Retorno.objects.get(code=id_pagseguro)
+	plano_id = d.id_plano
+	code = d.code
+	reference = d.reference
+	data = d.date
+	nome = d.name
+	email_C = d.email
+	phone = d.phone
+	valor_R = d.grossAmount + d.extraAmount
+	print plano_id, code, reference, data, nome, email_C, phone, valor_R
 
 
-		b = PlanoCliente.objects.get(cliente_id=user)
+	b = PlanoCliente.objects.get(cliente_id=cad_user)
+	b = b.plano
+	print b, plano
+	if b != plano:
+		PlanoCliente.objects.filter(plano=b).update(plano=plano)
+		b = PlanoCliente.objects.get(cliente_id=cad_user)
 		b = b.plano
 
-		if b != p:
-			PlanoCliente.objects.filter(plano=b).update(plano=plano)
-			b = PlanoCliente.objects.get(cliente_id=user)
-			b = b.plano
 
+	x = PlanoCliente.objects.get(cliente_id=cad_user)
+	id_plano = x.id
+	consultas = int(x.consultas)
 
-		x = PlanoCliente.objects.get(cliente_id=user)
-		id_plano = x.id
-		consultas = int(x.consultas)
+	z = Plano.objects.get(id=plano_id)
+	valor = int(z.valor)
+	nome_plano = z.plano
+	valor_consulta = z.valor_consulta
+	gratis = z.consultas_gratis
+	results = int(valor / valor_consulta)
 
-		z = Plano.objects.get(id=plano_id)
-		valor = int(z.valor)
-		nome_plano = z.plano
-		valor_consulta = z.valor_consulta
-		gratis = z.consultas_gratis
-		results = int(valor / valor_consulta)
+	controle = Retorno.objects.values_list('controle').filter(code=id_pagseguro)[0]
+	controle = controle[0]
 
-		controle = Retorno.objects.values_list('controle').filter(code=id_pagseguro)[0]
-		controle = controle[0]
+	if controle == 0:
 
-		if controle == 0:
+		novo_saldo = consultas + results + gratis
+		PlanoCliente.objects.filter(cliente_id=cad_user).update(consultas=novo_saldo,plano=plano_id,nome_plano=descricao)
+		Retorno.objects.filter(code=id_pagseguro).update(controle=1,consultas=results,lastEventDate=agora,status=status)
+		Cadastro.objects.filter(id=cad_user).update(plano=plano_id)
 
-			novo_saldo = consultas + results + gratis
-			PlanoCliente.objects.filter(cliente_id=user).update(consultas=novo_saldo,plano=plano_id,nome_plano=descricao)
-			Retorno.objects.filter(code=id_pagseguro).update(controle=1,consultas=results,lastEventDate=agora,status=status)
-			Cadastro.objects.filter(id=user).update(plano=plano_id)
-
-			mail.send(
-			    [email],
-			    sender=settings.DEFAULT_FROM_EMAIL,
-			    template='status_3',
-			    context={'nome': nome,'consultas': results, 'code':code,'reference':reference,'data':data,
-					    'nome':nome,'valor_R':valor_R,'nome_plano':nome_plano,'results':results,'email_C':email_C,'phone':phone},
-			)
+		mail.send(
+		    [email],
+		    sender=settings.DEFAULT_FROM_EMAIL,
+		    template='status_3',
+		    context={'nome': nome,'consultas': results, 'code':code,'reference':reference,'data':data,
+				    'nome':nome,'valor_R':valor_R,'nome_plano':nome_plano,'results':results,'email_C':email_C,'phone':phone},
+		)
 
 @task
 def procura():
