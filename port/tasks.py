@@ -7,6 +7,7 @@ from django.shortcuts import render,get_object_or_404
 from django.db import IntegrityError
 from django.http import HttpResponse
 from port.models import Portados, NaoPortados, Cadastro, Cdr, Prefixo, PlanoCliente, Plano, Retorno, Cache, CspRetorno
+from revenda.models import Comissao_revenda, Codigo_revenda
 from post_office import mail
 from pagseguro.api import PagSeguroItem, PagSeguroApi
 from django.core.exceptions import ObjectDoesNotExist
@@ -346,10 +347,19 @@ def atualiza_pago(id_pagseguro,usuario,status):
 	plano = p.plano
 	nome = p.first_name
 	email = p.email
-	print plano, nome, email
+	revenda_id = p.cod_revenda
+	cliente_id = p.id
+	login = p.login
 	
+
+	# ID da revenda
+	rev = Codigo_revenda.objects.get(revenda=revenda_id)
+	codigo_revenda = rev.revenda
+
+
 	# Pega o plano comprado
 	d = Retorno.objects.get(code=id_pagseguro)
+	retorno_id = d.id
 	plano_id = d.id_plano
 	code = d.code
 	reference = d.reference
@@ -358,7 +368,8 @@ def atualiza_pago(id_pagseguro,usuario,status):
 	email_C = d.email
 	phone = d.phone
 	valor_R = d.grossAmount + d.extraAmount
-	print plano_id, code, reference, data, nome, email_C, phone, valor_R
+	comissao = d.grossAmount / 10
+	print 'comissa e %s' %comissao
 
 
 	b = PlanoCliente.objects.get(cliente_id=cad_user)
@@ -390,6 +401,9 @@ def atualiza_pago(id_pagseguro,usuario,status):
 		PlanoCliente.objects.filter(cliente_id=cad_user).update(consultas=novo_saldo,plano=plano_id,nome_plano=descricao)
 		Retorno.objects.filter(code=id_pagseguro).update(controle=1,consultas=results,lastEventDate=agora,status=status)
 		Cadastro.objects.filter(id=cad_user).update(plano=plano_id)
+
+		# Insere a comissao
+		Comissao_revenda.objects.create(login=login,nome=nome,revenda=codigo_revenda,data_compra=data,comissao=comissao,retorno_id=retorno_id)
 
 		mail.send(
 		    [email],

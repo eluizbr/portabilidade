@@ -1,3 +1,4 @@
+{% load humanize %}
 <section class="widget widget-invoice">
     <header>
         <div class="row">
@@ -7,6 +8,7 @@
                     <tr>
                         <th class="text-align-center">Status</th>
                         <th class="text-align-center">Forma de pagamento</th>
+                        <th class="text-align-center">Data da compra</th>
                         <th class="text-align-center">Plano</th>
                         <th class="text-align-center">Valor</th>
                         <th class="text-align-center">Consultas</th>
@@ -23,9 +25,10 @@
                             <td class="text-align-center"><strong>Aguardando pagamento</strong></td>
                         {% endif %}
                             <td class="text-align-center">{{p.get_paymentMethod_display}}</td>
+                            <td class="text-align-center">{{p.date}}</td>
                             <td class="text-align-center">{{p.item}}</td>
                             <td class="text-align-center">R$ {{p.grossAmount}}</td>
-                            <td class="text-align-center">{{p.consultas}}</td>
+                            <td class="text-align-center">{{p.consultas|intcomma}}</td>
                         </tr>
                     {% endfor %}
                     </tbody>

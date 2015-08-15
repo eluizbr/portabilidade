@@ -3,8 +3,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db.models import Sum
 from post_office import mail
-from models import Codigo_revenda
+from models import Codigo_revenda, Comissao_revenda
 from port.models import Cadastro, PlanoCliente, SipBuddies, Retorno
 from forms import RevendaForm
 import uuid
@@ -181,9 +182,18 @@ def meus_clientes(request):
 	# Pega todos os clientes da revenda
 	clientes = Cadastro.objects.all().filter(cod_revenda=cod_revenda)
 
-	for c in clientes:
-		for p in c.retorno_set.all():
-			print p.reference, p.status
-
-
 	return render(request, 'meus_clientes.html', locals())
+
+@login_required
+def comissao(request):
+	user = User.objects.get(pk=request.user.id)
+	cad = Cadastro.objects.get(user_id=user)
+	cliente_id = cad.id
+	chave_cod = cad.cod_cliente
+	x = Codigo_revenda.objects.get(cliente_id=cliente_id)
+	cod_revenda = x.revenda
+	# Pega todos os clientes da revenda
+	comissao = Comissao_revenda.objects.all().filter(revenda=cod_revenda)
+	soma = Comissao_revenda.objects.filter(revenda=cod_revenda).aggregate(Sum('comissao'))['comissao__sum']
+	print soma
+	return render(request, 'comissao.html', locals())

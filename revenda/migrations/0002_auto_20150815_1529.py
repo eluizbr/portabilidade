@@ -11,9 +11,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='revenda',
-            name='cod_revenda',
-            field=models.CharField(unique=True, max_length=100, verbose_name='Codigo da Revenda'),
+        migrations.RenameField(
+            model_name='comissao_revenda',
+            old_name='Nome',
+            new_name='nome',
         ),
     ]

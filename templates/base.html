@@ -74,7 +74,7 @@
             </li>
         </ul>
         <!-- every .sidebar-nav may have a title -->
-        {% if chave_cod %}
+    {% if chave_cod %}
         <h5 class="sidebar-nav-title">Perfil <a class="action-link" href="#"><i class="glyphicon glyphicon-refresh"></i></a></h5>
         <ul class="sidebar-nav">
             <li>
@@ -120,13 +120,12 @@
 {#                     <li><a href="{% url 'revenda-dados' %}" data-no-pjax>Meus dados</a></li> #}
                     <li><a href="{% url 'meus-clientes' %}" data-no-pjax>Meus Clientes</a></li>
                     <li><a href="{% url 'criar-revenda' %}" data-no-pjax>Criar cliente</a></li>
-                    <li><a href="#" data-no-pjax>Faturas</a></li>
-                    <li><a href="#" data-no-pjax>Comissionamento</a></li>
+                    <li><a href="{% url 'comissao' %}" data-no-pjax>Comissionamento</a></li>
                 </ul>
             </li>
             {% endif %}
         </ul>
-        {% endif %}
+    {% endif %}
     </div>
 </nav>
 <!-- This is the white navigation bar seen on the top. A bit enhanced BS navbar. See .page-controls in _base.scss. -->
