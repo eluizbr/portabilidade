@@ -202,6 +202,7 @@ def pabx_info(request,id):
 
 	user = User.objects.get(pk=request.user.id)
 	cad = Cadastro.objects.get(user=id)
+	login = cad.login
 	chave = cad.chave
 	chave_cod = cad.cod_cliente
 	cod_cliente = cad.cod_cliente
