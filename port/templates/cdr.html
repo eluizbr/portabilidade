@@ -189,7 +189,24 @@
                                         </div>
                                 </div>
                             </div>
-
+                            <legend><strong>Cliente</strong></legend>
+                            {% if revenda == 1 %}
+                                <div class="form-group">
+                                    <label class="col-sm-1 control-label" for="default-select">Cliente</label>
+                                    <div class="col-sm-2">
+                                        <select
+                                                data-width="auto"
+                                                data-minimum-results-for-search="10"
+                                                tabindex="-1"
+                                                class="select2 form-control" name="cliente" id="cliente">
+                                            <option value="{{login}}">Selecione um cliente</option>
+                                        {% for cliente in cliente %}
+                                            <option>{{cliente}}</option>
+                                        {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            {% endif %}
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-sm-offset-5 col-sm-12">
@@ -257,6 +274,25 @@
     				           {% endfor %}
     				            </tbody>
     				        </table>
+                            <br>
+                            {% if usuario != request.user.username %}
+                                <div class="progress progress-xs">
+                                    <div class="progress-bar progress-bar-gray" role="progressbar" aria-valuenow="30"
+                                         aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
+                                    </div>
+                                </div>
+                                <br>
+                                <header>
+                                    <h5>
+                                        Usuário : <strong>{{usuario}}</strong>
+                                    </h5>
+                                </header>
+                                <head>
+                                    <h5>
+                                        Custo no periodo : <strong>R$ {{soma}}</strong> {{data|date:"F Y" }}
+                                    </h5>
+                                </head>
+                            {% endif %}
                             <div class="row">
                                 <div class="col-sm-offset-4 col-sm-7 ">
                                     {% bootstrap_paginate contacts centered="true" previous_label="Anterior" next_label="Proximo" range=5 %}
@@ -297,9 +333,27 @@
 <script src="{% static "vendor/backgrid-paginator/backgrid-paginator.js"%}"></script>
 <script src="{% static "vendor/datatables/media/js/jquery.dataTables.js"%}"></script>
 <script src="{% static "vendor/bootstrap-select/dist/js/bootstrap-select.min.js"%}"></script>
+<script src="{% static "vendor/bootstrap3-wysihtml5/lib/js/wysihtml5-0.3.0.min.js"%}"></script>
+<script src="{% static "vendor/bootstrap3-wysihtml5/src/bootstrap3-wysihtml5.js"%}"></script>
+<script src="{% static "vendor/select2/select2.min.js"%}"></script>
+<script src="{% static "vendor/switchery/dist/switchery.min.js"%}"></script>
+<script src="{% static "vendor/dropzone/dist/min/dropzone.min.js"%}"></script>
+<script src="{% static "vendor/markdown/lib/markdown.js"%}"></script>
+<script src="{% static "vendor/bootstrap-markdown/js/bootstrap-markdown.js"%}"></script>
+<script src="{% static "vendor/moment/min/moment.min.js"%}"></script>
+<script src="{% static "vendor/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"%}"></script>
+<script src="{% static "vendor/mjolnic-bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js"%}"></script>
 <script src="{% static "vendor/jasny-bootstrap/js/inputmask.js"%}"></script>
-<script src="{% static "vendor/jquery/dist/jquery.mask.js" %}"></script>
-<script src="{% static "vendor/jquery/dist/jquery.mask.min.js" %}"></script>
+<script src="{% static "vendor/jquery/dist/jquery.mask.js"%}"></script>
+<script src="{% static "vendor/jquery/dist/jquery.mask.min.js"%}"></script>
+<script src="{% static "vendor/jquery-autosize/jquery.autosize.min.js"%}"></script>
+<script src="{% static "vendor/seiyria-bootstrap-slider/dist/bootstrap-slider.min.js"%}"></script>
+<script src="{% static "vendor/holderjs/holder.js"%}"></script>
+
+
+
+
+<script src="{% static "js/form-elements.js"%}"></script>
 
 
 

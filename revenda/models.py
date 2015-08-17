@@ -22,3 +22,6 @@ class Comissao_revenda(models.Model):
 	comissao = models.DecimalField(blank=True, null=True, max_digits=10,decimal_places=2, default=00.00)
 	mes = models.IntegerField(blank=True, null=True, default=mes)
 	ano = models.IntegerField(blank=True, null=True, default=ano)
+
+	def __unicode__(self):
+		return unicode(self.login)

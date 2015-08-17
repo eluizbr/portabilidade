@@ -119,8 +119,8 @@
                 </a>
                 <ul id="revenda" class="collapse">
 {#                     <li><a href="{% url 'revenda-dados' %}">Meus dados</a></li> #}
+                    <li><a href="{% url 'criar-revenda' %}">Cadastrar cliente</a></li>
                     <li><a href="{% url 'meus-clientes' %}">Meus Clientes</a></li>
-                    <li><a href="{% url 'criar-revenda' %}">Criar cliente</a></li>
                     <li><a href="{% url 'comissao' %}">Comissionamento</a></li>
                 </ul>
             </li>
@@ -526,6 +526,22 @@
 <!-- page specific js -->
 <script src="{% static "js/index.js"%}"></script>
 {% block scripts %}{% endblock %}
+
+<script type="text/javascript">
+$(document).on('hidden.bs.modal', function (e) {
+    $(e.target).removeData('bs.modal');
+});
+</script>
+
+<style type="text/css">
+        .modal-content {
+        position: absolute;
+       /* padding: -20px;*/
+        width: 1100px; /* SET THE WIDTH OF THE MODAL */
+    }
+
+
+</style>
 
 <script type="text/javascript">
 

@@ -13,6 +13,7 @@ import datetime
 import random
 import decimal
 from datetime import timedelta,date,datetime
+from django.db import connection
 
 @login_required
 def criar_revenda(request):
@@ -187,7 +188,13 @@ def comissao(request):
 	cod_revenda = x.revenda
 	# Pega todos os clientes da revenda
 	comissao = Comissao_revenda.objects.all().filter(revenda=cod_revenda,mes=mes,ano=ano)
-	soma = Comissao_revenda.objects.filter(revenda=cod_revenda,mes=mes,ano=ano).aggregate(Sum('comissao'))['comissao__sum']
+	soma = comissao.aggregate(Sum('comissao'))['comissao__sum']
+
+	c = connection.cursor()
+	retorno = 'SELECT data_compra,SUM(comissao) AS comissao FROM revenda_comissao_revenda GROUP BY mes ORDER BY mes DESC'
+	retorno = c.execute(retorno)
+	retorno = c.fetchall()
+
 	
 	return render(request, 'comissao.html', locals())
 

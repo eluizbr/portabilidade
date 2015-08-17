@@ -26,7 +26,11 @@
 				    <div class="col-md-12">
 				        <section class="widget">
 				            <header>
-				                <h3>Comissão acomulada em <strong>{{today|date:"F Y" }}</strong> é de: <span class="fw-semi-bold">R$ {{soma}}</span></h3>
+				                {% if soma != None %}
+					                <h3>Comissão acomulada em <strong>{{today|date:"F Y" }}</strong> é de: <span class="fw-semi-bold">R$ {{soma}}</span></h3>
+				                {% else %}
+					                <h3>Não há comissão no mês de <strong>{{today|date:"F Y" }}</strong></h3>
+				                {% endif %}
 				            </header>
 				            <div class="widget-body">
 				                <table class="table table-striped mt-lg mb-0">
@@ -60,15 +64,17 @@
             </div>
 		</div>
 	</div>
-
+	
 	<div class="row">
+	{% if retorno != None %}	
+	{% else %}
 		<div class="col-md-12">
 		    <div class="panel-group mb-lg" id="accordion" data-toggle="collapse">
 		        <div class="panel panel-default">
 		            <div class="panel-heading">
 		                <h5 class="panel-title">
 		                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
-		                    	Fatura <strong>{{today|date:"F Y" }}</strong></span>
+		                    	<strong>Faturas anteriores</strong>
 
 		                        <i class="fa fa-angle-down pull-right"></i>
 		                    </a>
@@ -81,31 +87,23 @@
 								    <div class="col-md-12">
 				        <section class="widget">
 				            <header>
-				                <h3>Comissão em <strong>{{today|date:"F Y" }}</strong> é de: <span class="fw-semi-bold">R$ {{soma}}</span></h3>
+				                {# <h3>Comissão em <strong>{{today|date:"F Y" }}</strong> é de: <span class="fw-semi-bold">R$ {{soma}}</span></h3> #}
 				            </header>
 				            <div class="widget-body">
 				                <table class="table table-striped mt-lg mb-0">
 				                    <thead>
 				                    <tr>
-				                        <th class="text-align-center">Login</th>
-				                        <th class="text-align-center">Clinte</th>
-				                        <th class="text-align-center">Data da compra</th>
-				                        <th class="text-align-center">Comissão</th>
 				                        <th class="text-align-center">Mês</th>
-				                        <th class="text-align-center">Ano</th>
+				                        <th class="text-align-center">Comissão</th>
 				                    </tr>
 				                    </thead>
 				                    <tbody>
-				                    {% for n in comissao %}
+				                  		{% for mes,comissao in retorno %}
 					                        <tr>
-					                        	<td class="text-align-center">{{n.login}}</td>
-					                        	<td class="text-align-center">{{n.nome}}</td>
-					                        	<td class="text-align-center">{{n.data_compra}}</td>
-					                        	<td class="text-align-center">R$ {{n.comissao|intcomma}}</td>
-					                        	<td class="text-align-center">{{n.mes}}</td>
-					                        	<td class="text-align-center">{{n.ano}}</td>
+					                        	<td class="text-align-center">{{mes|date:"F Y" }}</td>
+					                        	<td class="text-align-center">R$ {{comissao|intcomma}}</td>
 					                        </tr>			                        
-				                    {% endfor %}
+				                    	{% endfor %}
 				                    </tbody>
 				                </table>
 				            </div>
@@ -117,6 +115,7 @@
 		        </div>
 			</div>
 		</div>
+	{% endif %}	
 	</div>
 
 {% endblock content %}

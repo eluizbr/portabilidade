@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseRedirect, HttpRequest
 from django.template import RequestContext
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail, BadHeaderError
 from django.contrib.auth.decorators import login_required
@@ -400,11 +400,19 @@ def meus_dados(request):
 @login_required
 def cdr(request):
 
+	hora = datetime.datetime.now()
+	hoje = hora.strftime("%Y-%m-%dT23:59:59") 
+	ontem = hora - timedelta(days=1)
+	ontem = ontem.strftime("%Y-%m-%dT00:00:00")
+
 	user = User.objects.get(pk=request.user.id)
 	cad = Cadastro.objects.get(user=user)
+	login = cad.login
 	user_id = cad.id
 	chave_cod = cad.cod_cliente
 	revenda = cad.revenda
+
+	cliente = Cadastro.objects.only('login')
 
 	numero = request.GET.get('numero', '')
 	operadora = request.GET.get('operadora', '')
@@ -413,8 +421,17 @@ def cdr(request):
 	portado = request.GET.get('portado', '')
 	tipo = request.GET.get('tipo', '')
 	rn1 = request.GET.get('rn1', '')
+	data = request.GET.get('calldate1', ontem)
+	data2 = request.GET.get('calldate2', hoje)
 
-	results = Cdr.objects.all().filter(cliente_id=cad.id)
+	if revenda == 1:
+		usuario = request.GET.get('cliente', login)
+		cad = Cadastro.objects.get(login=usuario)
+		user_id = cad.id
+		results = Cdr.objects.only().filter(cliente_id=cad.id)
+	else:
+		results = Cdr.objects.only().filter(cliente_id=cad.id)
+
 	n_numero = results.values_list('numero').distinct()
 	n_operadora = results.values_list('operadora').distinct()
 	n_cidade = results.values_list('cidade').distinct()
@@ -422,9 +439,13 @@ def cdr(request):
 	n_portado = results.values_list('portado').distinct()
 	n_tipo = results.values_list('tipo').distinct()
 	n_rn1 = results.values_list('rn1').distinct()
+	n_data = results.values_list('data').distinct()
 
 	results_v = results.filter(numero__startswith=numero,operadora__contains=operadora,cidade__contains=cidade,
-								estado__contains=estado,portado__contains=portado,tipo__contains=tipo,rn1__contains=rn1).order_by('-data_hora')
+								estado__contains=estado,portado__contains=portado,tipo__contains=tipo,rn1__contains=rn1,
+								data_hora__range=[data,data2]).order_by('-data_hora')
+
+	soma = results_v.aggregate(Sum('valor'))['valor__sum']
 
 	if request.method == 'GET':
 		results = results_v
@@ -561,14 +582,15 @@ def operadoras(request):
 
 		except EmptyPage:
 			contacts = paginator.page(paginator.num_pages)
-		
+
 		portados = Cdr.objects.values('portado').annotate(cnt=Count('portado')).order_by('portado').filter(cliente_id=id_cliente)
-		total_items = Cdr.objects.count()
+		total_items = Cdr.objects.filter(cliente_id=id_cliente).count()
 		total_items = float(total_items)
 
 		items = [
 	        {'portados': g['portado'], 'value': g['cnt'] * 100 / total_items} for g in portados
 	    ]
+
 		return render(request, 'operadoras.html', locals())
 	
 	except IndexError:
