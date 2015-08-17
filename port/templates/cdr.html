@@ -224,8 +224,11 @@
         </div>
     </div>
 
-
-    <h1 class="page-title">Portabilidade <small><small>Consulta</small></small></h1>
+    {% if usuario != request.user.username %}
+        <h3 class="page-title">Usuário consultado: <strong>{{usuario}}</strong> - Valor total no período: R$ <strong>{{soma}}</strong></h3>
+    {% else %}
+         <h3 class="page-title">Valor total no período: R$ <strong>{{soma}}</strong></h3>   
+    {% endif %}
     <div class="row">
         <div class="col-md-12">
             <section class="widget">
@@ -274,25 +277,6 @@
     				           {% endfor %}
     				            </tbody>
     				        </table>
-                            <br>
-                            {% if usuario != request.user.username %}
-                                <div class="progress progress-xs">
-                                    <div class="progress-bar progress-bar-gray" role="progressbar" aria-valuenow="30"
-                                         aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
-                                    </div>
-                                </div>
-                                <br>
-                                <header>
-                                    <h5>
-                                        Usuário : <strong>{{usuario}}</strong>
-                                    </h5>
-                                </header>
-                                <head>
-                                    <h5>
-                                        Custo no periodo : <strong>R$ {{soma}}</strong> {{data|date:"F Y" }}
-                                    </h5>
-                                </head>
-                            {% endif %}
                             <div class="row">
                                 <div class="col-sm-offset-4 col-sm-7 ">
                                     {% bootstrap_paginate contacts centered="true" previous_label="Anterior" next_label="Proximo" range=5 %}
@@ -306,8 +290,6 @@
 </div>
 
 {% endblock content %}
-
-
 
 {% block scripts %}
 
