@@ -194,8 +194,21 @@ def comissao(request):
 	retorno = 'SELECT data_compra,SUM(comissao) AS comissao FROM revenda_comissao_revenda GROUP BY mes ORDER BY mes DESC'
 	retorno = c.execute(retorno)
 	retorno = c.fetchall()
-
 	
 	return render(request, 'comissao.html', locals())
 
+@login_required
+def pabx_info(request,id):
 
+	user = User.objects.get(pk=request.user.id)
+	cad = Cadastro.objects.get(user=id)
+	chave = cad.chave
+	chave_cod = cad.cod_cliente
+	cod_cliente = cad.cod_cliente
+	revenda = cad.revenda
+
+	asterisk = SipBuddies.objects.get(cliente=cod_cliente)
+	ast_user = asterisk.name
+	ast_pass = asterisk.secret
+
+	return render(request, 'pabx_info.html', locals())

@@ -40,7 +40,7 @@
 				                        <th class="text-align-center">Consultas</th>
 				                        <th class="text-align-center">Editar usuário</th>
 				                        <th class="text-align-center">Historico de compras</th>
-				                        {# <th class="text-align-center">Nova compra</th> #}
+				                        <th class="text-align-center">PABX</th>
 				                    </tr>
 				                    </thead>
 				                    <tbody>
@@ -56,7 +56,7 @@
 									        {% endfor %}
 				                            <td class="text-align-center"> <button href="/revenda/edit-cliente/{{n.id}}" data-toggle="modal" data-target="#myModal19"  class="btn btn-inverse"><i class="fa fa-edit"></i></button></td>
 				                            <td class="text-align-center"> <button href="/revenda/info/{{n.id}}" data-toggle="modal" data-target="#myModal18"  class="btn btn-inverse"><i class="fa fa-list"></i></button></td>
-				                            {# <td class="text-align-center"> <button href="/revenda/edit-cliente/{{n.id}}" data-toggle="modal" data-target="#myModal19"  class="btn btn-inverse"><i class="fa fa-usd"></i></button></td>    #}
+				                            <td class="text-align-center"> <button href="/revenda/pabx/{{n.id}}" data-toggle="modal" data-target="#myModal20"  class="btn btn-inverse"><i class="fa fa-gear"></i></button></td>   
 				                        </tr>
 				                    {% endfor %}
 				                    </tbody>
@@ -83,6 +83,19 @@
 	</div>
 
 	<div class="modal fade" id="myModal19" tabindex="-1" role="dialog" aria-labelledby="myModalLabel19" aria-hidden="true">
+	    <div class="modal-dialog modal-lg">
+	        <div class="modal-content">
+		        <div class="row">
+		            <div class="col-md-12">
+
+		            </div>
+		        </div>
+
+	        </div>
+	    </div>
+	</div>
+
+	<div class="modal fade" id="myModal20" tabindex="-1" role="dialog" aria-labelledby="myModalLabel20" aria-hidden="true">
 	    <div class="modal-dialog modal-lg">
 	        <div class="modal-content">
 		        <div class="row">
